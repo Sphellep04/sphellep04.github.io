@@ -49,6 +49,14 @@ body { margin: 0; background: var(--bg); color: var(--ink); font: 500 16px/1.3 v
 .panel p { margin: 0; color: var(--mute); font-size: 18px; max-width: 30ch; }
 .panel .big { color: var(--ink); font: 600 28px/1.1 var(--ui); }
 .btn { margin-top: 8px; padding: 12px 28px; border-radius: 999px; background: var(--accent); color: #fff; font: 600 20px/1 var(--ui); box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35); }
+#skins { position: absolute; left: 0; right: 0; bottom: calc(34px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: none; }
+#skins .row { display: flex; gap: 10px; pointer-events: auto; }
+#skins button { position: relative; width: 44px; height: 44px; border-radius: 50%; border: 3px solid rgba(255, 255, 255, 0.25); padding: 0; cursor: pointer; color: #fff; font: 600 11px/1 var(--ui); box-shadow: 0 3px 0 rgba(0, 0, 0, 0.35); }
+#skins button[aria-pressed="true"] { border-color: #fff; transform: translateY(-2px); }
+#skins button.locked { background: #2a1d5a !important; color: var(--mute); }
+#skins button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+#skins .note { font-size: 13px; color: var(--mute); text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4); }
+@media (max-height: 460px) { #skins .note { display: none; } #skins button { width: 36px; height: 36px; } #skins { bottom: calc(30px + env(safe-area-inset-bottom, 0px)); } }
 </style>
 
 <style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #1b1147; }</style>
@@ -66,6 +74,7 @@ body { margin: 0; background: var(--bg); color: var(--ink); font: 500 16px/1.3 v
   <div class="panel" id="pReady">
     <h1>Flipside</h1>
     <p>Tap, click or press Space to flip gravity. Dodge the spikes, grab the stars.</p>
+    <p id="ghostNote" hidden>A ghost of your best run will race you.</p>
     <span class="btn">Tap to start</span>
   </div>
   <div class="panel" id="pOver" hidden>
@@ -74,6 +83,7 @@ body { margin: 0; background: var(--bg); color: var(--ink); font: 500 16px/1.3 v
     <p id="oSub">Best 0</p>
     <span class="btn">Tap to try again</span>
   </div>
+  <div id="skins" hidden><div class="row" id="skinRow" role="group" aria-label="Choose a blob skin"></div><div class="note" id="skinNote"></div></div>
   <div class="credit">Made by <a href="https://phellep.vercel.app/">Phellep Shapopi</a></div>
 </main>
 
@@ -91,6 +101,55 @@ let dist = 0, stars = 0, speed = 0, best = 0, milestone = 0;
 let obs = [], items = [], parts = [], popups = [], far = [], nextX = 0;
 let sound = window.Toybox ? Toybox.sound : true;
 const P = { y: 0, vy: 0, g: 1, ang: 0, grounded: true, sq: 0, blink: 2, eye: 0 };
+let countT = 0, goT = 0, runT = 0, recT = 0, rec = [], ghost = null, life = 0, skinId = 'bubblegum';
+
+/* ---------- zones: the look changes as you go further ---------- */
+const HEX = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+const TKEYS = ['bg0', 'bg1', 'bg2', 'w0', 'w1', 'ceil', 'floor', 'bA', 'bB', 'sA', 'sB'];
+const THEMES = [
+  { name: 'Dusk', at: 0, hue: 300, bg0: '#2a1266', bg1: '#3c1a72', bg2: '#1b1147', w0: '#0f0a2a', w1: '#241458', ceil: '#4de1ff', floor: '#ff5da2', bA: '#5ce8ff', bB: '#2a8bd6', sA: '#fff1fa', sB: '#ff5da2' },
+  { name: 'Neon', at: 250, hue: 165, bg0: '#062a3a', bg1: '#0b4a55', bg2: '#04222e', w0: '#031820', w1: '#0a3a44', ceil: '#7dffb0', floor: '#4de1ff', bA: '#b6ff6a', bB: '#2fbf7a', sA: '#eafff5', sB: '#20d6a0' },
+  { name: 'Sunset', at: 600, hue: 30, bg0: '#4a1240', bg1: '#8a2a4a', bg2: '#2a0f30', w0: '#200818', w1: '#4a1430', ceil: '#ffb347', floor: '#ff5d5d', bA: '#ffd166', bB: '#ff7a3d', sA: '#fff3e0', sB: '#ff5d5d' },
+  { name: 'Deep space', at: 1000, hue: 220, bg0: '#02030c', bg1: '#0a1030', bg2: '#010208', w0: '#000005', w1: '#0a0f30', ceil: '#a99bff', floor: '#ffffff', bA: '#c9b8ff', bB: '#5b6bd6', sA: '#ffffff', sB: '#7c8cff' }
+];
+const mkTheme = (t) => { const o = { hue: t.hue }; for (const k of TKEYS) o[k] = HEX(t[k]); return o; };
+const TH = THEMES.map(mkTheme), cur = mkTheme(THEMES[0]); let zone = 0;
+const rgb = (a) => 'rgb(' + (a[0] | 0) + ',' + (a[1] | 0) + ',' + (a[2] | 0) + ')';
+const rgba = (a, al) => 'rgba(' + (a[0] | 0) + ',' + (a[1] | 0) + ',' + (a[2] | 0) + ',' + al + ')';
+function blendTheme(dt) { const t = TH[zone], k = Math.min(1, dt * 1.6); for (const key of TKEYS) for (let i = 0; i < 3; i++) cur[key][i] += (t[key][i] - cur[key][i]) * k; cur.hue += (t.hue - cur.hue) * k; }
+
+/* ---------- blob skins, unlocked with stars you collect over all your runs ---------- */
+const SKINS = [
+  { id: 'bubblegum', name: 'Bubblegum', cost: 0, g: ['#ffb3d6', '#ff5da2', '#c93a7f'], glow: 'rgba(255,93,162,0.6)', trail: '255,150,210' },
+  { id: 'mint', name: 'Mint', cost: 20, g: ['#d8fff0', '#3ddc97', '#1a8f63'], glow: 'rgba(61,220,151,0.6)', trail: '140,255,200' },
+  { id: 'sunny', name: 'Sunny', cost: 60, g: ['#fff2b0', '#ffc93d', '#d98a00'], glow: 'rgba(255,201,61,0.6)', trail: '255,225,120' },
+  { id: 'ghost', name: 'Ghost', cost: 120, g: ['#ffffff', '#cfd6ff', '#8f9ad6'], glow: 'rgba(207,214,255,0.7)', trail: '220,225,255' },
+  { id: 'galaxy', name: 'Galaxy', cost: 250, g: ['#c9b8ff', '#6a4bd6', '#2a1a80'], glow: 'rgba(140,110,255,0.7)', trail: '180,150,255', dots: true }
+];
+const skin = () => SKINS.find((k) => k.id === skinId) || SKINS[0];
+try { life = +(localStorage.getItem('flipside.stars') || 0) || 0; const sid = localStorage.getItem('flipside.skin'); if (sid) skinId = sid; } catch (e) {}
+if (!SKINS.some((k) => k.id === skinId && k.cost <= life)) skinId = 'bubblegum';
+try { const gj = JSON.parse(localStorage.getItem('flipside.ghost') || 'null'); if (gj && Array.isArray(gj.y) && gj.y.length > 4 && +gj.d > 0) ghost = gj; } catch (e) {}
+const saveLife = (n) => { try { localStorage.setItem('flipside.stars', String(n)); } catch (e) {} };
+function renderSkins() {
+  const row = $('skinRow'); row.innerHTML = '';
+  for (const k of SKINS) {
+    const b = document.createElement('button'), open = k.cost <= life; b.type = 'button';
+    b.style.background = 'radial-gradient(circle at 35% 30%, ' + k.g[0] + ', ' + k.g[1] + ' 55%, ' + k.g[2] + ')';
+    b.setAttribute('aria-pressed', String(open && k.id === skinId));
+    b.setAttribute('aria-label', open ? k.name + ' skin' : k.name + ' skin, locked, needs ' + k.cost + ' stars');
+    if (!open) { b.classList.add('locked'); b.textContent = k.cost + '\u2605'; }
+    b.addEventListener('click', () => {
+      if (!open) { if (window.Toybox) Toybox.toast('Collect ' + (k.cost - life) + ' more stars to unlock ' + k.name); return; }
+      skinId = k.id; try { localStorage.setItem('flipside.skin', skinId); } catch (e) {} tone(660, 880, 0.08, 'triangle', 0.18); renderSkins();
+    });
+    row.appendChild(b);
+  }
+  const next = SKINS.find((k) => k.cost > life);
+  $('skinNote').textContent = next ? '\u2605 ' + life + ' collected. Next skin at ' + next.cost + '.' : '\u2605 ' + life + ' collected. Every skin unlocked!';
+  $('skins').hidden = !(state === 'ready' || state === 'dead');
+  $('ghostNote').hidden = !ghost;
+}
 try { best = +(localStorage.getItem(KEY) || 0) || 0; } catch (e) {}
 
 /* ---------- audio ---------- */
@@ -127,11 +186,11 @@ const surface = (dir) => (dir > 0 ? floorY - pr : ceilY + pr);
 
 /* ---------- game flow ---------- */
 function reset() {
-  obs = []; items = []; parts = []; popups = []; dist = 0; stars = 0; milestone = 0; speed = U * 0.62; nextX = W * 0.9 + 400; over = 0; shake = 0;
+  obs = []; items = []; parts = []; popups = []; dist = 0; stars = 0; milestone = 0; zone = 0; speed = U * 0.62; nextX = W * 0.9 + 400; over = 0; shake = 0;
   P.g = 1; P.y = surface(1); P.vy = 0; P.ang = 0; P.grounded = true; P.sq = 0;
   spawnAhead();
 }
-function start() { audio(); if (ac && ac.state === 'suspended') ac.resume(); reset(); state = 'play'; $('pReady').hidden = true; $('pOver').hidden = true; }
+function start() { audio(); if (ac && ac.state === 'suspended') ac.resume(); reset(); state = 'count'; countT = 0; goT = 0; runT = 0; recT = 0; rec = []; $('pReady').hidden = true; $('pOver').hidden = true; $('skins').hidden = true; tone(392, 392, 0.14, 'triangle', 0.2); }
 function flip() {
   if (state === 'ready' || (state === 'dead' && over > 0.45)) { start(); return; }
   if (state !== 'play') return;
@@ -141,7 +200,8 @@ function flip() {
 function die() {
   state = 'dead'; over = 0; shake = (window.Toybox && Toybox.reduced) ? 0 : 14; sDie();
   for (let i = 0; i < 26; i++) { const a = rnd() * TAU, s = 80 + rnd() * 420; parts.push({ x: px(), y: P.y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, t: 0, life: 0.9 + rnd() * 0.5, r: 3 + rnd() * 6, c: rnd() < 0.7 ? '#ff5da2' : '#ffd0ea', grav: 900 }); }
-  const m = Math.floor(dist / U * 10) + stars * 10; if (window.Toybox) Toybox.setResult('Flipside', m); let nb = false; if (m > best) { best = m; nb = true; try { localStorage.setItem(KEY, String(best)); } catch (e) {} }
+  const m = Math.floor(dist / U * 10) + stars * 10; if (window.Toybox) Toybox.setResult('Flipside', m); let nb = false; if (m > best) { best = m; nb = true; try { localStorage.setItem(KEY, String(best)); } catch (e) {} if (rec.length > 4) { ghost = { d: Math.floor(dist / U * 10), y: rec.slice(0, 3600) }; try { localStorage.setItem('flipside.ghost', JSON.stringify(ghost)); } catch (e) {} } }
+  life += stars; saveLife(life); renderSkins();
   $('oScore').textContent = m + ' pts'; $('oSub').textContent = nb ? 'New best!' : 'Best ' + best; $('pOver').hidden = false;
 }
 const px = () => W * 0.22;
@@ -182,9 +242,15 @@ function hitObstacle(o) {
 
 /* ---------- update ---------- */
 function update(dt) {
-  time += dt; over += dt; shake *= Math.pow(0.001, dt);
+  time += dt; over += dt; shake *= Math.pow(0.001, dt); blendTheme(dt); if (goT > 0) goT -= dt;
+  if (state === 'count') {
+    const prev = Math.floor(countT / 0.45); countT += dt; const b = Math.floor(countT / 0.45);
+    if (countT >= 1.35) { state = 'play'; goT = 0.5; tone(784, 1046, 0.3, 'triangle', 0.24); }
+    else if (b !== prev) tone(b === 1 ? 440 : 523, b === 1 ? 440 : 523, 0.14, 'triangle', 0.2);
+  }
   const play = state === 'play';
-  const sp = play ? U * 0.62 + Math.min(U * 0.78, dist / U * 0.009 * U) : (state === 'ready' ? U * 0.25 : 0);
+  if (play) { runT += dt; recT += dt; while (recT >= 0.05) { recT -= 0.05; rec.push(Math.round(clamp((P.y - ceilY) / ch, 0, 1) * 1000)); } }
+  const sp = play ? U * 0.62 + Math.min(U * 0.78, dist / U * 0.009 * U) : ((state === 'ready' || state === 'count') ? U * 0.25 : 0);
   speed += (sp - speed) * Math.min(1, dt * 3);
   const dx = speed * dt; if (play) dist += dx;
   far.forEach((s) => { s.x -= dx * s.z; if (s.x < -40) { s.x = W + 40; s.y = rnd(); } });
@@ -205,11 +271,13 @@ function update(dt) {
     obs = obs.filter((o) => o.x + o.w > -60); items = items.filter((it) => it.x > -60 && !it.got);
     spawnAhead();
     for (const o of obs) if (o.x < px() + pr * 2 && o.x + o.w > px() - pr * 2 && hitObstacle(o)) { die(); break; }
-    if (state === 'play') for (const it of items) if (Math.hypot(it.x - px(), it.y - P.y) < it.r + pr * 0.9) { it.got = true; stars++; sStar(); popups.push({ x: it.x, y: it.y, t: 0, s: '+10' }); for (let i = 0; i < 10; i++) { const a = rnd() * TAU; parts.push({ x: it.x, y: it.y, vx: Math.cos(a) * 200, vy: Math.sin(a) * 200, t: 0, life: 0.5, r: 3, c: '#ffd166' }); } }
+    if (state === 'play') for (const it of items) if (Math.hypot(it.x - px(), it.y - P.y) < it.r + pr * 0.9) { it.got = true; stars++; sStar(); saveLife(life + stars); for (const k of SKINS) if (k.cost > 0 && k.cost === life + stars) { popups.push({ x: W * 0.5, y: ceilY - 30, t: 0, s: k.name + ' skin unlocked!', big: true }); tone(660, 1320, 0.3, 'triangle', 0.22); } popups.push({ x: it.x, y: it.y, t: 0, s: '+10' }); for (let i = 0; i < 10; i++) { const a = rnd() * TAU; parts.push({ x: it.x, y: it.y, vx: Math.cos(a) * 200, vy: Math.sin(a) * 200, t: 0, life: 0.5, r: 3, c: '#ffd166' }); } }
     const m = Math.floor(dist / U * 10); if (m >= milestone + 100) { milestone = m - (m % 100); tone(660, 990, 0.18, 'triangle', 0.18); popups.push({ x: W * 0.5, y: ceilY - 30, t: 0, s: milestone + ' m!', big: true }); }
-    if (Math.random() < dt * 30) parts.push({ x: px() - pr, y: P.y + (rnd() - 0.5) * pr, vx: -speed * 0.5, vy: (rnd() - 0.5) * 30, t: 0, life: 0.35, r: 2 + rnd() * 2, c: 'rgba(255,150,210,0.8)' });
+    let z = 0; for (let i = THEMES.length - 1; i >= 0; i--) if (m >= THEMES[i].at) { z = i; break; }
+    if (z > zone) { zone = z; popups.push({ x: W * 0.5, y: ceilY + 46, t: 0, s: THEMES[z].name + ' zone', big: true }); tone(523, 1046, 0.35, 'triangle', 0.2); tone(659, 1318, 0.35, 'triangle', 0.16, 0.08); }
+    if (Math.random() < dt * 30) parts.push({ x: px() - pr, y: P.y + (rnd() - 0.5) * pr, vx: -speed * 0.5, vy: (rnd() - 0.5) * 30, t: 0, life: 0.35, r: 2 + rnd() * 2, c: 'rgba(' + skin().trail + ',0.8)' });
   } else if (state === 'ready') {
-    if (Math.random() < dt * 20) parts.push({ x: px() - pr, y: P.y, vx: -speed * 0.5, vy: (rnd() - 0.5) * 20, t: 0, life: 0.35, r: 2, c: 'rgba(255,150,210,0.6)' });
+    if (Math.random() < dt * 20) parts.push({ x: px() - pr, y: P.y, vx: -speed * 0.5, vy: (rnd() - 0.5) * 20, t: 0, life: 0.35, r: 2, c: 'rgba(' + skin().trail + ',0.6)' });
   }
   for (const p of parts) { p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt; if (p.grav) p.vy += p.grav * dt; }
   parts = parts.filter((p) => p.t < p.life);
@@ -222,44 +290,56 @@ function starPath(x, y, r, rot) { g.beginPath(); for (let i = 0; i < 10; i++) { 
 function draw() {
   g.setTransform(dpr, 0, 0, dpr, 0, 0);
   const sx = shake > 0.3 ? (rnd() - 0.5) * shake : 0, sy = shake > 0.3 ? (rnd() - 0.5) * shake : 0; g.translate(sx, sy);
-  const bgr = g.createLinearGradient(0, 0, 0, H); bgr.addColorStop(0, '#2a1266'); bgr.addColorStop(0.5, '#3c1a72'); bgr.addColorStop(1, '#1b1147');
+  const bgr = g.createLinearGradient(0, 0, 0, H); bgr.addColorStop(0, rgb(cur.bg0)); bgr.addColorStop(0.5, rgb(cur.bg1)); bgr.addColorStop(1, rgb(cur.bg2));
   g.fillStyle = bgr; g.fillRect(-20, -20, W + 40, H + 40);
-  for (const s of far) { g.fillStyle = 'hsla(' + (300 + s.h * 60) + ',80%,80%,' + (0.2 + s.z * 0.5) + ')'; g.beginPath(); g.arc(s.x, s.y * H, s.r * 2.2, 0, TAU); g.fill(); }
+  for (const s of far) { g.fillStyle = 'hsla(' + (cur.hue + s.h * 60) + ',80%,80%,' + (0.2 + s.z * 0.5) + ')'; g.beginPath(); g.arc(s.x, s.y * H, s.r * 2.2, 0, TAU); g.fill(); }
   // moving stripes give a sense of speed
   g.fillStyle = 'rgba(255,255,255,0.04)'; const off = (dist * 0.6) % 160;
   for (let x = -off; x < W; x += 160) { g.beginPath(); g.moveTo(x, ceilY); g.lineTo(x + 60, ceilY); g.lineTo(x + 10, floorY); g.lineTo(x - 50, floorY); g.fill(); }
   // walls
-  const wallGrad = (y0, y1) => { const q = g.createLinearGradient(0, y0, 0, y1); q.addColorStop(0, '#0f0a2a'); q.addColorStop(1, '#241458'); return q; };
+  const wallGrad = (y0, y1) => { const q = g.createLinearGradient(0, y0, 0, y1); q.addColorStop(0, rgb(cur.w0)); q.addColorStop(1, rgb(cur.w1)); return q; };
   g.fillStyle = wallGrad(0, ceilY); g.fillRect(-20, -20, W + 40, ceilY + 20);
   g.fillStyle = wallGrad(H, floorY); g.fillRect(-20, floorY, W + 40, H - floorY + 20);
-  g.fillStyle = '#4de1ff'; g.fillRect(-20, ceilY - 4, W + 40, 4); g.fillStyle = '#ff5da2'; g.fillRect(-20, floorY, W + 40, 4);
-  g.fillStyle = 'rgba(77,225,255,0.16)'; g.fillRect(-20, ceilY, W + 40, 10); g.fillStyle = 'rgba(255,93,162,0.16)'; g.fillRect(-20, floorY - 10, W + 40, 10);
+  g.fillStyle = rgb(cur.ceil); g.fillRect(-20, ceilY - 4, W + 40, 4); g.fillStyle = rgb(cur.floor); g.fillRect(-20, floorY, W + 40, 4);
+  g.fillStyle = rgba(cur.ceil, 0.16); g.fillRect(-20, ceilY, W + 40, 10); g.fillStyle = rgba(cur.floor, 0.16); g.fillRect(-20, floorY - 10, W + 40, 10);
   // obstacles
   for (const o of obs) {
     if (o.kind === 'block') {
-      const y0 = o.side > 0 ? floorY - o.h : ceilY, gr = g.createLinearGradient(o.x, 0, o.x + o.w, 0); gr.addColorStop(0, '#5ce8ff'); gr.addColorStop(1, '#2a8bd6');
+      const y0 = o.side > 0 ? floorY - o.h : ceilY, gr = g.createLinearGradient(o.x, 0, o.x + o.w, 0); gr.addColorStop(0, rgb(cur.bA)); gr.addColorStop(1, rgb(cur.bB));
       g.fillStyle = gr; g.beginPath(); g.roundRect ? g.roundRect(o.x, y0, o.w, o.h, 6) : g.rect(o.x, y0, o.w, o.h); g.fill();
       g.fillStyle = 'rgba(255,255,255,0.35)'; g.fillRect(o.x + 4, y0 + 4, 4, o.h - 8);
     } else {
       const sw = o.w / o.n, base = o.side > 0 ? floorY : ceilY, tip = o.side > 0 ? floorY - o.h : ceilY + o.h;
       for (let i = 0; i < o.n; i++) {
-        const ax = o.x + i * sw; g.fillStyle = '#fff1fa'; g.beginPath(); g.moveTo(ax, base); g.lineTo(ax + sw / 2, tip); g.lineTo(ax + sw, base); g.closePath(); g.fill();
-        g.fillStyle = '#ff5da2'; g.beginPath(); g.moveTo(ax + sw / 2, tip); g.lineTo(ax + sw, base); g.lineTo(ax + sw / 2, base); g.closePath(); g.fill();
+        const ax = o.x + i * sw; g.fillStyle = rgb(cur.sA); g.beginPath(); g.moveTo(ax, base); g.lineTo(ax + sw / 2, tip); g.lineTo(ax + sw, base); g.closePath(); g.fill();
+        g.fillStyle = rgb(cur.sB); g.beginPath(); g.moveTo(ax + sw / 2, tip); g.lineTo(ax + sw, base); g.lineTo(ax + sw / 2, base); g.closePath(); g.fill();
       }
     }
   }
   // stars
   for (const it of items) { const bob = Math.sin(time * 4 + it.ph) * 3; g.save(); g.shadowColor = 'rgba(255,209,102,0.9)'; g.shadowBlur = 14; g.fillStyle = '#ffd166'; starPath(it.x, it.y + bob, it.r, time * 1.5 + it.ph); g.fill(); g.restore(); }
   for (const p of parts) { const a = 1 - p.t / p.life; g.globalAlpha = Math.max(0, a); g.fillStyle = p.c; g.beginPath(); g.arc(p.x, p.y, p.r * (0.4 + 0.6 * a), 0, TAU); g.fill(); } g.globalAlpha = 1;
+  if (ghost && state === 'play') {
+    const gx = px() + (ghost.d - dist / U * 10) * U / 10;
+    if (gx > -10 && gx < W + 10) { g.save(); g.strokeStyle = 'rgba(255,255,255,0.55)'; g.lineWidth = 2; g.setLineDash([8, 8]); g.beginPath(); g.moveTo(gx, ceilY); g.lineTo(gx, floorY); g.stroke(); g.setLineDash([]); g.fillStyle = 'rgba(255,255,255,0.85)'; g.font = '600 14px Fredoka, sans-serif'; g.textAlign = 'center'; g.fillText('BEST ' + ghost.d + ' m', gx, ceilY + 24); g.restore(); }
+    const gi = runT / 0.05;
+    if (gi < ghost.y.length - 1) { const i0 = Math.floor(gi), f = gi - i0, gy = ceilY + (ghost.y[i0] + (ghost.y[i0 + 1] - ghost.y[i0]) * f) / 1000 * ch; g.save(); g.globalAlpha = 0.28; g.fillStyle = '#ffffff'; g.beginPath(); g.arc(px(), gy, pr, 0, TAU); g.fill(); g.globalAlpha = 0.5; g.strokeStyle = '#ffffff'; g.lineWidth = 2; g.stroke(); g.restore(); }
+  }
   if (state !== 'dead') drawPlayer();
+  if (state === 'count' || goT > 0) {
+    const isC = state === 'count', ph = isC ? (countT % 0.45) / 0.45 : 1 - goT / 0.5, rm = window.Toybox && Toybox.reduced;
+    const sc = rm ? 1 : (isC ? 1.3 - ph * 0.3 : 1 + ph * 0.5), txt = isC ? String(3 - Math.min(2, Math.floor(countT / 0.45))) : 'GO!';
+    g.save(); g.globalAlpha = isC ? 1 - ph * 0.4 : Math.max(0, 1 - ph); g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.shadowColor = 'rgba(0,0,0,0.4)'; g.shadowBlur = 0; g.shadowOffsetY = 4; g.font = '600 ' + Math.round(U * 0.2 * sc) + 'px Fredoka, sans-serif'; g.fillText(txt, W / 2, (ceilY + floorY) / 2); g.restore();
+  }
   for (const q of popups) { const a = 1 - q.t / 0.9; g.globalAlpha = a; g.fillStyle = q.big ? '#fff' : '#ffd166'; g.font = '600 ' + (q.big ? 34 : 20) + 'px Fredoka, sans-serif'; g.textAlign = 'center'; g.fillText(q.s, q.x, q.y - q.t * 40); g.globalAlpha = 1; }
 }
 function drawPlayer() {
   const x = px(), y = P.y, sq = P.sq + clamp(Math.abs(P.vy) / (ch * 4), 0, 0.18);
   g.save(); g.translate(x, y); g.rotate(P.ang);
   const stretchV = Math.abs(P.vy) > 1 ? 1 + sq : 1 - Math.abs(P.sq) * 0.6; g.scale(1 + (1 - stretchV) * 0.7, stretchV);
-  const gr = g.createRadialGradient(-pr * 0.35, -pr * 0.45, pr * 0.1, 0, 0, pr * 1.1); gr.addColorStop(0, '#ffb3d6'); gr.addColorStop(0.5, '#ff5da2'); gr.addColorStop(1, '#c93a7f');
-  g.shadowColor = 'rgba(255,93,162,0.6)'; g.shadowBlur = 16; g.fillStyle = gr; g.beginPath(); g.arc(0, 0, pr, 0, TAU); g.fill(); g.shadowBlur = 0;
+  const gr = g.createRadialGradient(-pr * 0.35, -pr * 0.45, pr * 0.1, 0, 0, pr * 1.1); const sk = skin(); gr.addColorStop(0, sk.g[0]); gr.addColorStop(0.5, sk.g[1]); gr.addColorStop(1, sk.g[2]);
+  g.shadowColor = sk.glow; g.shadowBlur = 16; g.fillStyle = gr; g.beginPath(); g.arc(0, 0, pr, 0, TAU); g.fill(); g.shadowBlur = 0;
+  if (sk.dots) { g.fillStyle = 'rgba(255,255,255,0.85)'; for (const d of [[0.3, 0.5, 0.07], [-0.1, 0.6, 0.05], [0.55, 0.2, 0.05], [-0.5, 0.35, 0.06]]) { g.beginPath(); g.arc(d[0] * pr, d[1] * pr, d[2] * pr, 0, TAU); g.fill(); } }
   g.fillStyle = 'rgba(255,255,255,0.55)'; g.beginPath(); g.ellipse(-pr * 0.38, -pr * 0.42, pr * 0.22, pr * 0.14, -0.6, 0, TAU); g.fill();
   const er = pr * 0.27;
   for (const s of [-1, 1]) {
@@ -278,7 +358,8 @@ $('snd').addEventListener('click', (e) => { sound = !sound; e.currentTarget.setA
 function frame(ts) { const t = ts / 1000; let dt = t - lastT; lastT = t; if (dt > 0.05 || dt <= 0) dt = 0.016; update(dt); draw(); requestAnimationFrame(frame); }
 resize();
 if (window.ResizeObserver) new ResizeObserver(resize).observe(cv); else window.addEventListener('resize', resize);
-try { if (location.hash === '#debug') window.__fl = { state: () => state, info: () => ({ dist, stars, speed, obs: obs.length, y: P.y, g: P.g, ceilY, floorY }), obs: () => obs, step: (n) => { for (let i = 0; i < n; i++) update(1 / 60); }, flip, die, godmode: () => { hitObstacle = () => false; } }; } catch (e) {}
+try { if (location.hash === '#debug') window.__fl = { state: () => state, info: () => ({ dist, stars, speed, obs: obs.length, y: P.y, g: P.g, ceilY, floorY }), obs: () => obs, step: (n) => { for (let i = 0; i < n; i++) update(1 / 60); }, flip, die, godmode: () => { hitObstacle = () => false; }, count: () => countT, zone: () => zone, life: () => life, ghost: () => ghost, skin: () => skinId, setDist: (m) => { dist = m * U / 10; } }; } catch (e) {}
+renderSkins();
 lastT = performance.now() / 1000; requestAnimationFrame(frame);
 })();
 </script>
