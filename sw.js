@@ -1,0 +1,28 @@
+/* Toybox service worker: pages load from the network when online (so updates arrive) and from the cache when offline. */
+const VERSION = 'toybox-v1';
+const CORE = ["./", "toybox.js", "manifest.webmanifest", "img/toybox-64.png", "img/toybox-180.png", "img/toybox-192.png", "starlight/", "starlight/manifest.webmanifest", "starlight/img/favicon-64.png", "starlight/img/icon-192.png", "kalimba-rain/", "kalimba-rain/manifest.webmanifest", "kalimba-rain/img/favicon-64.png", "kalimba-rain/img/icon-192.png", "doodle-zoo/", "doodle-zoo/manifest.webmanifest", "doodle-zoo/img/favicon-64.png", "doodle-zoo/img/icon-192.png", "goo-lab/", "goo-lab/manifest.webmanifest", "goo-lab/img/favicon-64.png", "goo-lab/img/icon-192.png", "flipside/", "flipside/manifest.webmanifest", "flipside/img/favicon-64.png", "flipside/img/icon-192.png", "slice-party/", "slice-party/manifest.webmanifest", "slice-party/img/favicon-64.png", "slice-party/img/icon-192.png", "snake/", "snake/manifest.webmanifest", "snake/img/favicon-64.png", "snake/img/icon-192.png", "block-drop/", "block-drop/manifest.webmanifest", "block-drop/img/favicon-64.png", "block-drop/img/icon-192.png", "road-hop/", "road-hop/manifest.webmanifest", "road-hop/img/favicon-64.png", "road-hop/img/icon-192.png", "maze-munch/", "maze-munch/manifest.webmanifest", "maze-munch/img/favicon-64.png", "maze-munch/img/icon-192.png", "hangman/", "hangman/manifest.webmanifest", "hangman/img/favicon-64.png", "hangman/img/icon-192.png", "paddle-duel/", "paddle-duel/manifest.webmanifest", "paddle-duel/img/favicon-64.png", "paddle-duel/img/icon-192.png", "Kalimba/"];
+self.addEventListener('install', (e) => {
+  e.waitUntil(caches.open(VERSION).then((c) => Promise.all(CORE.map((u) => c.add(new Request(u, { cache: 'reload' })).catch(() => {})))).then(() => self.skipWaiting()));
+});
+self.addEventListener('activate', (e) => {
+  e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== VERSION).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
+});
+self.addEventListener('fetch', (e) => {
+  const req = e.request; if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  const same = url.origin === self.location.origin;
+  const font = url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com';
+  if (!same && !font) return;
+  if (req.mode === 'navigate') {
+    e.respondWith(fetch(req).then((res) => { const copy = res.clone(); caches.open(VERSION).then((c) => c.put(req, copy)); return res; }).catch(() => caches.match(req, { ignoreSearch: true }).then((r) => r || caches.match('./'))));
+    return;
+  }
+  if (font) {
+    e.respondWith(caches.match(req).then((hit) => hit || fetch(req).then((res) => { const copy = res.clone(); caches.open(VERSION).then((c) => c.put(req, copy)); return res; })));
+    return;
+  }
+  e.respondWith(caches.match(req, { ignoreSearch: true }).then((hit) => {
+    const net = fetch(req).then((res) => { if (res && res.ok) { const copy = res.clone(); caches.open(VERSION).then((c) => c.put(req, copy)); } return res; }).catch(() => hit);
+    return hit || net;
+  }));
+});

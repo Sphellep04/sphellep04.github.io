@@ -1,0 +1,25 @@
+{
+  "name": "Block Drop | Toybox",
+  "short_name": "Block Drop",
+  "description": "Stack the falling blocks, clear rows and chase a quad as the speed climbs.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0d0b1f",
+  "theme_color": "#0d0b1f",
+  "icons": [
+    {
+      "src": "img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

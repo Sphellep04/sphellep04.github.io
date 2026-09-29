@@ -1,0 +1,25 @@
+{
+  "name": "Slice Party | Toybox",
+  "short_name": "Slice Party",
+  "description": "A swipe game. Slice the candy blobs, dodge the bombs and build big combos.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b6f86",
+  "theme_color": "#0b6f86",
+  "icons": [
+    {
+      "src": "img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

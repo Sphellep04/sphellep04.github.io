@@ -63,6 +63,9 @@ body { margin: 0; background: var(--bg); color: var(--ink); font: 400 12px/1.5 v
 </style>
 
 <style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #0a1a12; }</style>
+<!-- toybox-shared -->
+<link rel="manifest" href="manifest.webmanifest">
+<script src="../toybox.js"></script>
 </head>
 <body>
 <main id="app">
@@ -91,7 +94,8 @@ R.$ = $; R.clamp = clamp; R.rnd = Math.random; R.TAU = Math.PI * 2;
 R.canvas = $('game'); R.g = R.canvas.getContext('2d');
 R.W = 1; R.H = 1; R.dpr = 1; R.state = 'ready'; R.time = 0;
 R.opts = { key: 'snake', lowerBetter: false, fmt: (n) => String(n), overHead: 'GAME OVER' };
-R.best = null; R.sound = true; R.score = 0;
+R.best = null; R.sound = window.Toybox ? Toybox.sound : true; R.score = 0;
+Object.defineProperty(R, 'reduced', { get: () => !!(window.Toybox ? Toybox.reduced : (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) });
 R.loop = null; R.onStart = null; R.onResize = null; R.onKey = null; R.onPointer = {};
 try { const v = localStorage.getItem('retro.' + R.opts.key + '.best'); if (v !== null) R.best = +v; } catch (e) {}
 
@@ -123,6 +127,7 @@ R.start = () => {
   if (R.onStart) R.onStart();
 };
 R.gameOver = (score, head) => {
+  if (window.Toybox) Toybox.setResult(document.title, score);
   if (R.state === 'over') return; R.state = 'over'; R.overAt = R.time;
   const s = score === undefined ? R.score : score; let isNew = false;
   if (R.best === null || (R.opts.lowerBetter ? s < R.best : s > R.best)) { if (s > 0 || R.opts.lowerBetter) { R.best = s; isNew = true; try { localStorage.setItem('retro.' + R.opts.key + '.best', String(s)); } catch (e) {} } }
@@ -130,7 +135,8 @@ R.gameOver = (score, head) => {
 };
 $('pReady').addEventListener('pointerdown', (e) => { e.preventDefault(); R.start(); });
 $('pOver').addEventListener('pointerdown', (e) => { e.preventDefault(); if (R.time - R.overAt > 0.5) R.start(); });
-$('snd').addEventListener('click', (e) => { R.sound = !R.sound; e.currentTarget.setAttribute('aria-pressed', String(R.sound)); e.currentTarget.textContent = R.sound ? 'SOUND ON' : 'SOUND OFF'; if (R.sound) R.audio(); });
+$('snd').addEventListener('click', (e) => { R.sound = !R.sound; e.currentTarget.setAttribute('aria-pressed', String(R.sound)); e.currentTarget.textContent = R.sound ? 'SOUND ON' : 'SOUND OFF'; if (window.Toybox) Toybox.setSound(R.sound); if (R.sound) R.audio(); });
+{ const b = $('snd'); b.setAttribute('aria-pressed', String(R.sound)); b.textContent = R.sound ? 'SOUND ON' : 'SOUND OFF'; }
 
 /* ---- on-screen buttons: R.pad([{label, key, hold, on}]) ---- */
 R.pad = (btns, touchOnly) => {
@@ -235,7 +241,7 @@ function draw() {
     }
   }
   for (const p of parts) { const a = 1 - p.t / p.life; g.globalAlpha = Math.max(0, a); g.fillStyle = p.c; g.fillRect(p.x - 2, p.y - 2, 4, 4); } g.globalAlpha = 1;
-  if (flash > 0) { g.fillStyle = 'rgba(255,80,80,' + flash + ')'; g.fillRect(0, 0, R.W, R.H); }
+  if (flash > 0) { g.fillStyle = 'rgba(255,80,80,' + (R.reduced ? flash * 0.3 : flash) + ')'; g.fillRect(0, 0, R.W, R.H); }
 }
 R.loop = (dt) => {
   if (R.state === 'play') { acc += dt; while (acc >= step && R.state === 'play') { acc -= step; tick(); } if (gold) { gold.t -= dt; if (gold.t <= 0) gold = null; } }

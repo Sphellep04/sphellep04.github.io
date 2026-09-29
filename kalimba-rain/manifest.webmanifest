@@ -1,0 +1,25 @@
+{
+  "name": "Kalimba Rain | Toybox",
+  "short_name": "Kalimba Rain",
+  "description": "A rain-and-chimes toy. Draw bars across a moonlit waterhole and falling beads of rain ring them like a kalimba.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#050d16",
+  "theme_color": "#050d16",
+  "icons": [
+    {
+      "src": "img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

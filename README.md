@@ -29,3 +29,15 @@ Each toy is a self-contained folder with its own `index.html` and `img/` folder,
 Plain HTML, CSS and JavaScript. No build step.
 
 `Kalimba/` is only a redirect so the old capital K link still works.
+
+## Shared pieces
+
+Every toy loads one shared file, `toybox.js`, and the whole site is covered by `sw.js`.
+
+| File | What it does |
+| --- | --- |
+| `toybox.js` | Shared sound and motion settings, the small menu on each toy (home, fullscreen, share, install), keeps the screen awake, blocks pull-to-refresh and double-tap zoom |
+| `sw.js` | Service worker: every toy works offline after the first visit. Change `VERSION` inside it when you want to force everyone to refresh |
+| `manifest.webmanifest` and `<toy>/manifest.webmanifest` | Lets the site and each toy be installed to a home screen |
+
+Best scores are read from the browser by the home page, so a new game only needs its own folder and a card. If it uses a custom score key, add it to the list near the top of `toybox.js`.

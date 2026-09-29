@@ -52,6 +52,9 @@ body { margin: 0; background: var(--bg); color: var(--ink); font: 500 16px/1.3 v
 </style>
 
 <style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #1b1147; }</style>
+<!-- toybox-shared -->
+<link rel="manifest" href="manifest.webmanifest">
+<script src="../toybox.js"></script>
 </head>
 <body>
 <main id="app">
@@ -86,7 +89,7 @@ let W = 1, H = 1, dpr = 1, U = 1, ceilY = 0, floorY = 0, ch = 1, pr = 16;
 let state = 'ready', time = 0, lastT = 0, over = 0, shake = 0;
 let dist = 0, stars = 0, speed = 0, best = 0, milestone = 0;
 let obs = [], items = [], parts = [], popups = [], far = [], nextX = 0;
-let sound = true;
+let sound = window.Toybox ? Toybox.sound : true;
 const P = { y: 0, vy: 0, g: 1, ang: 0, grounded: true, sq: 0, blink: 2, eye: 0 };
 try { best = +(localStorage.getItem(KEY) || 0) || 0; } catch (e) {}
 
@@ -136,9 +139,9 @@ function flip() {
   for (let i = 0; i < 6; i++) parts.push({ x: px(), y: P.y, vx: -speed * 0.3 - rnd() * 80, vy: (rnd() - 0.5) * 120, t: 0, life: 0.4, r: 2 + rnd() * 3, c: '#ffd0ea' });
 }
 function die() {
-  state = 'dead'; over = 0; shake = 14; sDie();
+  state = 'dead'; over = 0; shake = (window.Toybox && Toybox.reduced) ? 0 : 14; sDie();
   for (let i = 0; i < 26; i++) { const a = rnd() * TAU, s = 80 + rnd() * 420; parts.push({ x: px(), y: P.y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, t: 0, life: 0.9 + rnd() * 0.5, r: 3 + rnd() * 6, c: rnd() < 0.7 ? '#ff5da2' : '#ffd0ea', grav: 900 }); }
-  const m = Math.floor(dist / U * 10) + stars * 10; let nb = false; if (m > best) { best = m; nb = true; try { localStorage.setItem(KEY, String(best)); } catch (e) {} }
+  const m = Math.floor(dist / U * 10) + stars * 10; if (window.Toybox) Toybox.setResult('Flipside', m); let nb = false; if (m > best) { best = m; nb = true; try { localStorage.setItem(KEY, String(best)); } catch (e) {} }
   $('oScore').textContent = m + ' pts'; $('oSub').textContent = nb ? 'New best!' : 'Best ' + best; $('pOver').hidden = false;
 }
 const px = () => W * 0.22;
@@ -270,7 +273,8 @@ function drawPlayer() {
 /* ---------- input and loop ---------- */
 cv.addEventListener('pointerdown', (e) => { e.preventDefault(); flip(); });
 window.addEventListener('keydown', (e) => { if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'Enter') { e.preventDefault(); if (!e.repeat) flip(); } });
-$('snd').addEventListener('click', (e) => { sound = !sound; e.currentTarget.setAttribute('aria-pressed', String(sound)); e.currentTarget.textContent = sound ? 'Sound on' : 'Sound off'; if (sound) audio(); });
+$('snd').addEventListener('click', (e) => { sound = !sound; e.currentTarget.setAttribute('aria-pressed', String(sound)); e.currentTarget.textContent = sound ? 'Sound on' : 'Sound off'; if (window.Toybox) Toybox.setSound(sound); if (sound) audio(); });
+(function () { const b = $('snd'); b.setAttribute('aria-pressed', String(sound)); b.textContent = sound ? 'Sound on' : 'Sound off'; })();
 function frame(ts) { const t = ts / 1000; let dt = t - lastT; lastT = t; if (dt > 0.05 || dt <= 0) dt = 0.016; update(dt); draw(); requestAnimationFrame(frame); }
 resize();
 if (window.ResizeObserver) new ResizeObserver(resize).observe(cv); else window.addEventListener('resize', resize);

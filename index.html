@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en-GB">
+<html lang="en-GB" data-toybox="hub">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -57,64 +57,97 @@ h1 { margin: 0; font: 600 clamp(3rem, 12vw, 6.4rem)/0.92 var(--display); letter-
 .section-title { margin: 64px 0 0; font: 600 clamp(1.8rem, 6vw, 2.6rem)/1 var(--display); letter-spacing: -0.02em; }
 .section-note { margin: 8px 0 0; color: var(--mute); }
 .retro { margin-top: 24px; }
+.tools { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.chip, .pref { font: 500 12px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); background: rgba(8, 7, 18, 0.6); border: 1px solid var(--line); border-radius: 999px; padding: 11px 16px; min-height: 40px; cursor: pointer; }
+.chip:hover, .pref:hover { border-color: var(--ember); }
+.chip:focus-visible, .pref:focus-visible { outline: 2px solid var(--aqua); outline-offset: 2px; }
+.chip[aria-pressed="true"] { background: var(--ember); color: #1a1230; border-color: var(--ember); }
+.chip.rand { border-style: dashed; color: var(--aqua); }
+.prefs { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; color: var(--mute); font-size: 12px; }
+.pref { text-transform: none; letter-spacing: 0.02em; color: var(--mute); padding: 9px 14px; min-height: 36px; }
+.hint { flex-basis: 100%; margin: 0; }
+.best { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--aqua); }
+.card[hidden], .section-hidden { display: none !important; }
 .soon { border-style: dashed; align-items: center; justify-content: center; text-align: center; min-height: 220px; color: var(--mute); }
 .soon:hover { transform: none; border-color: var(--line); }
 footer { margin-top: 56px; color: var(--mute); font-size: 12px; }
 footer a { color: var(--ink); }
 </style>
+<link rel="manifest" href="manifest.webmanifest">
+<script src="toybox.js"></script>
 </head>
 <body>
 <main>
   <h1>Toybox</h1>
   <p class="lede">Small web toys, made just for the vibes. Open one, tap around, turn the sound up.</p>
 
-  <section class="grid" aria-label="Toys">
-    <a class="card" href="starlight/">
+    <div class="tools" role="group" aria-label="Filter toys">
+    <button class="chip" type="button" data-f="all" aria-pressed="true">All</button>
+    <button class="chip" type="button" data-f="music" aria-pressed="false">Music</button>
+    <button class="chip" type="button" data-f="playful" aria-pressed="false">Playful</button>
+    <button class="chip" type="button" data-f="games" aria-pressed="false">Games</button>
+    <button class="chip" type="button" data-f="retro" aria-pressed="false">Retro</button>
+    <button class="chip rand" type="button" id="rand">Play something random</button>
+  </div>
+  <div class="prefs" aria-label="Settings for every toy">
+    <button class="pref" type="button" id="pSound"></button>
+    <button class="pref" type="button" id="pMotion"></button>
+    <button class="pref" type="button" id="pInstall" hidden>Install Toybox</button>
+    <p class="hint" id="iosHint" hidden>To install on iPhone or iPad, tap the Share button in Safari, then Add to Home Screen.</p>
+  </div>
+<section class="grid" aria-label="Toys">
+    <a class="card" href="starlight/" data-cat="music" data-slug="starlight">
       <img src="img/starlight-preview.png" alt="A desert night sky with the Southern Cross drawn in glowing stars" width="1200" height="630">
       <div class="body">
         <h2>Starlight</h2>
         <p>A sky that plays back what you place in it. A beam sweeps around and every star it touches sings.</p>
         <span class="tags">Music · Night sky</span>
+        <span class="best" data-best="starlight" hidden></span>
       </div>
     </a>
-    <a class="card" href="kalimba-rain/">
+    <a class="card" href="kalimba-rain/" data-cat="music" data-slug="kalimba-rain">
       <img src="img/kalimba-preview.png" alt="Coloured chime bars over a moonlit waterhole with raindrops falling on them" width="1200" height="630">
       <div class="body">
         <h2>Kalimba Rain</h2>
         <p>Draw chime bars and let the rain play them. Longer bars sound lower.</p>
         <span class="tags">Music · Physics</span>
+        <span class="best" data-best="kalimba-rain" hidden></span>
       </div>
     </a>
-    <a class="card" href="doodle-zoo/">
+    <a class="card" href="doodle-zoo/" data-cat="playful" data-slug="doodle-zoo">
       <img src="img/doodle-preview.png" alt="A notebook page with hand drawn animals that have come alive and have googly eyes" width="1200" height="630">
       <div class="body">
         <h2>Doodle Zoo</h2>
         <p>Draw any creature and watch it come alive. It hops, looks at you and can be thrown across the page.</p>
         <span class="tags">Silent · Drawing</span>
+        <span class="best" data-best="doodle-zoo" hidden></span>
       </div>
     </a>
-    <a class="card" href="goo-lab/">
+    <a class="card" href="goo-lab/" data-cat="playful" data-slug="goo-lab">
       <img src="img/goo-lab-preview.png" alt="Glossy candy coloured blobs of goo with googly eyes" width="1200" height="630">
       <div class="body">
         <h2>Goo Lab</h2>
         <p>Squishy candy goo with googly eyes. Drag it, slice it, mix colours and float it in zero gravity.</p>
         <span class="tags">Playful · Silent</span>
+        <span class="best" data-best="goo-lab" hidden></span>
       </div>
     </a>
-    <a class="card" href="flipside/">
+    <a class="card" href="flipside/" data-cat="games" data-slug="flipside">
       <img src="img/flipside-preview.png" alt="A pink blob running along a neon corridor between spikes and stars" width="1200" height="630">
       <div class="body">
         <h2>Flipside</h2>
         <p>Flip gravity between the floor and the ceiling. Dodge the spikes, grab the stars, go further.</p>
         <span class="tags">Game · One tap</span>
+        <span class="best" data-best="flipside" hidden></span>
       </div>
     </a>
-    <a class="card" href="slice-party/">
+    <a class="card" href="slice-party/" data-cat="games" data-slug="slice-party">
       <img src="img/slice-party-preview.png" alt="Candy blobs being sliced in half with a combo message" width="1200" height="630">
       <div class="body">
         <h2>Slice Party</h2>
         <p>Swipe to slice the candy blobs. Dodge the bombs and build big combos.</p>
         <span class="tags">Game · Swipe</span>
+        <span class="best" data-best="slice-party" hidden></span>
       </div>
     </a>
   </section>
@@ -122,57 +155,98 @@ footer a { color: var(--ink); }
   <h2 class="section-title">Retro Corner</h2>
   <p class="section-note">Old school games, rebuilt for phones and keyboards.</p>
   <section class="grid retro" aria-label="Retro games">
-    <a class="card" href="snake/">
+    <a class="card" href="snake/" data-cat="retro games" data-slug="snake">
       <img src="img/snake-preview.png" alt="A green snake growing along a checkered board toward candy" width="1200" height="630">
       <div class="body">
         <h2>Snake</h2>
         <p>Swipe to steer, eat the candy, and grow as long as you can. Gold stars are worth a bonus.</p>
         <span class="tags">Arcade · Swipe</span>
+        <span class="best" data-best="snake" hidden></span>
       </div>
     </a>
-    <a class="card" href="block-drop/">
+    <a class="card" href="block-drop/" data-cat="retro games" data-slug="block-drop">
       <img src="img/block-drop-preview.png" alt="Falling blocks stacked in a well with the next piece shown" width="1200" height="630">
       <div class="body">
         <h2>Block Drop</h2>
         <p>Stack the falling blocks, clear rows and chase a quad as the speed climbs.</p>
         <span class="tags">Puzzle · Touch</span>
+        <span class="best" data-best="block-drop" hidden></span>
       </div>
     </a>
-    <a class="card" href="road-hop/">
+    <a class="card" href="road-hop/" data-cat="retro games" data-slug="road-hop">
       <img src="img/road-hop-preview.png" alt="A frog crossing lanes of traffic and logs on a river" width="1200" height="630">
       <div class="body">
         <h2>Road Hop</h2>
         <p>Hop across busy roads and ride logs over the river. Keep moving or the screen catches you.</p>
         <span class="tags">Arcade · Tap</span>
+        <span class="best" data-best="road-hop" hidden></span>
       </div>
     </a>
-    <a class="card" href="maze-munch/">
+    <a class="card" href="maze-munch/" data-cat="retro games" data-slug="maze-munch">
       <img src="img/maze-munch-preview.png" alt="A yellow muncher in a blue maze chased by ghosts" width="1200" height="630">
       <div class="body">
         <h2>Maze Munch</h2>
         <p>Gobble every dot in a fresh maze each level. Dodge the ghosts and grab a power pellet.</p>
         <span class="tags">Arcade · Swipe</span>
+        <span class="best" data-best="maze-munch" hidden></span>
       </div>
     </a>
-    <a class="card" href="hangman/">
+    <a class="card" href="hangman/" data-cat="retro games" data-slug="hangman">
       <img src="img/hangman-preview.png" alt="A gallows, blank letters and an on-screen keyboard" width="1200" height="630">
       <div class="body">
         <h2>Hangman</h2>
         <p>Guess the hidden word before the stick figure is finished. Animals, food, tech and Namibia.</p>
         <span class="tags">Word · Tap</span>
+        <span class="best" data-best="hangman" hidden></span>
       </div>
     </a>
-    <a class="card" href="paddle-duel/">
+    <a class="card" href="paddle-duel/" data-cat="retro games" data-slug="paddle-duel">
       <img src="img/paddle-duel-preview.png" alt="Two paddles and a ball trailing across a dark court" width="1200" height="630">
       <div class="body">
         <h2>Paddle Duel</h2>
         <p>Classic paddle and ball against the computer. Win a heart back every five points.</p>
         <span class="tags">Arcade · Drag</span>
+        <span class="best" data-best="paddle-duel" hidden></span>
       </div>
     </a>
   </section>
 
   <footer>Made by Phellep Shapopi <a href="https://phellep.vercel.app">Portfolio</a></footer>
 </main>
+<script>
+(function () {
+  var T = window.Toybox, $ = function (id) { return document.getElementById(id); };
+  var cards = [].slice.call(document.querySelectorAll('.card[data-cat]'));
+  var retroHead = [].slice.call(document.querySelectorAll('.section-title, .section-note'));
+  var retroGrid = document.querySelector('.grid.retro'), mainGrid = document.querySelector('.grid:not(.retro)');
+  /* saved bests */
+  document.querySelectorAll('[data-best]').forEach(function (el) { var v = T.best(el.getAttribute('data-best')); if (v !== null) { el.textContent = 'Your best ' + v; el.hidden = false; } });
+  /* filter chips */
+  function apply(f) {
+    var shown = 0;
+    cards.forEach(function (c) { var ok = f === 'all' || c.getAttribute('data-cat').split(' ').indexOf(f) > -1; c.hidden = !ok; if (ok) shown++; });
+    document.querySelectorAll('.chip[data-f]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-f') === f)); });
+    var retroShown = cards.some(function (c) { return !c.hidden && c.getAttribute('data-cat').indexOf('retro') > -1; });
+    var mainShown = cards.some(function (c) { return !c.hidden && c.getAttribute('data-cat').indexOf('retro') === -1; });
+    retroHead.forEach(function (n) { n.classList.toggle('section-hidden', !retroShown); });
+    retroGrid.classList.toggle('section-hidden', !retroShown); mainGrid.classList.toggle('section-hidden', !mainShown);
+    if (f !== 'all') { try { history.replaceState(null, '', '#' + f); } catch (e) {} } else { try { history.replaceState(null, '', location.pathname); } catch (e) {} }
+  }
+  document.querySelectorAll('.chip[data-f]').forEach(function (b) { b.addEventListener('click', function () { apply(b.getAttribute('data-f')); }); });
+  var h = location.hash.replace('#', ''); if (['music', 'playful', 'games', 'retro'].indexOf(h) > -1) apply(h);
+  $('rand').addEventListener('click', function () { var vis = cards.filter(function (c) { return !c.hidden; }); var c = vis[Math.floor(Math.random() * vis.length)]; if (c) location.href = c.getAttribute('href'); });
+  /* shared settings */
+  function syncSound() { var b = $('pSound'); b.textContent = 'Sound in every toy: ' + (T.sound ? 'on' : 'off'); b.setAttribute('aria-pressed', String(T.sound)); }
+  function syncMotion() { var m = T.motionMode(); $('pMotion').textContent = 'Motion: ' + (m === 'auto' ? 'automatic' : m === 'reduced' ? 'reduced' : 'full'); }
+  $('pSound').addEventListener('click', function () { T.setSound(!T.sound); syncSound(); });
+  $('pMotion').addEventListener('click', function () { var m = T.motionMode(); T.setMotion(m === 'auto' ? 'reduced' : m === 'reduced' ? 'full' : 'auto'); syncMotion(); });
+  syncSound(); syncMotion();
+  /* install */
+  function syncInstall() { $('pInstall').hidden = !(T.canInstall && !T.isStandalone()); $('iosHint').hidden = !(T.isIOS && !T.isStandalone()); }
+  $('pInstall').addEventListener('click', function () { T.install(); });
+  document.addEventListener('toybox:install-ready', syncInstall); syncInstall();
+  window.addEventListener('pageshow', function () { document.querySelectorAll('[data-best]').forEach(function (el) { var v = T.best(el.getAttribute('data-best')); if (v !== null) { el.textContent = 'Your best ' + v; el.hidden = false; } }); });
+})();
+</script>
 </body>
 </html>

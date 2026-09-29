@@ -1,0 +1,25 @@
+{
+  "name": "Goo Lab | Toybox",
+  "short_name": "Goo Lab",
+  "description": "Squishy candy goo with googly eyes. Drag it, slice it, mix colours and float it in zero gravity.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f3eeff",
+  "theme_color": "#f3eeff",
+  "icons": [
+    {
+      "src": "img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

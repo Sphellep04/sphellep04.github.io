@@ -63,6 +63,9 @@ body { margin: 0; background: var(--bg); color: var(--ink); font: 400 12px/1.5 v
 </style>
 
 <style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #0d0b1f; }</style>
+<!-- toybox-shared -->
+<link rel="manifest" href="manifest.webmanifest">
+<script src="../toybox.js"></script>
 </head>
 <body>
 <main id="app">
@@ -91,7 +94,8 @@ R.$ = $; R.clamp = clamp; R.rnd = Math.random; R.TAU = Math.PI * 2;
 R.canvas = $('game'); R.g = R.canvas.getContext('2d');
 R.W = 1; R.H = 1; R.dpr = 1; R.state = 'ready'; R.time = 0;
 R.opts = { key: 'block-drop', lowerBetter: false, fmt: (n) => String(n), overHead: 'GAME OVER' };
-R.best = null; R.sound = true; R.score = 0;
+R.best = null; R.sound = window.Toybox ? Toybox.sound : true; R.score = 0;
+Object.defineProperty(R, 'reduced', { get: () => !!(window.Toybox ? Toybox.reduced : (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) });
 R.loop = null; R.onStart = null; R.onResize = null; R.onKey = null; R.onPointer = {};
 try { const v = localStorage.getItem('retro.' + R.opts.key + '.best'); if (v !== null) R.best = +v; } catch (e) {}
 
@@ -123,6 +127,7 @@ R.start = () => {
   if (R.onStart) R.onStart();
 };
 R.gameOver = (score, head) => {
+  if (window.Toybox) Toybox.setResult(document.title, score);
   if (R.state === 'over') return; R.state = 'over'; R.overAt = R.time;
   const s = score === undefined ? R.score : score; let isNew = false;
   if (R.best === null || (R.opts.lowerBetter ? s < R.best : s > R.best)) { if (s > 0 || R.opts.lowerBetter) { R.best = s; isNew = true; try { localStorage.setItem('retro.' + R.opts.key + '.best', String(s)); } catch (e) {} } }
@@ -130,7 +135,8 @@ R.gameOver = (score, head) => {
 };
 $('pReady').addEventListener('pointerdown', (e) => { e.preventDefault(); R.start(); });
 $('pOver').addEventListener('pointerdown', (e) => { e.preventDefault(); if (R.time - R.overAt > 0.5) R.start(); });
-$('snd').addEventListener('click', (e) => { R.sound = !R.sound; e.currentTarget.setAttribute('aria-pressed', String(R.sound)); e.currentTarget.textContent = R.sound ? 'SOUND ON' : 'SOUND OFF'; if (R.sound) R.audio(); });
+$('snd').addEventListener('click', (e) => { R.sound = !R.sound; e.currentTarget.setAttribute('aria-pressed', String(R.sound)); e.currentTarget.textContent = R.sound ? 'SOUND ON' : 'SOUND OFF'; if (window.Toybox) Toybox.setSound(R.sound); if (R.sound) R.audio(); });
+{ const b = $('snd'); b.setAttribute('aria-pressed', String(R.sound)); b.textContent = R.sound ? 'SOUND ON' : 'SOUND OFF'; }
 
 /* ---- on-screen buttons: R.pad([{label, key, hold, on}]) ---- */
 R.pad = (btns, touchOnly) => {
@@ -388,7 +394,7 @@ function draw() {
   g.fillStyle = '#16153a'; for (let y = 0; y < H; y += 24) for (let x = ((y / 24) % 2) * 24; x < W; x += 48) g.fillRect(x, y, 24, 24);
   hud();
   g.save();
-  if (shake > 0.2) g.translate((rnd() - 0.5) * shake, (rnd() - 0.5) * shake);
+  if (shake > 0.2 && !R.reduced) g.translate((rnd() - 0.5) * shake, (rnd() - 0.5) * shake);
   const ww = COLS * cs, wh = ROWS * cs;
   // well frame and grid
   g.fillStyle = glow > 0 ? 'rgb(' + ((79 + 176 * glow) | 0) + ',227,255)' : '#5a58a0'; g.fillRect(wx - 5, wy - 5, ww + 10, wh + 10);

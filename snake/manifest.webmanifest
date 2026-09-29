@@ -1,0 +1,25 @@
+{
+  "name": "Snake | Toybox",
+  "short_name": "Snake",
+  "description": "Swipe to steer, eat the candy, and grow as long as you can. Gold stars are worth a bonus.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0a1a12",
+  "theme_color": "#0a1a12",
+  "icons": [
+    {
+      "src": "img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

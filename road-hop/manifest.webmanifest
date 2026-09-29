@@ -1,0 +1,25 @@
+{
+  "name": "Road Hop | Toybox",
+  "short_name": "Road Hop",
+  "description": "Hop across busy roads and ride logs over the river. Keep moving or the screen catches you.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b1a10",
+  "theme_color": "#0b1a10",
+  "icons": [
+    {
+      "src": "img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

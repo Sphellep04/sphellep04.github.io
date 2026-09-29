@@ -109,6 +109,9 @@ button.rec { color: #ff8e8e; border-color: #ff8e8e; }
 </style>
 
 <style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #04060f; }</style>
+<!-- toybox-shared -->
+<link rel="manifest" href="manifest.webmanifest">
+<script src="../toybox.js"></script>
 </head>
 <body>
 <main id="app">
@@ -362,7 +365,7 @@ function resize() {
 }
 
 /* ---------- audio ---------- */
-let actx = null, master = null, bus = null, muted = false, voices = 0, awake = false, whiteBuf = null, brownBuf = null;
+let actx = null, master = null, bus = null, muted = window.Toybox ? !Toybox.sound : false, voices = 0, awake = false, whiteBuf = null, brownBuf = null;
 
 function impulse(sec, decay) {
   const rate = actx.sampleRate, len = Math.floor(rate * sec), buf = actx.createBuffer(2, len, rate);
@@ -920,6 +923,7 @@ $('btnSound').addEventListener('click', () => {
   if (!awake) { wake(); return; }
   if (!actx) return;
   muted = !muted;
+  if (window.Toybox) Toybox.setSound(!muted);
   master.gain.setTargetAtTime(muted ? 0 : 0.9, actx.currentTime, 0.05);
   if (!muted && actx.state === 'suspended') actx.resume();
   syncSound();
