@@ -54,6 +54,9 @@ h1 { margin: 0; font: 600 clamp(3rem, 12vw, 6.4rem)/0.92 var(--display); letter-
 .card h2 { margin: 0; font: 600 1.6rem/1.1 var(--display); letter-spacing: -0.01em; }
 .card p { margin: 0; color: var(--mute); }
 .tags { margin-top: 8px; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ember); }
+.section-title { margin: 64px 0 0; font: 600 clamp(1.8rem, 6vw, 2.6rem)/1 var(--display); letter-spacing: -0.02em; }
+.section-note { margin: 8px 0 0; color: var(--mute); }
+.retro { margin-top: 24px; }
 .soon { border-style: dashed; align-items: center; justify-content: center; text-align: center; min-height: 220px; color: var(--mute); }
 .soon:hover { transform: none; border-color: var(--line); }
 footer { margin-top: 56px; color: var(--mute); font-size: 12px; }
@@ -112,6 +115,59 @@ footer a { color: var(--ink); }
         <h2>Slice Party</h2>
         <p>Swipe to slice the candy blobs. Dodge the bombs and build big combos.</p>
         <span class="tags">Game · Swipe</span>
+      </div>
+    </a>
+  </section>
+
+  <h2 class="section-title">Retro Corner</h2>
+  <p class="section-note">Old school games, rebuilt for phones and keyboards.</p>
+  <section class="grid retro" aria-label="Retro games">
+    <a class="card" href="snake/">
+      <img src="img/snake-preview.png" alt="A green snake growing along a checkered board toward candy" width="1200" height="630">
+      <div class="body">
+        <h2>Snake</h2>
+        <p>Swipe to steer, eat the candy, and grow as long as you can. Gold stars are worth a bonus.</p>
+        <span class="tags">Arcade · Swipe</span>
+      </div>
+    </a>
+    <a class="card" href="block-drop/">
+      <img src="img/block-drop-preview.png" alt="Falling blocks stacked in a well with the next piece shown" width="1200" height="630">
+      <div class="body">
+        <h2>Block Drop</h2>
+        <p>Stack the falling blocks, clear rows and chase a quad as the speed climbs.</p>
+        <span class="tags">Puzzle · Touch</span>
+      </div>
+    </a>
+    <a class="card" href="road-hop/">
+      <img src="img/road-hop-preview.png" alt="A frog crossing lanes of traffic and logs on a river" width="1200" height="630">
+      <div class="body">
+        <h2>Road Hop</h2>
+        <p>Hop across busy roads and ride logs over the river. Keep moving or the screen catches you.</p>
+        <span class="tags">Arcade · Tap</span>
+      </div>
+    </a>
+    <a class="card" href="maze-munch/">
+      <img src="img/maze-munch-preview.png" alt="A yellow muncher in a blue maze chased by ghosts" width="1200" height="630">
+      <div class="body">
+        <h2>Maze Munch</h2>
+        <p>Gobble every dot in a fresh maze each level. Dodge the ghosts and grab a power pellet.</p>
+        <span class="tags">Arcade · Swipe</span>
+      </div>
+    </a>
+    <a class="card" href="hangman/">
+      <img src="img/hangman-preview.png" alt="A gallows, blank letters and an on-screen keyboard" width="1200" height="630">
+      <div class="body">
+        <h2>Hangman</h2>
+        <p>Guess the hidden word before the stick figure is finished. Animals, food, tech and Namibia.</p>
+        <span class="tags">Word · Tap</span>
+      </div>
+    </a>
+    <a class="card" href="paddle-duel/">
+      <img src="img/paddle-duel-preview.png" alt="Two paddles and a ball trailing across a dark court" width="1200" height="630">
+      <div class="body">
+        <h2>Paddle Duel</h2>
+        <p>Classic paddle and ball against the computer. Win a heart back every five points.</p>
+        <span class="tags">Arcade · Drag</span>
       </div>
     </a>
   </section>

@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Classic paddle and ball against the computer. Win a heart back every five points.">
+<meta name="theme-color" content="#04101c">
+<title>Paddle Duel</title>
+<meta property="og:type" content="website">
+<meta property="og:title" content="Paddle Duel">
+<meta property="og:description" content="Classic paddle and ball against the computer. Win a heart back every five points.">
+<meta property="og:image" content="https://sphellep04.github.io/paddle-duel/img/preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://sphellep04.github.io/paddle-duel/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Paddle Duel">
+<meta name="twitter:description" content="Classic paddle and ball against the computer. Win a heart back every five points.">
+<meta name="twitter:image" content="https://sphellep04.github.io/paddle-duel/img/preview.png">
+<link rel="icon" type="image/png" sizes="64x64" href="img/favicon-64.png">
+<link rel="apple-touch-icon" href="img/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+<style>
+:root {
+  /* Layout: a column with a score bar on top, the playfield in the middle, optional on-screen buttons under it and a credit line at the bottom. */
+  --bg: #04101c;
+  --panel: #08203a;
+  --ink: #e6f6ff;
+  --mute: #6fa3c8;
+  --accent: #35e0ff;
+  --accent2: #0f5a7a;
+  --pix: "Press Start 2P", ui-monospace, "Courier New", monospace;
+  color-scheme: dark;
+}
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 12px/1.5 var(--pix); overflow: hidden; overscroll-behavior: none; }
+#app { position: relative; height: 100%; display: flex; flex-direction: column; background: var(--bg); max-width: 100%; }
+.hud { flex: 0 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 8px; }
+.score b { display: block; font-weight: 400; font-size: 22px; line-height: 1; font-variant-numeric: tabular-nums; color: var(--accent); text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5); }
+.score small { display: block; margin-top: 6px; font-size: 9px; color: var(--mute); }
+#snd { font: 400 10px/1 var(--pix); color: var(--ink); background: transparent; border: 2px solid var(--mute); border-radius: 0; min-height: 40px; padding: 0 12px; cursor: pointer; }
+#snd:focus-visible, .pbtn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+#stage { position: relative; flex: 1 1 auto; min-height: 0; margin: 0 12px; background: var(--panel); border: 3px solid var(--mute); box-shadow: 0 0 0 3px var(--bg), 0 0 24px rgba(0, 0, 0, 0.6) inset; overflow: hidden; }
+#stage::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, 0) 2px, rgba(0, 0, 0, 0.12) 3px); }
+#game { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+.pad { flex: 0 0 auto; display: flex; justify-content: center; align-items: center; gap: 10px; padding: 10px 12px 2px; touch-action: none; }
+.pbtn { flex: 1 1 0; max-width: 120px; min-height: 56px; font: 400 14px/1 var(--pix); color: var(--ink); background: var(--panel); border: 3px solid var(--mute); border-radius: 0; box-shadow: 0 4px 0 rgba(0, 0, 0, 0.5); cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+.pbtn:active, .pbtn.on { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5); background: var(--accent2); }
+.credit { flex: 0 0 auto; text-align: center; font-size: 8px; color: var(--mute); padding: 8px 8px calc(8px + env(safe-area-inset-bottom, 0px)); }
+.credit a { color: var(--ink); }
+.panel { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; padding: 0 20px; background: rgba(0, 0, 0, 0.62); cursor: pointer; }
+.panel h1 { margin: 0; font-weight: 400; font-size: clamp(22px, 7vw, 40px); line-height: 1.2; color: var(--accent); text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.6); }
+.panel p { margin: 0; max-width: 34ch; font-size: 10px; line-height: 1.9; color: var(--ink); }
+.panel .big { font-size: 26px; color: var(--ink); }
+.btn { margin-top: 6px; padding: 14px 20px; background: var(--accent); color: #111; font-size: 12px; box-shadow: 0 4px 0 rgba(0, 0, 0, 0.5); animation: blink 1.1s steps(2) infinite; }
+@keyframes blink { 50% { opacity: 0.55; } }
+@media (max-width: 520px) { .score b { font-size: 18px; } }
+@media (hover: hover) and (pointer: fine) { .pad.touch-only { display: none; } }
+
+</style>
+
+<style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #04101c; }</style>
+</head>
+<body>
+<main id="app">
+  <div class="hud">
+    <div class="score"><b id="sc">0</b><small id="sub">BEST 0</small></div>
+    <button id="snd" type="button" aria-pressed="true">SOUND ON</button>
+  </div>
+  <div id="stage">
+    <canvas id="game" aria-label="Paddle Duel. Drag or use arrow keys to move your paddle and beat the computer at Pong."></canvas>
+    
+    <div class="panel" id="pReady"><h1>PADDLE DUEL</h1><p>Drag to slide your paddle, or use the arrow keys or W and S. Bounce the ball past the computer. Hit it with the edge of your paddle for a sharper angle. Every miss costs a heart, and you win a heart back every 5 points.</p><span class="btn">TAP TO START</span></div>
+    <div class="panel" id="pOver" hidden><p class="big" id="oHead">GAME OVER</p><h1 id="oScore">0</h1><p id="oSub">BEST 0</p><span class="btn">TAP TO PLAY AGAIN</span></div>
+  </div>
+  <div class="pad " id="pad" hidden></div>
+  <div class="credit">Made by <a href="https://phellep.vercel.app/">Phellep Shapopi</a></div>
+</main>
+
+<script>
+
+const R = window.R = {};
+(() => {
+'use strict';
+const $ = (id) => document.getElementById(id);
+const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+R.$ = $; R.clamp = clamp; R.rnd = Math.random; R.TAU = Math.PI * 2;
+R.canvas = $('game'); R.g = R.canvas.getContext('2d');
+R.W = 1; R.H = 1; R.dpr = 1; R.state = 'ready'; R.time = 0;
+R.opts = { key: 'paddle-duel', lowerBetter: false, fmt: (n) => String(n), overHead: 'GAME OVER' };
+R.best = null; R.sound = true; R.score = 0;
+R.loop = null; R.onStart = null; R.onResize = null; R.onKey = null; R.onPointer = {};
+try { const v = localStorage.getItem('retro.' + R.opts.key + '.best'); if (v !== null) R.best = +v; } catch (e) {}
+
+/* ---- audio: tiny synth so no files are needed ---- */
+let ac = null, master = null, nbuf = null;
+R.audio = () => {
+  if (ac || !R.sound) return;
+  try { ac = new (window.AudioContext || window.webkitAudioContext)(); master = ac.createGain(); master.gain.value = 0.3; master.connect(ac.destination); nbuf = ac.createBuffer(1, ac.sampleRate * 0.6, ac.sampleRate); const d = nbuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; } catch (e) { ac = null; }
+};
+R.beep = (f, dur, type, vol, slide, delay) => {
+  if (!R.sound || !ac) return; const t = ac.currentTime + (delay || 0), o = ac.createOscillator(), gn = ac.createGain();
+  o.type = type || 'square'; o.frequency.setValueAtTime(f, t); if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(20, slide), t + dur);
+  const v = vol === undefined ? 0.15 : vol; gn.gain.setValueAtTime(v, t); gn.gain.exponentialRampToValueAtTime(0.0001, t + dur); o.connect(gn); gn.connect(master); o.start(t); o.stop(t + dur + 0.02);
+};
+R.noise = (dur, vol, cut) => {
+  if (!R.sound || !ac) return; const t = ac.currentTime, s = ac.createBufferSource(), f = ac.createBiquadFilter(), gn = ac.createGain();
+  s.buffer = nbuf; f.type = 'lowpass'; f.frequency.value = cut || 1800; gn.gain.setValueAtTime(vol === undefined ? 0.25 : vol, t); gn.gain.exponentialRampToValueAtTime(0.0001, t + dur); s.connect(f); f.connect(gn); gn.connect(master); s.start(t); s.stop(t + dur);
+};
+R.buzz = (ms) => { try { if (navigator.vibrate) navigator.vibrate(ms || 15); } catch (e) {} };
+
+/* ---- score, best, panels ---- */
+R.setScore = (n) => { R.score = n; $('sc').textContent = R.opts.fmt(n); };
+R.setSub = (t) => { $('sub').textContent = t; };
+const showBest = () => { $('sub').textContent = 'BEST ' + (R.best === null ? '-' : R.opts.fmt(R.best)); };
+R.showBest = showBest;
+R.start = () => {
+  R.audio(); if (ac && ac.state === 'suspended') ac.resume();
+  R.state = 'play'; $('pReady').hidden = true; $('pOver').hidden = true; R.setScore(0); showBest();
+  if (R.onStart) R.onStart();
+};
+R.gameOver = (score, head) => {
+  if (R.state === 'over') return; R.state = 'over'; R.overAt = R.time;
+  const s = score === undefined ? R.score : score; let isNew = false;
+  if (R.best === null || (R.opts.lowerBetter ? s < R.best : s > R.best)) { if (s > 0 || R.opts.lowerBetter) { R.best = s; isNew = true; try { localStorage.setItem('retro.' + R.opts.key + '.best', String(s)); } catch (e) {} } }
+  $('oHead').textContent = head || R.opts.overHead; $('oScore').textContent = R.opts.fmt(s); $('oSub').textContent = isNew ? 'NEW BEST!' : 'BEST ' + (R.best === null ? '-' : R.opts.fmt(R.best)); $('pOver').hidden = false; showBest();
+};
+$('pReady').addEventListener('pointerdown', (e) => { e.preventDefault(); R.start(); });
+$('pOver').addEventListener('pointerdown', (e) => { e.preventDefault(); if (R.time - R.overAt > 0.5) R.start(); });
+$('snd').addEventListener('click', (e) => { R.sound = !R.sound; e.currentTarget.setAttribute('aria-pressed', String(R.sound)); e.currentTarget.textContent = R.sound ? 'SOUND ON' : 'SOUND OFF'; if (R.sound) R.audio(); });
+
+/* ---- on-screen buttons: R.pad([{label, key, hold, on}]) ---- */
+R.pad = (btns, touchOnly) => {
+  const p = $('pad'); p.innerHTML = ''; p.hidden = !btns || !btns.length; if (touchOnly) p.classList.add('touch-only');
+  (btns || []).forEach((b) => {
+    const el = document.createElement('button'); el.type = 'button'; el.className = 'pbtn'; el.textContent = b.label; if (b.aria) el.setAttribute('aria-label', b.aria);
+    let timer = null; const fire = () => { if (R.state === 'play' || b.always) { if (b.on) b.on(); } };
+    const stop = () => { el.classList.remove('on'); clearInterval(timer); timer = null; if (b.up) b.up(); };
+    el.addEventListener('pointerdown', (e) => { e.preventDefault(); try { el.setPointerCapture(e.pointerId); } catch (err) {} el.classList.add('on'); fire(); if (b.hold) { clearInterval(timer); timer = setInterval(fire, b.hold); } });
+    el.addEventListener('pointerup', stop); el.addEventListener('pointercancel', stop); el.addEventListener('lostpointercapture', stop);
+    p.appendChild(el);
+  });
+  requestAnimationFrame(R.resize);
+};
+
+/* ---- sizing, input, loop ---- */
+R.resize = () => {
+  const c = R.canvas, r = c.getBoundingClientRect(); if (r.width < 10 || r.height < 10) return;
+  const w = Math.round(r.width), h = Math.round(r.height), d = Math.min(2, window.devicePixelRatio || 1);
+  if (w === R.W && h === R.H && d === R.dpr) return;
+  R.W = w; R.H = h; R.dpr = d; c.width = Math.round(w * d); c.height = Math.round(h * d);
+  if (R.onResize) R.onResize(w, h);
+};
+const loc = (e) => { const r = R.canvas.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+R.canvas.addEventListener('pointerdown', (e) => { e.preventDefault(); try { R.canvas.setPointerCapture(e.pointerId); } catch (err) {} R.audio(); const p = loc(e); if (R.onPointer.down) R.onPointer.down(p[0], p[1], e); });
+R.canvas.addEventListener('pointermove', (e) => { const p = loc(e); if (R.onPointer.move) R.onPointer.move(p[0], p[1], e); });
+const up = (e) => { const p = loc(e); if (R.onPointer.up) R.onPointer.up(p[0], p[1], e); };
+R.canvas.addEventListener('pointerup', up); R.canvas.addEventListener('pointercancel', up);
+window.addEventListener('keydown', (e) => {
+  if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) e.preventDefault();
+  if ((e.code === 'Space' || e.code === 'Enter') && R.state !== 'play') { if (R.state === 'ready' || R.time - R.overAt > 0.5) { R.start(); return; } }
+  if (R.onKey) R.onKey(e);
+});
+let last = 0;
+function frame(ts) {
+  const t = ts / 1000; let dt = t - last; last = t; if (dt > 0.05 || dt <= 0) dt = 0.016; R.time += dt;
+  R.g.setTransform(R.dpr, 0, 0, R.dpr, 0, 0);
+  if (R.loop) R.loop(dt);
+  requestAnimationFrame(frame);
+}
+R.run = () => { R.resize(); if (window.ResizeObserver) new ResizeObserver(R.resize).observe(R.canvas); else window.addEventListener('resize', R.resize); showBest(); last = performance.now() / 1000; requestAnimationFrame(frame); };
+R.debug = (o) => { try { if (location.hash === '#debug') window.__g = o; } catch (e) {} };
+})();
+
+(() => {
+'use strict';
+const {g, clamp, rnd, TAU} = R;
+let L = 600, Wd = 400, portrait = false, pad = { c: 200, len: 90 }, ai = { c: 200, off: 0 }, ball = { a: 0, c: 0, va: 0, vc: 0, r: 8, trail: [] }, score = 0, lives = 3, rally = 0, serveT = 0, serveDir = 1, speed = 400, parts = [], flashP = 0, flashA = 0, keyDir = 0, best = 0, msg = '';
+const TH = 12, MARG = 18;
+function dims() { portrait = R.H > R.W; L = portrait ? R.H : R.W; Wd = portrait ? R.W : R.H; pad.len = clamp(Wd * 0.24, 64, 120); ball.r = clamp(Math.min(R.W, R.H) * 0.02, 6, 10); }
+function resetBall(dir) { ball.a = L / 2; ball.c = Wd / 2; speed = Math.max(300, L * 0.5); const ang = (rnd() - 0.5) * 0.7; ball.va = dir * speed * Math.cos(ang); ball.vc = speed * Math.sin(ang); ball.trail = []; serveT = 0.9; rally = 0; }
+function reset() { dims(); score = 0; lives = 3; pad.c = Wd / 2; ai.c = Wd / 2; ai.off = 0; parts = []; resetBall(1); msg = ''; R.setScore(0); }
+function burst(a, c, col, n) { for (let i = 0; i < n; i++) { const an = rnd() * TAU, s = 60 + rnd() * 180; parts.push({ a, c, va: Math.cos(an) * s, vc: Math.sin(an) * s, t: 0, life: 0.45, col }); } }
+function hit(p, side) {
+  const rel = clamp((ball.c - p.c) / (pad.len / 2 + ball.r), -1, 1), ang = rel * 1.0;
+  rally++; speed = Math.min(L * 1.35, speed * 1.045 + 6); const dir = side === 0 ? 1 : -1;
+  ball.va = dir * speed * Math.cos(ang); ball.vc = speed * Math.sin(ang);
+  R.beep(side === 0 ? 440 : 330, 0.05, 'square', 0.1, 120); R.buzz(6); burst(ball.a, ball.c, side === 0 ? '#35e0ff' : '#ff6b9a', 8);
+  if (side === 0) flashP = 0.15; else { flashA = 0.15; ai.off = (rnd() - 0.5) * pad.len * Math.max(0.15, 0.7 - score * 0.02); }
+}
+function point(byPlayer) {
+  if (byPlayer) { score++; R.setScore(score); R.beep(660, 0.2, 'square', 0.14, 500); burst(L - 6, ball.c, '#35e0ff', 18); if (score % 5 === 0 && lives < 5) { lives++; msg = '+1 HEART'; } else msg = ''; resetBall(-1 * -1); ball.va = Math.abs(ball.va); }
+  else { lives--; R.beep(200, 0.35, 'sawtooth', 0.16, -100); R.noise(0.2, 0.2, 800); R.buzz(70); burst(6, ball.c, '#ff6b9a', 18); msg = ''; if (lives <= 0) { R.gameOver(score, 'THE COMPUTER WINS'); return; } resetBall(1); ball.va = -Math.abs(ball.va); }
+  serveT = 1.0;
+}
+function update(dt) {
+  if (keyDir) pad.c += keyDir * Wd * 0.9 * dt; pad.c = clamp(pad.c, pad.len / 2, Wd - pad.len / 2);
+  // ai
+  const aiMax = Wd * (0.42 + Math.min(0.5, score * 0.028)); let target = Wd / 2;
+  if (ball.va > 0 && serveT <= 0) target = ball.c + ai.off; else if (ball.va > 0) target = Wd / 2;
+  const d = target - ai.c; ai.c += clamp(d, -aiMax * dt, aiMax * dt); 
+  ai.c = clamp(ai.c, pad.len / 2, Wd - pad.len / 2);
+  if (serveT > 0) { serveT -= dt; return; }
+  const steps = Math.ceil(Math.hypot(ball.va, ball.vc) * dt / 6) || 1, h = dt / steps;
+  for (let i = 0; i < steps; i++) {
+    ball.trail.push([ball.a, ball.c]); if (ball.trail.length > 10) ball.trail.shift();
+    ball.a += ball.va * h; ball.c += ball.vc * h;
+    if (ball.c < ball.r) { ball.c = ball.r; ball.vc = Math.abs(ball.vc); R.beep(260, 0.03, 'triangle', 0.06); }
+    if (ball.c > Wd - ball.r) { ball.c = Wd - ball.r; ball.vc = -Math.abs(ball.vc); R.beep(260, 0.03, 'triangle', 0.06); }
+    const pa = MARG + TH + ball.r; if (ball.va < 0 && ball.a <= pa && ball.a > MARG - ball.r && Math.abs(ball.c - pad.c) <= pad.len / 2 + ball.r) { ball.a = pa; hit(pad, 0); }
+    const aa = L - MARG - TH - ball.r; if (ball.va > 0 && ball.a >= aa && ball.a < L - MARG + ball.r && Math.abs(ball.c - ai.c) <= pad.len / 2 + ball.r) { ball.a = aa; hit(ai, 1); }
+    if (ball.a < -ball.r * 2) { point(false); return; }
+    if (ball.a > L + ball.r * 2) { point(true); return; }
+  }
+}
+function rr(x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+function toS(a, c) { return portrait ? [c, L - a] : [a, c]; }
+function draw() {
+  g.fillStyle = '#04101c'; g.fillRect(0, 0, R.W, R.H);
+  g.save(); if (portrait) g.transform(0, -1, 1, 0, 0, L);
+  g.strokeStyle = 'rgba(53,224,255,0.25)'; g.lineWidth = 3; g.setLineDash([12, 14]); g.beginPath(); g.moveTo(L / 2, 0); g.lineTo(L / 2, Wd); g.stroke(); g.setLineDash([]);
+  g.strokeStyle = 'rgba(53,224,255,0.4)'; g.lineWidth = 2; g.beginPath(); g.arc(L / 2, Wd / 2, Math.min(L, Wd) * 0.12, 0, TAU); g.stroke();
+  // paddles
+  const pcol = flashP > 0 ? '#ffffff' : '#35e0ff', acol = flashA > 0 ? '#ffffff' : '#ff6b9a';
+  g.shadowColor = '#35e0ff'; g.shadowBlur = 0; g.fillStyle = pcol; rr(MARG, pad.c - pad.len / 2, TH, pad.len, 6); g.fill();
+  g.fillStyle = acol; rr(L - MARG - TH, ai.c - pad.len / 2, TH, pad.len, 6); g.fill();
+  // trail + ball
+  for (let i = 0; i < ball.trail.length; i++) { const t = ball.trail[i]; g.globalAlpha = i / ball.trail.length * 0.35; g.fillStyle = '#fff'; g.beginPath(); g.arc(t[0], t[1], ball.r * (0.4 + i / ball.trail.length * 0.5), 0, TAU); g.fill(); } g.globalAlpha = 1;
+  if (serveT <= 0 || ((R.time * 10) | 0) % 2) { g.fillStyle = '#ffffff'; g.beginPath(); g.arc(ball.a, ball.c, ball.r, 0, TAU); g.fill(); }
+  for (const p of parts) { g.globalAlpha = Math.max(0, 1 - p.t / p.life); g.fillStyle = p.col; g.fillRect(p.a - 2, p.c - 2, 4, 4); } g.globalAlpha = 1;
+  g.restore();
+  // hearts and rally in screen space
+  g.textAlign = 'center'; g.font = '11px "Press Start 2P", monospace';
+  const hx = R.W / 2, hy = portrait ? R.H - 18 - 0 : R.H - 14; g.fillStyle = '#ff6b9a'; g.fillText('♥'.repeat(lives) + '♡'.repeat(Math.max(0, 5 - lives)), hx, portrait ? R.H - 4 : R.H - 6);
+  if (rally >= 3) { g.fillStyle = 'rgba(230,246,255,0.5)'; g.font = '12px "Press Start 2P", monospace'; g.fillText('RALLY ' + rally, R.W / 2, portrait ? R.H / 2 - 24 : 30); }
+  if (msg && serveT > 0) { g.fillStyle = '#7dff7a'; g.font = '14px "Press Start 2P", monospace'; g.fillText(msg, R.W / 2, R.H / 2 - 40); }
+}
+R.loop = (dt) => {
+  dt = Math.min(dt, 0.05); flashP = Math.max(0, flashP - dt); flashA = Math.max(0, flashA - dt);
+  if (R.state === 'play') update(dt); else if (R.state === 'ready') { ai.c = Wd / 2 + Math.sin(R.time * 1.5) * Wd * 0.25; pad.c = Wd / 2 + Math.sin(R.time * 1.5 + 1) * Wd * 0.25; ball.a = L / 2 + Math.sin(R.time * 1.2) * L * 0.3; ball.c = Wd / 2 + Math.sin(R.time * 2.1) * Wd * 0.3; ball.trail = []; }
+  for (const p of parts) { p.t += dt; p.a += p.va * dt; p.c += p.vc * dt; } parts = parts.filter((p) => p.t < p.life);
+  draw();
+};
+R.onStart = reset;
+R.onResize = () => { const oc = Wd; dims(); if (R.state !== 'play') { pad.c = Wd / 2; } else { pad.c = clamp(pad.c * Wd / oc, pad.len / 2, Wd - pad.len / 2); ball.c *= Wd / oc; ball.a = Math.min(ball.a, L); } };
+const K = { ArrowUp: -1, KeyW: -1, ArrowLeft: -1, KeyA: -1, ArrowDown: 1, KeyS: 1, ArrowRight: 1, KeyD: 1 };
+let held = {};
+R.onKey = (e) => { if (K[e.code] !== undefined) { held[e.code] = e.type !== 'keyup'; } };
+window.addEventListener('keydown', (e) => { if (K[e.code] !== undefined) { held[e.code] = true; upd(); } });
+window.addEventListener('keyup', (e) => { if (K[e.code] !== undefined) { held[e.code] = false; upd(); } });
+function upd() { let d = 0; for (const k in held) if (held[k]) d += K[k]; keyDir = clamp(d, -1, 1); if (portrait) keyDir = keyDir; }
+let dragging = false, d0 = 0, p0 = 0;
+const cOf = (x, y) => portrait ? x : y;
+R.onPointer.down = (x, y) => { dragging = true; d0 = cOf(x, y); p0 = pad.c; };
+R.onPointer.move = (x, y) => { if (!dragging) return; pad.c = clamp(p0 + (cOf(x, y) - d0) * 1.15, pad.len / 2, Wd - pad.len / 2); };
+R.onPointer.up = () => { dragging = false; };
+R.debug({ info: () => ({ score, lives, rally, speed, portrait, L, Wd, state: R.state, ball: [ball.a, ball.c], pad: pad.c, ai: ai.c }), setPad: (c) => { pad.c = c; }, ball, pad });
+R.run();
+
+})();
+</script>
+</body>
+</html>

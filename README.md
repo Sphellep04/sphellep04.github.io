@@ -14,6 +14,12 @@ Each toy is a self-contained folder with its own `index.html` and `img/` folder,
 | `kalimba-rain/` | [Kalimba Rain](https://sphellep04.github.io/kalimba-rain/) | Chime bars played by falling rain |
 | `doodle-zoo/` | [Doodle Zoo](https://sphellep04.github.io/doodle-zoo/) | Drawings that come alive as bouncy creatures |
 | `goo-lab/` | [Goo Lab](https://sphellep04.github.io/goo-lab/) | Squishy candy goo you can drag, slice and mix |
+| `snake/` | [Snake](https://sphellep04.github.io/snake/) | Retro Corner: Swipe to steer, eat the candy, and grow as long as you can. Gold stars are worth a bonus. |
+| `block-drop/` | [Block Drop](https://sphellep04.github.io/block-drop/) | Retro Corner: Stack the falling blocks, clear rows and chase a quad as the speed climbs. |
+| `road-hop/` | [Road Hop](https://sphellep04.github.io/road-hop/) | Retro Corner: Hop across busy roads and ride logs over the river. Keep moving or the screen catches you. |
+| `maze-munch/` | [Maze Munch](https://sphellep04.github.io/maze-munch/) | Retro Corner: Gobble every dot in a fresh maze each level. Dodge the ghosts and grab a power pellet. |
+| `hangman/` | [Hangman](https://sphellep04.github.io/hangman/) | Retro Corner: Guess the hidden word before the stick figure is finished. Animals, food, tech and Namibia. |
+| `paddle-duel/` | [Paddle Duel](https://sphellep04.github.io/paddle-duel/) | Retro Corner: Classic paddle and ball against the computer. Win a heart back every five points. |
 
 ## Adding a toy
 
