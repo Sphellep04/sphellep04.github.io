@@ -8,8 +8,8 @@ Each toy is a self-contained folder with its own `index.html` and `img/` folder,
 
 | Folder | Toy | What it is |
 | --- | --- | --- |
-| `sand-lab/` | [Sand Lab](https://sphellep04.github.io/sand-lab/) | Falling sand with water, plants, fire and lava |
-| `shatter/` | [Shatter](https://sphellep04.github.io/shatter/) | Crack a window in the dark and watch the glass fall |
+| `flipside/` | [Flipside](https://sphellep04.github.io/flipside/) | One tap gravity-flip runner game |
+| `slice-party/` | [Slice Party](https://sphellep04.github.io/slice-party/) | Swipe to slice candy blobs, dodge bombs |
 | `starlight/` | [Starlight](https://sphellep04.github.io/starlight/) | A musical desert night sky |
 | `kalimba-rain/` | [Kalimba Rain](https://sphellep04.github.io/kalimba-rain/) | Chime bars played by falling rain |
 | `doodle-zoo/` | [Doodle Zoo](https://sphellep04.github.io/doodle-zoo/) | Drawings that come alive as bouncy creatures |
