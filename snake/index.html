@@ -42,7 +42,15 @@ body { margin: 0; background: var(--bg); color: var(--ink); font: 400 12px/1.5 v
 .score b { display: block; font-weight: 400; font-size: 22px; line-height: 1; font-variant-numeric: tabular-nums; color: var(--accent); text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5); }
 .score small { display: block; margin-top: 6px; font-size: 9px; color: var(--mute); }
 #snd { font: 400 10px/1 var(--pix); color: var(--ink); background: transparent; border: 2px solid var(--mute); border-radius: 0; min-height: 40px; padding: 0 12px; cursor: pointer; }
-#snd:focus-visible, .pbtn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+#pz { font: 400 12px/1 var(--pix); color: var(--ink); background: transparent; border: 2px solid var(--mute); border-radius: 0; min-height: 40px; min-width: 44px; padding: 0 10px; cursor: pointer; letter-spacing: -2px; }
+.hbtns { display: flex; gap: 8px; align-items: center; }
+.sbtn, .mbtn { margin-top: 2px; font: 400 10px/1 var(--pix); color: var(--ink); background: transparent; border: 2px solid var(--mute); border-radius: 0; min-height: 40px; padding: 0 14px; cursor: pointer; }
+.sbtn:hover, .mbtn:hover, #pz:hover, #snd:hover { border-color: var(--accent); }
+.panel .row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+#oScore.nb { animation: nb 0.7s ease-out 2; }
+@keyframes nb { 0% { transform: scale(1); } 40% { transform: scale(1.25); color: #fff; } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { #oScore.nb { animation: none; } }
+#pz:focus-visible, .sbtn:focus-visible, .mbtn:focus-visible, #snd:focus-visible, .pbtn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 #stage { position: relative; flex: 1 1 auto; min-height: 0; margin: 0 12px; background: var(--panel); border: 3px solid var(--mute); box-shadow: 0 0 0 3px var(--bg), 0 0 24px rgba(0, 0, 0, 0.6) inset; overflow: hidden; }
 #stage::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, 0) 2px, rgba(0, 0, 0, 0.12) 3px); }
 #game { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
@@ -71,13 +79,14 @@ body { margin: 0; background: var(--bg); color: var(--ink); font: 400 12px/1.5 v
 <main id="app">
   <div class="hud">
     <div class="score"><b id="sc">0</b><small id="sub">BEST 0</small></div>
-    <button id="snd" type="button" aria-pressed="true">SOUND ON</button>
+    <div class="hbtns"><button id="pz" type="button" aria-label="Pause" title="Pause (P)" hidden>II</button><button id="snd" type="button" aria-pressed="true">SOUND ON</button></div>
   </div>
   <div id="stage">
     <canvas id="game" aria-label="Snake. Swipe or use the arrow keys to steer the snake."></canvas>
     
-    <div class="panel" id="pReady"><h1>SNAKE</h1><p>Swipe or use the arrow keys to steer. Eat the candy, grow long, and do not hit the walls or yourself.</p><span class="btn">TAP TO START</span></div>
-    <div class="panel" id="pOver" hidden><p class="big" id="oHead">GAME OVER</p><h1 id="oScore">0</h1><p id="oSub">BEST 0</p><span class="btn">TAP TO PLAY AGAIN</span></div>
+    <div class="panel" id="pReady"><h1>SNAKE</h1><p>Swipe or use the arrow keys to steer. Eat the candy, grow long, and do not hit the walls or yourself.</p><div class="row"><button type="button" class="mbtn" hidden></button></div><span class="btn">TAP TO START</span></div>
+    <div class="panel" id="pPause" hidden><h1>PAUSED</h1><p>Tap anywhere or press P to carry on.</p><span class="btn">RESUME</span></div>
+    <div class="panel" id="pOver" hidden><p class="big" id="oHead">GAME OVER</p><h1 id="oScore">0</h1><p id="oSub">BEST 0</p><p id="oPlays"></p><div class="row"><button type="button" class="mbtn" hidden></button><button type="button" class="sbtn" id="bShare">SHARE</button></div><span class="btn">TAP TO PLAY AGAIN</span></div>
   </div>
   <div class="pad " id="pad" hidden></div>
   <div class="credit">Made by <a href="https://phellep.vercel.app/">Phellep Shapopi</a></div>
@@ -97,7 +106,24 @@ R.opts = { key: 'snake', lowerBetter: false, fmt: (n) => String(n), overHead: 'G
 R.best = null; R.sound = window.Toybox ? Toybox.sound : true; R.score = 0;
 Object.defineProperty(R, 'reduced', { get: () => !!(window.Toybox ? Toybox.reduced : (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) });
 R.loop = null; R.onStart = null; R.onResize = null; R.onKey = null; R.onPointer = {};
-try { const v = localStorage.getItem('retro.' + R.opts.key + '.best'); if (v !== null) R.best = +v; } catch (e) {}
+R.baseKey = R.opts.key; R.mode = null; R.paused = false;
+R.loadBest = () => { R.best = null; try { const v = localStorage.getItem('retro.' + R.opts.key + '.best'); if (v !== null) R.best = +v; } catch (e) {} };
+R.loadBest();
+/* modes: R.setModes([{id, label}], onChange). The first mode keeps the plain best score key so the hub still shows it. */
+R.setModes = (list, cb) => {
+  let i = 0; try { const m = localStorage.getItem('retro.' + R.baseKey + '.mode'); const k = list.findIndex((o) => o.id === m); if (k >= 0) i = k; } catch (e) {}
+  const apply = () => {
+    R.mode = list[i].id; R.opts.key = i === 0 ? R.baseKey : R.baseKey + '-' + R.mode; R.loadBest();
+    document.querySelectorAll('.mbtn').forEach((b) => { b.hidden = false; b.textContent = 'MODE: ' + list[i].label; });
+    if (R.state !== 'play') { R.showBest(); }
+    if (cb) cb(R.mode);
+  };
+  document.querySelectorAll('.mbtn').forEach((b) => {
+    b.addEventListener('pointerdown', (e) => e.stopPropagation());
+    b.addEventListener('click', (e) => { e.stopPropagation(); i = (i + 1) % list.length; try { localStorage.setItem('retro.' + R.baseKey + '.mode', R.mode = list[i].id); } catch (er) {} apply(); });
+  });
+  apply();
+};
 
 /* ---- audio: tiny synth so no files are needed ---- */
 let ac = null, master = null, nbuf = null;
@@ -123,16 +149,27 @@ const showBest = () => { $('sub').textContent = 'BEST ' + (R.best === null ? '-'
 R.showBest = showBest;
 R.start = () => {
   R.audio(); if (ac && ac.state === 'suspended') ac.resume();
-  R.state = 'play'; $('pReady').hidden = true; $('pOver').hidden = true; R.setScore(0); showBest();
+  R.state = 'play'; R.paused = false; $('pReady').hidden = true; $('pOver').hidden = true; $('pPause').hidden = true; $('pz').hidden = false; R.setScore(0); showBest();
+  try { const k = 'retro.' + R.baseKey + '.plays'; localStorage.setItem(k, String((+localStorage.getItem(k) || 0) + 1)); } catch (e) {}
   if (R.onStart) R.onStart();
 };
 R.gameOver = (score, head) => {
   if (window.Toybox) Toybox.setResult(document.title, score);
-  if (R.state === 'over') return; R.state = 'over'; R.overAt = R.time;
+  if (R.state === 'over') return; R.state = 'over'; R.overAt = R.time; R.paused = false; $('pz').hidden = true; $('pPause').hidden = true;
   const s = score === undefined ? R.score : score; let isNew = false;
   if (R.best === null || (R.opts.lowerBetter ? s < R.best : s > R.best)) { if (s > 0 || R.opts.lowerBetter) { R.best = s; isNew = true; try { localStorage.setItem('retro.' + R.opts.key + '.best', String(s)); } catch (e) {} } }
   $('oHead').textContent = head || R.opts.overHead; $('oScore').textContent = R.opts.fmt(s); $('oSub').textContent = isNew ? 'NEW BEST!' : 'BEST ' + (R.best === null ? '-' : R.opts.fmt(R.best)); $('pOver').hidden = false; showBest();
+  $('oScore').classList.toggle('nb', isNew); let n = 0; try { n = +localStorage.getItem('retro.' + R.baseKey + '.plays') || 0; } catch (e) {} $('oPlays').textContent = n ? 'GAME ' + n : '';
 };
+R.pause = () => { if (R.state !== 'play' || R.paused) return; R.paused = true; $('pPause').hidden = false; };
+R.resume = () => { if (!R.paused) return; R.paused = false; $('pPause').hidden = true; };
+$('pz').addEventListener('click', () => (R.paused ? R.resume() : R.pause()));
+$('pPause').addEventListener('pointerdown', (e) => { e.preventDefault(); R.resume(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) R.pause(); });
+window.addEventListener('blur', () => R.pause());
+$('bShare').addEventListener('pointerdown', (e) => e.stopPropagation());
+$('bShare').addEventListener('click', (e) => { e.stopPropagation(); if (window.Toybox && Toybox.share) Toybox.share(); });
+if (!(window.Toybox && Toybox.share)) $('bShare').hidden = true;
 $('pReady').addEventListener('pointerdown', (e) => { e.preventDefault(); R.start(); });
 $('pOver').addEventListener('pointerdown', (e) => { e.preventDefault(); if (R.time - R.overAt > 0.5) R.start(); });
 $('snd').addEventListener('click', (e) => { R.sound = !R.sound; e.currentTarget.setAttribute('aria-pressed', String(R.sound)); e.currentTarget.textContent = R.sound ? 'SOUND ON' : 'SOUND OFF'; if (window.Toybox) Toybox.setSound(R.sound); if (R.sound) R.audio(); });
@@ -143,7 +180,7 @@ R.pad = (btns, touchOnly) => {
   const p = $('pad'); p.innerHTML = ''; p.hidden = !btns || !btns.length; if (touchOnly) p.classList.add('touch-only');
   (btns || []).forEach((b) => {
     const el = document.createElement('button'); el.type = 'button'; el.className = 'pbtn'; el.textContent = b.label; if (b.aria) el.setAttribute('aria-label', b.aria);
-    let timer = null; const fire = () => { if (R.state === 'play' || b.always) { if (b.on) b.on(); } };
+    let timer = null; const fire = () => { if ((R.state === 'play' && !R.paused) || b.always) { if (b.on) b.on(); } };
     const stop = () => { el.classList.remove('on'); clearInterval(timer); timer = null; if (b.up) b.up(); };
     el.addEventListener('pointerdown', (e) => { e.preventDefault(); try { el.setPointerCapture(e.pointerId); } catch (err) {} el.classList.add('on'); fire(); if (b.hold) { clearInterval(timer); timer = setInterval(fire, b.hold); } });
     el.addEventListener('pointerup', stop); el.addEventListener('pointercancel', stop); el.addEventListener('lostpointercapture', stop);
@@ -166,6 +203,8 @@ R.canvas.addEventListener('pointermove', (e) => { const p = loc(e); if (R.onPoin
 const up = (e) => { const p = loc(e); if (R.onPointer.up) R.onPointer.up(p[0], p[1], e); };
 R.canvas.addEventListener('pointerup', up); R.canvas.addEventListener('pointercancel', up);
 window.addEventListener('keydown', (e) => {
+  if ((e.code === 'KeyP' || e.code === 'Escape') && R.state === 'play') { e.preventDefault(); R.paused ? R.resume() : R.pause(); return; }
+  if (R.paused) { if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); R.resume(); } return; }
   if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) e.preventDefault();
   if ((e.code === 'Space' || e.code === 'Enter') && R.state !== 'play') { if (R.state === 'ready' || R.time - R.overAt > 0.5) { R.start(); return; } }
   if (R.onKey) R.onKey(e);
@@ -174,7 +213,7 @@ let last = 0;
 function frame(ts) {
   const t = ts / 1000; let dt = t - last; last = t; if (dt > 0.05 || dt <= 0) dt = 0.016; R.time += dt;
   R.g.setTransform(R.dpr, 0, 0, R.dpr, 0, 0);
-  if (R.loop) R.loop(dt);
+  if (R.loop && !R.paused) R.loop(dt);
   requestAnimationFrame(frame);
 }
 R.run = () => { R.resize(); if (window.ResizeObserver) new ResizeObserver(R.resize).observe(R.canvas); else window.addEventListener('resize', R.resize); showBest(); last = performance.now() / 1000; requestAnimationFrame(frame); };
@@ -212,7 +251,8 @@ const CANDY = ['#ff5d8f', '#ffb627', '#3ddc97', '#35a7ff', '#a66bff', '#ff7a3d']
 
 function tick() {
   if (queue.length) dir = queue.shift();
-  const h = snake[0], nx = h[0] + dir[0], ny = h[1] + dir[1];
+  const h = snake[0]; let nx = h[0] + dir[0], ny = h[1] + dir[1];
+  if (R.mode === 'wrap') { nx = (nx + cols) % cols; ny = (ny + rows) % rows; }
   if (nx < 0 || ny < 0 || nx >= cols || ny >= rows || snake.some((s, i) => i < snake.length - 1 && s[0] === nx && s[1] === ny)) { die(); return; }
   snake.unshift([nx, ny]);
   let ate = false;
@@ -227,7 +267,7 @@ function rr(x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y
 function draw() {
   g.fillStyle = '#0f2a1c'; g.fillRect(0, 0, R.W, R.H);
   g.fillStyle = '#123322'; for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) if ((x + y) % 2 === 0) g.fillRect(ox + x * cell, oy + y * cell, cell, cell);
-  g.strokeStyle = 'rgba(125,255,122,0.35)'; g.lineWidth = 2; g.strokeRect(ox - 1, oy - 1, cols * cell + 2, rows * cell + 2);
+  g.strokeStyle = 'rgba(125,255,122,0.35)'; g.lineWidth = 2; g.setLineDash(R.mode === 'wrap' ? [8, 6] : []); g.strokeRect(ox - 1, oy - 1, cols * cell + 2, rows * cell + 2);
   if (food) { const x = ox + (food[0] + 0.5) * cell, y = oy + (food[1] + 0.5) * cell, r = cell * 0.36 + Math.sin(R.time * 6) * 1.2; g.fillStyle = CANDY[food[2]]; g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill(); g.fillStyle = 'rgba(255,255,255,0.7)'; g.beginPath(); g.arc(x - r * 0.35, y - r * 0.35, r * 0.28, 0, TAU); g.fill(); }
   if (gold) { const x = ox + (gold.x + 0.5) * cell, y = oy + (gold.y + 0.5) * cell; if (gold.t > 2 || ((R.time * 8) | 0) % 2) { g.fillStyle = '#ffd23f'; g.beginPath(); for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr2 = i % 2 ? cell * 0.2 : cell * 0.46; g.lineTo(x + Math.cos(a) * rr2, y + Math.sin(a) * rr2); } g.closePath(); g.fill(); } }
   const n = snake.length;
@@ -240,6 +280,7 @@ function draw() {
       for (const sd of [-1, 1]) { const ax = cx + ex * cell * 0.12 + px * sd * e * 1.1, ay = cy + ey * cell * 0.12 + py * sd * e * 1.1; g.fillStyle = '#fff'; g.beginPath(); g.arc(ax, ay, e * 0.85, 0, TAU); g.fill(); g.fillStyle = '#10261a'; g.beginPath(); g.arc(ax + ex * e * 0.3, ay + ey * e * 0.3, e * 0.42, 0, TAU); g.fill(); }
     }
   }
+  g.setLineDash([]);
   for (const p of parts) { const a = 1 - p.t / p.life; g.globalAlpha = Math.max(0, a); g.fillStyle = p.c; g.fillRect(p.x - 2, p.y - 2, 4, 4); } g.globalAlpha = 1;
   if (flash > 0) { g.fillStyle = 'rgba(255,80,80,' + (R.reduced ? flash * 0.3 : flash) + ')'; g.fillRect(0, 0, R.W, R.H); }
 }
@@ -256,6 +297,7 @@ R.onPointer.down = (x, y) => { sx = x; sy = y; sw = true; };
 R.onPointer.move = (x, y) => { if (!sw) return; const dx = x - sx, dy = y - sy; if (Math.hypot(dx, dy) > 22) { turn(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? DIRS.right : DIRS.left) : (dy > 0 ? DIRS.down : DIRS.up)); sx = x; sy = y; } };
 R.onPointer.up = () => { sw = false; };
 R.pad([{ label: '◀', aria: 'Left', on: () => turn(DIRS.left) }, { label: '▲', aria: 'Up', on: () => turn(DIRS.up) }, { label: '▼', aria: 'Down', on: () => turn(DIRS.down) }, { label: '▶', aria: 'Right', on: () => turn(DIRS.right) }], true);
+R.setModes([{ id: 'classic', label: 'WALLS' }, { id: 'wrap', label: 'WRAP' }]);
 R.debug({ info: () => ({ score, len: snake.length, cols, rows, state: R.state, dir }), snake: () => snake, food: () => food, turn, DIRS, tick });
 R.run();
 
