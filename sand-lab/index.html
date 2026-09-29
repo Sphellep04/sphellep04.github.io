@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="A falling sand toy. Pour sand and water, grow plants, light fires and drop lava into the sea.">
+<meta name="theme-color" content="#0e0f16">
+<title>Sand Lab</title>
+<meta property="og:type" content="website">
+<meta property="og:title" content="Sand Lab">
+<meta property="og:description" content="A falling sand toy. Pour sand and water, grow plants, light fires and drop lava into the sea.">
+<meta property="og:image" content="https://sphellep04.github.io/sand-lab/img/preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://sphellep04.github.io/sand-lab/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Sand Lab">
+<meta name="twitter:description" content="A falling sand toy. Pour sand and water, grow plants, light fires and drop lava into the sea.">
+<meta name="twitter:image" content="https://sphellep04.github.io/sand-lab/img/preview.png">
+<link rel="icon" type="image/png" sizes="64x64" href="img/favicon-64.png">
+<link rel="apple-touch-icon" href="img/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Mono:wght@400&display=swap">
+<style>
+:root {
+  /* Layout: a dark lab bench. The sand box fills the screen, a slim tray of elements sits underneath. */
+  --bg: #0e0f16;
+  --panel: #171925;
+  --line: #2a2d40;
+  --ink: #e9e6f2;
+  --mute: #8b8ca3;
+  --accent: #ffb547;
+  --ui: "Space Grotesk", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+  color-scheme: dark;
+}
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 500 15px/1.3 var(--ui); overflow: hidden; overscroll-behavior: none; }
+#app { height: 100%; display: flex; flex-direction: column; background: var(--bg); }
+.stage { position: relative; flex: 1 1 auto; min-height: 0; }
+#box { position: absolute; inset: 0; width: 100%; height: 100%; display: block; image-rendering: pixelated; touch-action: none; cursor: crosshair; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+.title { position: absolute; left: 14px; top: 10px; pointer-events: none; }
+h1 { margin: 0; font: 700 22px/1 var(--ui); letter-spacing: 0.01em; }
+.tag { margin: 4px 0 0; font: 400 12px/1.2 var(--mono); color: var(--mute); }
+.credit { position: absolute; right: 14px; top: 12px; font: 400 12px/1 var(--mono); color: var(--mute); }
+.credit a { color: var(--ink); }
+#hint { position: absolute; left: 0; right: 0; bottom: 12px; text-align: center; font: 400 13px/1.3 var(--mono); color: var(--mute); pointer-events: none; transition: opacity 0.8s; padding: 0 16px; }
+.tray { flex: 0 0 auto; background: var(--panel); border-top: 1px solid var(--line); padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 8px; }
+.row { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+button { font: 500 14px/1 var(--ui); color: var(--ink); background: #20233a; border: 1px solid var(--line); border-radius: 10px; min-height: 40px; padding: 0 12px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+button:hover { background: #292d4a; }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button[aria-pressed="true"], button[aria-checked="true"] { border-color: var(--accent); background: #2f2a3a; box-shadow: 0 0 0 1px var(--accent) inset; }
+.dot { width: 14px; height: 14px; border-radius: 50%; flex: none; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25) inset; }
+.sep { width: 1px; background: var(--line); margin: 4px 4px; }
+@media (max-width: 520px) { button { padding: 0 10px; font-size: 13px; } .credit { display: none; } }
+</style>
+
+<style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #0e0f16; }</style>
+</head>
+<body>
+<main id="app">
+  <div class="stage">
+    <canvas id="box" aria-label="A box of falling sand. Press and drag to pour the chosen material."></canvas>
+    <div class="title"><h1>Sand Lab</h1><p class="tag">pour, burn, grow</p></div>
+    <div class="credit">Made by <a href="https://phellep.vercel.app/">Phellep Shapopi</a></div>
+    <p id="hint">Pick a material, then press and drag to pour it. Try water on plants, or lava on water.</p>
+  </div>
+  <div class="tray">
+    <div class="row" id="mats" role="radiogroup" aria-label="Material"></div>
+    <div class="row">
+      <div class="row" id="sizes" role="radiogroup" aria-label="Brush size"></div>
+      <div class="sep"></div>
+      <button id="bRain" type="button" aria-pressed="false">Rain</button>
+      <button id="bPause" type="button" aria-pressed="false">Pause</button>
+      <button id="bClear" type="button">Clear</button>
+    </div>
+  </div>
+</main>
+
+<script>
+(() => {
+'use strict';
+const $ = (id) => document.getElementById(id);
+const cv = $('box'), ctx = cv.getContext('2d');
+const E = 0, SAND = 1, WATER = 2, STONE = 3, FIRE = 4, PLANT = 5, OIL = 6, SMOKE = 7, STEAM = 8, LAVA = 9;
+const MATS = [
+  { t: SAND, n: 'Sand', c: '#e2bc6c', d: 0.55 },
+  { t: WATER, n: 'Water', c: '#3684de', d: 0.55 },
+  { t: STONE, n: 'Stone', c: '#6e707a', d: 1 },
+  { t: FIRE, n: 'Fire', c: '#ff8c1e', d: 0.6 },
+  { t: PLANT, n: 'Plant', c: '#46aa50', d: 1 },
+  { t: OIL, n: 'Oil', c: '#58382a', d: 0.55 },
+  { t: LAVA, n: 'Lava', c: '#ff6414', d: 0.7 },
+  { t: E, n: 'Eraser', c: '#0e0f16', d: 1 }
+];
+const SIZES = [['S', 2], ['M', 5], ['L', 9]];
+let W = 2, H = 2, cs = 4;
+let type = new Uint8Array(4), life = new Uint8Array(4), shade = new Uint8Array(4), moved = new Uint8Array(4);
+let img = null, px = null;
+let sel = 0, sizeIdx = 1, paused = false, rain = false, stamp = 0, frameN = 0, hintT = 0, touched = false;
+const ptr = { x: 0, y: 0, px: -1, py: -1, down: false };
+const rnd = Math.random;
+
+/* ---------- grid ---------- */
+function alloc(w, h) {
+  const nt = new Uint8Array(w * h), nl = new Uint8Array(w * h), ns = new Uint8Array(w * h);
+  // keep what fits, anchored to the bottom left
+  const cw = Math.min(w, W), ch = Math.min(h, H);
+  for (let y = 0; y < ch; y++) for (let x = 0; x < cw; x++) {
+    const a = (H - 1 - y) * W + x, b = (h - 1 - y) * w + x;
+    nt[b] = type[a]; nl[b] = life[a]; ns[b] = shade[a];
+  }
+  type = nt; life = nl; shade = ns; moved = new Uint8Array(w * h); W = w; H = h;
+  cv.width = w; cv.height = h; img = ctx.createImageData(w, h); px = new Uint32Array(img.data.buffer);
+}
+function resize() {
+  const r = cv.getBoundingClientRect();
+  if (r.width < 10 || r.height < 10) return;
+  cs = Math.max(3, Math.min(5, Math.round(Math.min(r.width, r.height) / 110)));
+  const w = Math.max(20, Math.round(r.width / cs)), h = Math.max(20, Math.round(r.height / cs));
+  if (w !== W || h !== H) alloc(w, h);
+}
+
+/* ---------- simulation ---------- */
+function swap(i, j) {
+  const t = type[i], l = life[i], s = shade[i];
+  type[i] = type[j]; life[i] = life[j]; shade[i] = shade[j];
+  type[j] = t; life[j] = l; shade[j] = s;
+  moved[i] = stamp; moved[j] = stamp;
+}
+const sinkable = (t) => t === E || t === WATER || t === OIL || t === SMOKE || t === STEAM;
+const lightLiquidGap = (t) => t === E || t === SMOKE || t === STEAM;
+function put(i, t, l) { type[i] = t; life[i] = l; shade[i] = (rnd() * 256) | 0; moved[i] = stamp; }
+
+function flow(i, x, y, reach, into) {
+  // water and oil: fall, slide down diagonally, then spread sideways
+  const below = i + W;
+  if (y < H - 1) {
+    if (into(type[below])) { swap(i, below); return; }
+    const a = rnd() < 0.5 ? -1 : 1;
+    for (let k = 0; k < 2; k++) {
+      const dx = k ? -a : a, nx = x + dx;
+      if (nx >= 0 && nx < W && into(type[below + dx]) && type[i + dx] === E) { swap(i, below + dx); return; }
+    }
+  }
+  const d = rnd() < 0.5 ? -1 : 1;
+  for (let s = 1; s <= reach; s++) {
+    const nx = x + d * s;
+    if (nx < 0 || nx >= W || type[i + d * s] !== E) { if (s > 1) swap(i, i + d * (s - 1)); return; }
+  }
+  swap(i, i + d * reach);
+}
+
+function rise(i, x, y) {
+  if (y === 0) return false;
+  const up = i - W;
+  if (type[up] === E) { swap(i, up); return true; }
+  const a = rnd() < 0.5 ? -1 : 1, nx = x + a;
+  if (nx >= 0 && nx < W && type[up + a] === E) { swap(i, up + a); return true; }
+  if (nx >= 0 && nx < W && type[i + a] === E && rnd() < 0.5) { swap(i, i + a); return true; }
+  return false;
+}
+
+function neighbour(i, x, y, k) {
+  // 0 up, 1 down, 2 left, 3 right, or -1 when off the edge
+  if (k === 0) return y > 0 ? i - W : -1;
+  if (k === 1) return y < H - 1 ? i + W : -1;
+  if (k === 2) return x > 0 ? i - 1 : -1;
+  return x < W - 1 ? i + 1 : -1;
+}
+
+function step() {
+  stamp = (stamp % 255) + 1; frameN++;
+  const ltr = (frameN & 1) === 0;
+  for (let y = H - 1; y >= 0; y--) {
+    for (let k = 0; k < W; k++) {
+      const x = ltr ? k : W - 1 - k, i = y * W + x, t = type[i];
+      if (t === E || t === STONE || moved[i] === stamp) continue;
+      switch (t) {
+        case SAND: {
+          if (y >= H - 1) break;
+          const b = i + W;
+          if (sinkable(type[b])) { swap(i, b); break; }
+          const a = rnd() < 0.5 ? -1 : 1;
+          if (x + a >= 0 && x + a < W && sinkable(type[b + a]) && sinkable(type[i + a])) swap(i, b + a);
+          else if (x - a >= 0 && x - a < W && sinkable(type[b - a]) && sinkable(type[i - a])) swap(i, b - a);
+          break;
+        }
+        case WATER: flow(i, x, y, 4, (q) => lightLiquidGap(q) || q === OIL); break;
+        case OIL: flow(i, x, y, 3, lightLiquidGap); break;
+        case LAVA: {
+          if (rnd() < 0.55) flow(i, x, y, 2, lightLiquidGap);
+          for (let n = 0; n < 4; n++) {
+            const j = neighbour(i, x, y, n); if (j < 0) continue;
+            const q = type[j];
+            if (q === WATER) { put(j, STEAM, 100 + ((rnd() * 80) | 0)); if (rnd() < 0.5) put(i, STONE, 0); }
+            else if ((q === PLANT || q === OIL) && rnd() < 0.5) put(j, FIRE, 30 + ((rnd() * 40) | 0));
+          }
+          break;
+        }
+        case FIRE: {
+          if (life[i] <= 1) { if (rnd() < 0.35) put(i, SMOKE, 50 + ((rnd() * 60) | 0)); else type[i] = E; break; }
+          life[i]--;
+          const j = neighbour(i, x, y, (rnd() * 4) | 0);
+          if (j >= 0) {
+            const q = type[j];
+            if (q === PLANT && rnd() < 0.18) put(j, FIRE, 25 + ((rnd() * 35) | 0));
+            else if (q === OIL && rnd() < 0.6) put(j, FIRE, 40 + ((rnd() * 40) | 0));
+            else if (q === WATER) { put(j, STEAM, 100 + ((rnd() * 80) | 0)); type[i] = E; break; }
+          }
+          if (y > 0 && type[i - W] === E) {
+            if (rnd() < 0.02) put(i - W, SMOKE, 50 + ((rnd() * 50) | 0));
+            else if (rnd() < 0.3) swap(i, i - W);
+          }
+          break;
+        }
+        case PLANT: {
+          if (rnd() < 0.12) {
+            const j = neighbour(i, x, y, (rnd() * 4) | 0);
+            if (j >= 0 && type[j] === WATER) { type[j] = E; life[i] = Math.min(255, life[i] + 7); }
+          }
+          if (life[i] > 0 && rnd() < 0.3) {
+            const dirs = [[0, -1], [0, -1], [-1, -1], [1, -1], [-1, 0], [1, 0]], d = dirs[(rnd() * dirs.length) | 0];
+            const nx = x + d[0], ny = y + d[1];
+            if (nx >= 0 && nx < W && ny >= 0 && ny < H && type[ny * W + nx] === E) {
+              life[i]--; put(ny * W + nx, PLANT, life[i] > 0 ? life[i] - 1 : 0);
+            }
+          }
+          break;
+        }
+        case SMOKE:
+          if (--life[i] <= 0) { type[i] = E; break; }
+          if (!rise(i, x, y) && rnd() < 0.1) type[i] = E;
+          break;
+        case STEAM:
+          if (--life[i] <= 0) { type[i] = WATER; break; }
+          rise(i, x, y);
+          break;
+      }
+    }
+  }
+  if (rain) for (let n = 0, m = Math.ceil(W / 70); n < m; n++) { const x = (rnd() * W) | 0; if (type[x] === E) put(x, WATER, 0); }
+}
+
+/* ---------- painting ---------- */
+function paint(cx, cy) {
+  const m = MATS[sel], r = SIZES[sizeIdx][1];
+  for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
+    if (dx * dx + dy * dy > r * r + r * 0.5) continue;
+    const x = cx + dx, y = cy + dy;
+    if (x < 0 || y < 0 || x >= W || y >= H) continue;
+    const i = y * W + x;
+    if (m.t === E) { type[i] = E; life[i] = 0; continue; }
+    if (type[i] !== E || rnd() > m.d) continue;
+    put(i, m.t, m.t === FIRE ? 28 + ((rnd() * 40) | 0) : m.t === LAVA ? 0 : 0);
+  }
+}
+function toCell(e) { const r = cv.getBoundingClientRect(); return [Math.floor((e.clientX - r.left) / r.width * W), Math.floor((e.clientY - r.top) / r.height * H)]; }
+function stroke(x0, y0, x1, y1) {
+  const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0), 1), sp = Math.max(1, SIZES[sizeIdx][1] * 0.8);
+  for (let s = 0; s <= n; s += sp) paint(Math.round(x0 + (x1 - x0) * s / n), Math.round(y0 + (y1 - y0) * s / n));
+}
+cv.addEventListener('pointerdown', (e) => {
+  try { cv.setPointerCapture(e.pointerId); } catch (err) {}
+  const [x, y] = toCell(e); ptr.x = x; ptr.y = y; ptr.px = x; ptr.py = y; ptr.down = true;
+  if (!touched) { touched = true; clearTimeout(hintT); hintT = setTimeout(() => { $('hint').style.opacity = 0; }, 4000); }
+  paint(x, y);
+});
+cv.addEventListener('pointermove', (e) => { const [x, y] = toCell(e); ptr.x = x; ptr.y = y; });
+const up = () => { ptr.down = false; ptr.px = -1; };
+cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+
+/* ---------- drawing ---------- */
+const BG = [14, 15, 22];
+const pack = (r, g, b) => (255 << 24) | ((b > 255 ? 255 : b < 0 ? 0 : b | 0) << 16) | ((g > 255 ? 255 : g < 0 ? 0 : g | 0) << 8) | (r > 255 ? 255 : r < 0 ? 0 : r | 0);
+const BGP = pack(BG[0], BG[1], BG[2]);
+function render() {
+  for (let y = 0; y < H; y++) {
+    const row = y * W;
+    for (let x = 0; x < W; x++) {
+      const i = row + x, t = type[i];
+      if (t === E) { px[i] = BGP; continue; }
+      const f = 0.86 + 0.28 * (shade[i] / 255);
+      let r, g, b;
+      switch (t) {
+        case SAND: r = 226 * f; g = 188 * f; b = 108 * f; break;
+        case WATER: {
+          const top = y === 0 || type[i - W] === E;
+          const k = top ? 1.35 : 0.9 + 0.12 * (shade[i] / 255) - Math.min(0.3, y / H * 0.12);
+          r = 46 * k + (top ? 40 : 0); g = 122 * k + (top ? 30 : 0); b = 222 * k; break;
+        }
+        case STONE: r = 112 * f; g = 114 * f; b = 124 * f; break;
+        case PLANT: r = 60 * f; g = 172 * f; b = 76 * f; break;
+        case OIL: r = 86 * f; g = 56 * f; b = 44 * f; break;
+        case LAVA: { const m = (shade[i] + frameN * 3) & 255, k = 0.7 + 0.3 * Math.sin(m / 40); r = 255; g = 90 + 70 * k; b = 20 + 20 * k; break; }
+        case FIRE: { const l = life[i], fl = rnd(); if (l > 30 || fl > 0.75) { r = 255; g = 220 - (fl * 50); b = 90; } else if (l > 12) { r = 255; g = 140 + fl * 40; b = 30; } else { r = 210; g = 60 + fl * 30; b = 20; } break; }
+        case SMOKE: { const a = Math.min(1, life[i] / 60) * 0.55; r = BG[0] + (120 - BG[0]) * a; g = BG[1] + (120 - BG[1]) * a; b = BG[2] + (130 - BG[2]) * a; break; }
+        default: { const a = Math.min(1, life[i] / 60) * 0.5; r = BG[0] + (205 - BG[0]) * a; g = BG[1] + (222 - BG[1]) * a; b = BG[2] + (240 - BG[2]) * a; }
+      }
+      px[i] = pack(r, g, b);
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+}
+
+/* ---------- interface ---------- */
+MATS.forEach((m, i) => {
+  const b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', String(i === 0));
+  b.innerHTML = '<span class="dot" style="background:' + m.c + '"></span>' + m.n;
+  b.addEventListener('click', () => pick(i)); $('mats').appendChild(b);
+});
+function pick(i) { sel = i; [...$('mats').children].forEach((c, k) => c.setAttribute('aria-checked', String(k === i))); }
+SIZES.forEach((s, i) => {
+  const b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', String(i === sizeIdx)); b.setAttribute('aria-label', 'Brush ' + s[0]); b.textContent = s[0]; b.style.minWidth = '40px'; b.style.justifyContent = 'center';
+  b.addEventListener('click', () => { sizeIdx = i; [...$('sizes').children].forEach((c, k) => c.setAttribute('aria-checked', String(k === i))); }); $('sizes').appendChild(b);
+});
+$('bRain').addEventListener('click', (e) => { rain = !rain; e.currentTarget.setAttribute('aria-pressed', String(rain)); });
+$('bPause').addEventListener('click', (e) => { paused = !paused; e.currentTarget.setAttribute('aria-pressed', String(paused)); e.currentTarget.textContent = paused ? 'Play' : 'Pause'; });
+$('bClear').addEventListener('click', () => { type.fill(0); life.fill(0); });
+window.addEventListener('keydown', (e) => {
+  if (e.key >= '1' && e.key <= '8') pick(+e.key - 1);
+  else if (e.key === ' ') { e.preventDefault(); $('bPause').click(); }
+});
+
+function frame() {
+  if (ptr.down) { if (ptr.px >= 0) stroke(ptr.px, ptr.py, ptr.x, ptr.y); else paint(ptr.x, ptr.y); ptr.px = ptr.x; ptr.py = ptr.y; }
+  if (!paused) step();
+  render();
+  requestAnimationFrame(frame);
+}
+resize();
+if (window.ResizeObserver) new ResizeObserver(resize).observe(cv); else window.addEventListener('resize', resize);
+try { if (location.hash === '#debug') window.__sl = { put: (t, x, y) => { put(y * W + x, t, t === FIRE ? 40 : 0); }, step: (n) => { for (let i = 0; i < n; i++) step(); }, count: (t) => { let c = 0; for (let i = 0; i < type.length; i++) if (type[i] === t) c++; return c; }, size: () => [W, H], sel: pick, paint }; } catch (e) {}
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

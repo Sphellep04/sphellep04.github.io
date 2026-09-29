@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Squishy candy goo with googly eyes. Drag it, slice it, mix colours and float it in zero gravity.">
+<meta name="theme-color" content="#f3eeff">
+<title>Goo Lab</title>
+<meta property="og:type" content="website">
+<meta property="og:title" content="Goo Lab">
+<meta property="og:description" content="Squishy candy goo with googly eyes. Drag it, slice it, mix colours and float it in zero gravity.">
+<meta property="og:image" content="https://sphellep04.github.io/goo-lab/img/preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://sphellep04.github.io/goo-lab/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Goo Lab">
+<meta name="twitter:description" content="Squishy candy goo with googly eyes. Drag it, slice it, mix colours and float it in zero gravity.">
+<meta name="twitter:image" content="https://sphellep04.github.io/goo-lab/img/preview.png">
+<link rel="icon" type="image/png" sizes="64x64" href="img/favicon-64.png">
+<link rel="apple-touch-icon" href="img/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&display=swap">
+<style>
+:root {
+  /* Layout: a pale lilac lab table. The goo lives on one big canvas, a slim tray of colours and tools sits underneath. */
+  --bg: #f3eeff;
+  --panel: #ffffff;
+  --line: #ddd3f5;
+  --ink: #2b2140;
+  --mute: #7c6f99;
+  --accent: #7a4dff;
+  --ui: "Fredoka", "Trebuchet MS", system-ui, sans-serif;
+  color-scheme: light;
+}
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 500 15px/1.3 var(--ui); overflow: hidden; overscroll-behavior: none; }
+#app { height: 100%; display: flex; flex-direction: column; background: var(--bg); }
+.stage { position: relative; flex: 1 1 auto; min-height: 0; }
+#goo { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+.title { position: absolute; left: 16px; top: 12px; pointer-events: none; }
+h1 { margin: 0; font: 600 26px/1 var(--ui); }
+#hint { margin: 4px 0 0; color: var(--mute); font-size: 14px; transition: opacity 0.8s; }
+.tray { flex: 0 0 auto; background: var(--panel); border-top: 1px solid var(--line); padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 8px; }
+.row { display: flex; flex-wrap: wrap; gap: 6px 8px; justify-content: center; align-items: center; }
+button { font: 500 15px/1 var(--ui); color: var(--ink); background: #f4efff; border: 2px solid var(--line); border-radius: 999px; min-height: 40px; padding: 0 16px; cursor: pointer; }
+button:hover { background: #ebe3ff; }
+button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+button[aria-pressed="true"], button[aria-checked="true"] { border-color: var(--accent); background: #e6dcff; }
+.sw { width: 36px; min-height: 36px; height: 36px; padding: 0; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 2px var(--line); }
+.sw[aria-checked="true"] { box-shadow: 0 0 0 3px var(--accent); transform: scale(1.12); }
+.sep { width: 2px; align-self: stretch; background: var(--line); margin: 4px 2px; }
+.credit { color: var(--mute); font-size: 13px; }
+.credit a { color: var(--ink); }
+@media (max-width: 560px) { button { padding: 0 12px; font-size: 14px; } }
+</style>
+
+<style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #f3eeff; }</style>
+</head>
+<body>
+<main id="app">
+  <div class="stage">
+    <canvas id="goo" aria-label="A table of squishy candy goo. Tap to drop a blob, drag to pull it, swipe with the Cut tool to slice."></canvas>
+    <div class="title"><h1>Goo Lab</h1><p id="hint">Tap to drop goo. Drag it about. Squash two together to mix them.</p></div>
+  </div>
+  <div class="tray">
+    <div class="row" id="sw" role="radiogroup" aria-label="Goo colour"></div>
+    <div class="row">
+      <button id="tPull" type="button" role="radio" aria-checked="true">Pull</button>
+      <button id="tCut" type="button" role="radio" aria-checked="false">Cut</button>
+      <div class="sep"></div>
+      <button id="bZero" type="button" aria-pressed="false">Zero gravity</button>
+      <button id="bEyes" type="button" aria-pressed="true">Eyes</button>
+      <button id="bShake" type="button">Shake</button>
+      <button id="bClear" type="button">Clear</button>
+    </div>
+    <div class="row"><span class="credit">Made by <a href="https://phellep.vercel.app/">Phellep Shapopi</a></span></div>
+  </div>
+</main>
+
+<script>
+(() => {
+'use strict';
+const $ = (id) => document.getElementById(id);
+const cv = $('goo'), g = cv.getContext('2d');
+const TAU = Math.PI * 2, rnd = Math.random;
+const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+const COLORS = [['#ff5d8f', 'Pink'], ['#ffb627', 'Yellow'], ['#3ddc97', 'Mint'], ['#35a7ff', 'Sky'], ['#a66bff', 'Violet'], ['#ff7a3d', 'Orange']];
+const rgb = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+const T = 0.42, KK = 1 / Math.sqrt(1 - Math.sqrt(T));
+const MAX = 64;
+let W = 1, H = 1, dpr = 1, U = 1, RS = 3;
+let blobs = [], colorIdx = 0, tool = 'pull', zero = false, eyes = true, hintT = 0, time = 0, lastT = 0, touched = false;
+let gw = 1, gh = 1, gc = null, gx = null, F = null, RR = null, GX = null, GY = null, CR = null, CG = null, CB = null, img = null, px32 = null;
+let trail = [];
+const ptr = { x: 0, y: 0, in: false, down: false, grab: null };
+
+/* ---------- blobs ---------- */
+function add(x, y, r, col, vx, vy) {
+  if (blobs.length >= MAX) return null;
+  const b = { x, y, vx: vx || 0, vy: vy || 0, r, c: col.slice(), grab: false, blink: 1 + rnd() * 4, blinking: 0, cool: 0, look: rnd() * TAU };
+  blobs.push(b); return b;
+}
+const newR = () => U * (0.038 + rnd() * 0.026);
+
+function vivid(c) { const m = (c[0] + c[1] + c[2]) / 3; return c.map((v) => clamp(m + (v - m) * 1.25, 0, 255)); }
+function merge(a, b) {
+  const A = a.r * a.r, B = b.r * b.r, S = A + B, r = Math.sqrt(S);
+  if (r > U * 0.13) return false;
+  a.x = (a.x * A + b.x * B) / S; a.y = (a.y * A + b.y * B) / S; a.vx = (a.vx * A + b.vx * B) / S; a.vy = (a.vy * A + b.vy * B) / S;
+  a.c = vivid([0, 1, 2].map((k) => (a.c[k] * A + b.c[k] * B) / S)); a.r = r; a.grab = a.grab || b.grab;
+  if (ptr.grab === b) ptr.grab = a;
+  return true;
+}
+
+function physics(dt) {
+  const G = zero ? 0 : U * 2.6, n = blobs.length;
+  for (const b of blobs) {
+    if (!b.grab) b.vy += G * dt;
+    if (zero) { b.vx += (rnd() - 0.5) * U * 0.05 * dt; b.vy += (rnd() - 0.5) * U * 0.05 * dt; }
+    b.cool -= dt;
+  }
+  const dead = new Set();
+  for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) {
+    const a = blobs[i], b = blobs[j]; if (dead.has(a) || dead.has(b)) continue;
+    let dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy); const rs = a.r + b.r;
+    if (d > rs * 1.9) continue;
+    if (d < 1e-3) { dx = rnd() - 0.5; dy = rnd() - 0.5; d = Math.hypot(dx, dy); }
+    const nx = dx / d, ny = dy / d;
+    if (d < rs * 0.5 && a.cool <= 0 && b.cool <= 0 && merge(a, b)) { dead.add(b); continue; }
+    let f;
+    if (d < rs * 0.72) f = -(rs * 0.72 - d) * 900; else f = (d - rs * 0.72) * 14 * (1 - (d - rs * 0.72) / (rs * 1.18));
+    const ma = a.r * a.r, mb = b.r * b.r, sa = mb / (ma + mb), sb = ma / (ma + mb);
+    a.vx -= nx * f * sa * dt; a.vy -= ny * f * sa * dt; b.vx += nx * f * sb * dt; b.vy += ny * f * sb * dt;
+    if (d < rs * 0.72) { const rv = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny, c = rv * 9 * dt; a.vx += nx * c * sa; a.vy += ny * c * sa; b.vx -= nx * c * sb; b.vy -= ny * c * sb; }
+  }
+  if (dead.size) blobs = blobs.filter((b) => !dead.has(b));
+  for (const b of blobs) {
+    if (b.grab) { const tx = ptr.x, ty = ptr.y; b.vx = clamp((tx - b.x) * 16, -U * 4, U * 4); b.vy = clamp((ty - b.y) * 16, -U * 4, U * 4); }
+    else { const k = 1 - 1.1 * dt; b.vx *= k; b.vy *= k; }
+    b.x += b.vx * dt; b.y += b.vy * dt;
+    const r = b.r;
+    if (b.y > H - r) { b.y = H - r; if (b.vy > 0) b.vy *= -0.12; b.vx *= 1 - 5 * dt; }
+    if (b.y < r) { b.y = r; if (b.vy < 0) b.vy *= -0.3; }
+    if (b.x < r) { b.x = r; if (b.vx < 0) b.vx *= -0.3; }
+    if (b.x > W - r) { b.x = W - r; if (b.vx > 0) b.vx *= -0.3; }
+    const sp = Math.hypot(b.vx, b.vy); if (sp > U * 6) { b.vx *= U * 6 / sp; b.vy *= U * 6 / sp; }
+  }
+}
+
+/* ---------- the goo surface: a metaball field shaded like glossy jelly ---------- */
+function alloc() {
+  RS = U > 520 ? 3 : 2;
+  gw = Math.max(8, Math.ceil(W / RS)); gh = Math.max(8, Math.ceil(H / RS));
+  gc = document.createElement('canvas'); gc.width = gw; gc.height = gh; gx = gc.getContext('2d');
+  const n = gw * gh; F = new Float32Array(n); RR = new Float32Array(n); GX = new Float32Array(n); GY = new Float32Array(n); CR = new Float32Array(n); CG = new Float32Array(n); CB = new Float32Array(n);
+  img = gx.createImageData(gw, gh); px32 = new Uint32Array(img.data.buffer);
+}
+const LX = -0.42, LY = -0.62, LZ = 0.66, LL = Math.hypot(LX, LY, LZ), lx = LX / LL, ly = LY / LL, lz = LZ / LL;
+const hx0 = lx, hy0 = ly, hz0 = lz + 1, hl = Math.hypot(hx0, hy0, hz0), hx = hx0 / hl, hy = hy0 / hl, hz = hz0 / hl;
+function field() {
+  F.fill(0); RR.fill(0); GX.fill(0); GY.fill(0); CR.fill(0); CG.fill(0); CB.fill(0);
+  for (const b of blobs) {
+    const R = b.r * KK, R2 = R * R, x0 = Math.max(0, Math.floor((b.x - R) / RS)), x1 = Math.min(gw - 1, Math.ceil((b.x + R) / RS)), y0 = Math.max(0, Math.floor((b.y - R) / RS)), y1 = Math.min(gh - 1, Math.ceil((b.y + R) / RS));
+    for (let y = y0; y <= y1; y++) {
+      const dy = (y + 0.5) * RS - b.y;
+      for (let x = x0; x <= x1; x++) {
+        const dx = (x + 0.5) * RS - b.x, q = (dx * dx + dy * dy) / R2; if (q >= 1) continue;
+        const t = 1 - q, w = t * t, i = y * gw + x, dg = -4 * t / R2;
+        F[i] += w; RR[i] += w * R; GX[i] += dg * dx; GY[i] += dg * dy; CR[i] += w * b.c[0]; CG[i] += w * b.c[1]; CB[i] += w * b.c[2];
+      }
+    }
+  }
+    for (let i = 0, n = gw * gh; i < n; i++) {
+    const f = F[i];
+    if (f < T - 0.05) { px32[i] = 0; continue; }
+    const a = clamp((f - (T - 0.05)) / 0.11, 0, 1);
+    const k1 = 1.15 * RR[i] / f;
+    let nx = -GX[i] * k1, ny = -GY[i] * k1, nz = 1; const nl = Math.sqrt(nx * nx + ny * ny + 1); nx /= nl; ny /= nl; nz /= nl;
+    const diff = Math.max(0, nx * lx + ny * ly + nz * lz), sd = Math.max(0, nx * hx + ny * hy + nz * hz);
+    const s2 = sd * sd, s4 = s2 * s2, s8 = s4 * s4, s32 = s8 * s8 * s8 * s8, spec = s32 * s4 * 0.6, rim = (1 - nz) * (1 - nz) * 0.16, thick = 0.95 + 0.16 * Math.min(1, f / 1.4), body = (0.86 + 0.34 * diff) * thick;
+    const r = CR[i] / f, gg = CG[i] / f, b = CB[i] / f;
+    const R = Math.min(255, r * body + spec * 255 + rim * 255 * 0.5), Gc = Math.min(255, gg * body + spec * 255 + rim * 255 * 0.5), B = Math.min(255, b * body + spec * 255 + rim * 255 * 0.5);
+    px32[i] = ((a * 255) << 24) | (B << 16) | (Gc << 8) | R;
+  }
+  gx.putImageData(img, 0, 0);
+}
+
+/* ---------- drawing ---------- */
+function drawEyes() {
+  for (const b of blobs) {
+    if (b.r < U * 0.034) continue;
+    const er = b.r * 0.27, ex = b.r * 0.36, ey = b.y - b.r * 0.12;
+    let tx = ptr.in ? ptr.x : b.x + Math.cos(b.look) * 100, ty = ptr.in ? ptr.y : b.y + Math.sin(b.look) * 100;
+    for (const s of [-1, 1]) {
+      const cx = b.x + s * ex, cy = ey;
+      if (b.blinking > 0) { g.strokeStyle = '#2b2140'; g.lineWidth = 2.5; g.lineCap = 'round'; g.beginPath(); g.moveTo(cx - er * 0.8, cy); g.lineTo(cx + er * 0.8, cy); g.stroke(); continue; }
+      g.fillStyle = '#fff'; g.beginPath(); g.arc(cx, cy, er, 0, TAU); g.fill();
+      g.strokeStyle = 'rgba(43,33,64,0.55)'; g.lineWidth = 1.5; g.stroke();
+      const dx = tx - cx, dy = ty - cy, d = Math.hypot(dx, dy) || 1, o = Math.min(er * 0.42, d * 0.2);
+      const pxx = cx + dx / d * o - b.vx * 0.004, pyy = cy + dy / d * o - b.vy * 0.004;
+      g.fillStyle = '#2b2140'; g.beginPath(); g.arc(pxx, pyy, er * 0.56, 0, TAU); g.fill();
+      g.fillStyle = '#fff'; g.beginPath(); g.arc(pxx - er * 0.16, pyy - er * 0.18, er * 0.17, 0, TAU); g.fill();
+    }
+  }
+}
+function draw() {
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.clearRect(0, 0, W, H);
+  const bgr = g.createLinearGradient(0, 0, 0, H); bgr.addColorStop(0, '#f7f3ff'); bgr.addColorStop(1, '#e8def9');
+  g.fillStyle = bgr; g.fillRect(0, 0, W, H);
+  // faint lab table dots
+  g.fillStyle = 'rgba(122,77,255,0.08)';
+  for (let y = 26; y < H; y += 34) for (let x = 26; x < W; x += 34) g.fillRect(x, y, 2, 2);
+  for (const b of blobs) { for (let k = 0; k < 3; k++) { g.fillStyle = 'rgba(70,40,140,0.07)'; g.beginPath(); g.ellipse(b.x + 3, Math.min(H - 2, b.y + b.r * 0.92), b.r * (1.25 - k * 0.15), b.r * (0.34 - k * 0.06), 0, 0, TAU); g.fill(); } }
+  field();
+  g.save(); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
+    g.drawImage(gc, 0, 0, gw * RS, gh * RS); g.restore();
+  if (eyes) drawEyes();
+  if (trail.length > 1) {
+    g.lineCap = 'round'; g.lineJoin = 'round';
+    for (let i = 1; i < trail.length; i++) { const a = 1 - (time - trail[i].t) / 0.4; if (a <= 0) continue; g.strokeStyle = 'rgba(255,255,255,' + (0.95 * a).toFixed(3) + ')'; g.lineWidth = 4 * a + 1; g.beginPath(); g.moveTo(trail[i - 1].x, trail[i - 1].y); g.lineTo(trail[i].x, trail[i].y); g.stroke(); g.strokeStyle = 'rgba(70,40,140,' + (0.35 * a).toFixed(3) + ')'; g.lineWidth = 1; g.stroke(); }
+  }
+}
+
+/* ---------- input ---------- */
+function pos(e) { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+function nearest(x, y) { let best = null, bd = 1e9; for (const b of blobs) { const d = Math.hypot(b.x - x, b.y - y); if (d < b.r * 1.15 + 10 && d < bd) { bd = d; best = b; } } return best; }
+function segDist(b, x0, y0, x1, y1) { const dx = x1 - x0, dy = y1 - y0, l2 = dx * dx + dy * dy || 1, t = clamp(((b.x - x0) * dx + (b.y - y0) * dy) / l2, 0, 1); return Math.hypot(b.x - (x0 + dx * t), b.y - (y0 + dy * t)); }
+function slice(x0, y0, x1, y1) {
+  const len = Math.hypot(x1 - x0, y1 - y0); if (len < 3) return;
+  const tx = (x1 - x0) / len, ty = (y1 - y0) / len, nx = -ty, ny = tx, made = [], gone = [];
+  for (const b of blobs) {
+    if (b.cool > 0 || b.r < U * 0.03 || segDist(b, x0, y0, x1, y1) > b.r * 0.85) continue;
+    const r = b.r * Math.SQRT1_2, off = r * 0.75, push = U * 0.35;
+    if (blobs.length + made.length - gone.length >= MAX) continue;
+    for (const s of [-1, 1]) { const n = { x: b.x + nx * off * s, y: b.y + ny * off * s, vx: b.vx + nx * push * s, vy: b.vy + ny * push * s, r, c: b.c.slice(), grab: false, blink: 1 + rnd() * 4, blinking: 0, cool: 6, look: rnd() * TAU }; made.push(n); }
+    gone.push(b); if (ptr.grab === b) ptr.grab = null;
+  }
+  if (gone.length) { blobs = blobs.filter((b) => !gone.includes(b)).concat(made); }
+}
+cv.addEventListener('pointerdown', (e) => {
+  try { cv.setPointerCapture(e.pointerId); } catch (err) {}
+  const p = pos(e); ptr.x = p[0]; ptr.y = p[1]; ptr.in = true; ptr.down = true;
+  if (!touched) { touched = true; clearTimeout(hintT); hintT = setTimeout(() => { $('hint').style.opacity = 0; }, 5000); }
+  if (tool === 'cut') { trail = [{ x: p[0], y: p[1], t: time }]; return; }
+  let b = nearest(p[0], p[1]);
+  if (!b) b = add(p[0], p[1], newR(), rgb(COLORS[colorIdx][0]));
+  if (b) { b.grab = true; ptr.grab = b; cv.style.cursor = 'grabbing'; }
+});
+cv.addEventListener('pointermove', (e) => {
+  const p = pos(e), ox = ptr.x, oy = ptr.y; ptr.x = p[0]; ptr.y = p[1]; ptr.in = true;
+  if (tool === 'cut' && ptr.down) { trail.push({ x: p[0], y: p[1], t: time }); slice(ox, oy, p[0], p[1]); }
+});
+function release() {
+  ptr.down = false;
+  if (ptr.grab) { ptr.grab.grab = false; ptr.grab = null; }
+  blobs.forEach((b) => { b.grab = false; }); cv.style.cursor = tool === 'cut' ? 'crosshair' : 'grab';
+}
+cv.addEventListener('pointerup', release); cv.addEventListener('pointercancel', release);
+cv.addEventListener('pointerleave', () => { if (!ptr.down) ptr.in = false; });
+
+COLORS.forEach((c, i) => {
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'sw'; b.setAttribute('role', 'radio'); b.setAttribute('aria-label', c[1]); b.setAttribute('aria-checked', String(i === 0)); b.style.background = c[0];
+  b.addEventListener('click', () => { colorIdx = i; [...$('sw').children].forEach((s, k) => s.setAttribute('aria-checked', String(k === i))); });
+  $('sw').appendChild(b);
+});
+function setTool(t) { tool = t; $('tPull').setAttribute('aria-checked', String(t === 'pull')); $('tCut').setAttribute('aria-checked', String(t === 'cut')); cv.style.cursor = t === 'cut' ? 'crosshair' : 'grab'; if (t === 'cut') { $('hint').textContent = 'Swipe across a blob to slice it in two.'; $('hint').style.opacity = 1; clearTimeout(hintT); hintT = setTimeout(() => { $('hint').style.opacity = 0; }, 4000); } }
+$('tPull').addEventListener('click', () => setTool('pull')); $('tCut').addEventListener('click', () => setTool('cut'));
+$('bZero').addEventListener('click', (e) => { zero = !zero; e.currentTarget.setAttribute('aria-pressed', String(zero)); blobs.forEach((b) => { b.vx += (rnd() - 0.5) * U * 0.3; b.vy -= rnd() * U * 0.25; }); });
+$('bEyes').addEventListener('click', (e) => { eyes = !eyes; e.currentTarget.setAttribute('aria-pressed', String(eyes)); });
+$('bShake').addEventListener('click', () => { blobs.forEach((b) => { b.vx += (rnd() - 0.5) * U * 2.2; b.vy -= U * (0.6 + rnd() * 1.4); }); });
+$('bClear').addEventListener('click', () => { blobs = []; });
+
+/* ---------- loop ---------- */
+function seed() {
+  const cols = [0, 3, 1, 2, 4, 5, 0, 3];
+  cols.forEach((c, i) => add(W * (0.18 + 0.64 * ((i * 0.618) % 1)), -U * 0.1 - i * U * 0.14, newR(), rgb(COLORS[c][0]), (rnd() - 0.5) * 60, 0));
+}
+function resize() {
+  const r = cv.getBoundingClientRect(); if (r.width < 10) return;
+  const nw = Math.round(r.width), nh = Math.round(r.height); if (nw === W && nh === H && gc) return;
+  W = nw; H = nh; dpr = Math.min(2, window.devicePixelRatio || 1); U = Math.min(W, H);
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); alloc();
+  blobs.forEach((b) => { b.x = clamp(b.x, b.r, W - b.r); b.y = Math.min(b.y, H - b.r); });
+}
+function frame(ts) {
+  const t = ts / 1000; let dt = t - lastT; lastT = t; if (dt > 0.05 || dt <= 0) dt = 0.016;
+  time += dt;
+  for (let s = 0; s < 3; s++) physics(dt / 3);
+  for (const b of blobs) { b.blink -= dt; if (b.blink <= 0) { b.blinking = 0.13; b.blink = 2 + rnd() * 4; } if (b.blinking > 0) b.blinking -= dt; if (rnd() < 0.004) b.look = rnd() * TAU; }
+  trail = trail.filter((p) => time - p.t < 0.4);
+  draw();
+  requestAnimationFrame(frame);
+}
+resize(); seed();
+if (window.ResizeObserver) new ResizeObserver(resize).observe(cv); else window.addEventListener('resize', resize);
+try { if (location.hash === '#debug') window.__gl = { blobs: () => blobs, add: (x, y, r, c) => add(x, y, r, rgb(COLORS[c || 0][0])), step: (n) => { for (let i = 0; i < n; i++) physics(1 / 180); }, size: () => [W, H, gw, gh] }; } catch (e) {}
+lastT = performance.now() / 1000;
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
