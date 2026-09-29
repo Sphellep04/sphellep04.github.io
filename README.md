@@ -1,6 +1,6 @@
 # Toybox
 
-The home page for my small web toys. Live at https://sphellep04.github.io
+The home page for my small web toys. Live at https://tinytoybox.me
 
 ## Toys in this repo
 
@@ -8,18 +8,18 @@ Each toy is a self-contained folder with its own `index.html` and `img/` folder,
 
 | Folder | Toy | What it is |
 | --- | --- | --- |
-| `flipside/` | [Flipside](https://sphellep04.github.io/flipside/) | One tap gravity-flip runner game |
-| `slice-party/` | [Slice Party](https://sphellep04.github.io/slice-party/) | Swipe to slice candy blobs, dodge bombs |
-| `starlight/` | [Starlight](https://sphellep04.github.io/starlight/) | A musical desert night sky |
-| `kalimba-rain/` | [Kalimba Rain](https://sphellep04.github.io/kalimba-rain/) | Chime bars played by falling rain |
-| `doodle-zoo/` | [Doodle Zoo](https://sphellep04.github.io/doodle-zoo/) | Drawings that come alive as bouncy creatures |
-| `goo-lab/` | [Goo Lab](https://sphellep04.github.io/goo-lab/) | Squishy candy goo you can drag, slice and mix |
-| `snake/` | [Snake](https://sphellep04.github.io/snake/) | Retro Corner: Swipe to steer, eat the candy, and grow as long as you can. Gold stars are worth a bonus. |
-| `block-drop/` | [Block Drop](https://sphellep04.github.io/block-drop/) | Retro Corner: Stack the falling blocks, clear rows and chase a quad as the speed climbs. |
-| `road-hop/` | [Road Hop](https://sphellep04.github.io/road-hop/) | Retro Corner: Hop across busy roads and ride logs over the river. Keep moving or the screen catches you. |
-| `maze-munch/` | [Maze Munch](https://sphellep04.github.io/maze-munch/) | Retro Corner: Gobble every dot in a fresh maze each level. Dodge the ghosts and grab a power pellet. |
-| `hangman/` | [Hangman](https://sphellep04.github.io/hangman/) | Retro Corner: Guess the hidden word before the stick figure is finished. Animals, food, tech and Namibia. |
-| `paddle-duel/` | [Paddle Duel](https://sphellep04.github.io/paddle-duel/) | Retro Corner: Classic paddle and ball against the computer. Win a heart back every five points. |
+| `flipside/` | [Flipside](https://tinytoybox.me/flipside/) | One tap gravity-flip runner game |
+| `slice-party/` | [Slice Party](https://tinytoybox.me/slice-party/) | Swipe to slice candy blobs, dodge bombs |
+| `starlight/` | [Starlight](https://tinytoybox.me/starlight/) | A musical desert night sky |
+| `kalimba-rain/` | [Kalimba Rain](https://tinytoybox.me/kalimba-rain/) | Chime bars played by falling rain |
+| `doodle-zoo/` | [Doodle Zoo](https://tinytoybox.me/doodle-zoo/) | Drawings that come alive as bouncy creatures |
+| `goo-lab/` | [Goo Lab](https://tinytoybox.me/goo-lab/) | Squishy candy goo you can drag, slice and mix |
+| `snake/` | [Snake](https://tinytoybox.me/snake/) | Retro Corner: Swipe to steer, eat the candy, and grow as long as you can. Gold stars are worth a bonus. |
+| `block-drop/` | [Block Drop](https://tinytoybox.me/block-drop/) | Retro Corner: Stack the falling blocks, clear rows and chase a quad as the speed climbs. |
+| `road-hop/` | [Road Hop](https://tinytoybox.me/road-hop/) | Retro Corner: Hop across busy roads and ride logs over the river. Keep moving or the screen catches you. |
+| `maze-munch/` | [Maze Munch](https://tinytoybox.me/maze-munch/) | Retro Corner: Gobble every dot in a fresh maze each level. Dodge the ghosts and grab a power pellet. |
+| `hangman/` | [Hangman](https://tinytoybox.me/hangman/) | Retro Corner: Guess the hidden word before the stick figure is finished. Animals, food, tech and Namibia. |
+| `paddle-duel/` | [Paddle Duel](https://tinytoybox.me/paddle-duel/) | Retro Corner: Classic paddle and ball against the computer. Win a heart back every five points. |
 
 ## Adding a toy
 
