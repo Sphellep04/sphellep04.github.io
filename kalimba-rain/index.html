@@ -95,6 +95,9 @@ button.on, button[aria-checked="true"] { color: var(--gold); border-color: var(-
 .seg button[aria-checked="true"] { z-index: 1; }
 [hidden] { display: none !important; }
 button[aria-pressed="true"] { color: var(--gold); border-color: var(--gold); }
+button[data-slot].full { border-style: solid; color: var(--gold); }
+button[data-slot]:not(.full) { border-style: dashed; }
+#flash { position: fixed; inset: 0; background: #dff6ff; opacity: 0; pointer-events: none; z-index: 5; }
 button.rec { color: #ff8e8e; border-color: #ff8e8e; }
 button:disabled { opacity: 0.4; cursor: default; }
 .tune {
@@ -111,6 +114,7 @@ button:disabled { opacity: 0.4; cursor: default; }
 <script src="../toybox.js"></script>
 </head>
 <body>
+<div id="flash" aria-hidden="true"></div>
 <main id="app">
   <canvas id="rain" aria-label="Moonlit waterhole. Drag on the sky to draw a chime bar. Rain beads fall from the cloud and ring each bar they hit. Tap a bar to remove it, drag it to move it, and drag the cloud sideways."></canvas>
 
@@ -155,6 +159,18 @@ button:disabled { opacity: 0.4; cursor: default; }
       </div>
       <button id="btnClouds" type="button" title="Cycle between one, two and three clouds">Clouds 1</button>
       <button id="btnBouncy" type="button" aria-pressed="false" title="New bars become springs that make beads bounce higher">Bouncy bars</button>
+      <button id="btnPlay" type="button" aria-pressed="false" title="Tap a bar to ring it instead of removing it. Keys A to ; play the bars on a computer">Tap to play</button>
+      <button id="btnThunder" type="button" aria-pressed="false" title="Now and then a storm rolls through with a flash, a rumble and a burst of beads">Thunder</button>
+      <div class="grp">
+        <span class="cap">Slots</span>
+        <div class="seg slots" role="group" aria-label="Saved layouts">
+          <button id="btnSaveSlot" type="button" aria-pressed="false" title="Press Save, then a slot number, to keep this waterhole">Save</button>
+          <button type="button" data-slot="1" title="Empty slot">1</button>
+          <button type="button" data-slot="2" title="Empty slot">2</button>
+          <button type="button" data-slot="3" title="Empty slot">3</button>
+        </div>
+      </div>
+      <button id="btnPhoto" type="button" title="Save a picture of this waterhole">Photo</button>
       <button id="btnRec" type="button" title="Record 15 seconds as a video with sound">Record</button>
     </div>
     <div class="deck" role="group" aria-label="Controls">
@@ -177,7 +193,8 @@ button:disabled { opacity: 0.4; cursor: default; }
 const $ = (id) => document.getElementById(id);
 const canvas = $('rain');
 const g = canvas.getContext('2d');
-const reduce = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+let reduce = window.Toybox ? !!Toybox.reduced : !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+document.addEventListener('toybox:motion', (e) => { reduce = !!e.detail; });
 const TAU = Math.PI * 2;
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -576,6 +593,82 @@ function onHit(s, impact, ball, cx, cy) {
   pluck(freqOf(m), clamp((cx / W) * 2 - 1, -1, 1) * 0.7, clamp(impact / (900 * S), 0.18, 1), s.sp);
 }
 
+/* ---------- play, thunder, slots, photo ---------- */
+let playMode = false, thunderOn = false, thunderT = 9, bolt = null, boltT = 0, slotArmed = false;
+function ringBar(s, vel) {
+  const idx = idxForLen(s.len), m = midiOf(idx), cx = (s.x1 + s.x2) / 2, cy = (s.y1 + s.y2) / 2;
+  s.wob = 1; s.flash = 1; s.last = simTime;
+  if (ripples.length < 70) ripples.push({ x: cx, y: cy, t: 0, rgb: hueColor(idx).join(','), pool: false });
+  notes++;
+  pluck(freqOf(m), clamp((cx / W) * 2 - 1, -1, 1) * 0.7, vel, s.sp);
+}
+const PLAY_KEYS = ['KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL', 'Semicolon'];
+const KEY_LABEL = ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ';'];
+function sortedBars() { return bars.slice().sort((a, b) => (a.len || 0) - (b.len || 0)).reverse().slice(0, PLAY_KEYS.length); }
+function rumble() {
+  if (!actx || muted || actx.state !== 'running' || !brownBuf) return;
+  const t = actx.currentTime + 0.02;
+  const n = actx.createBufferSource(); n.buffer = brownBuf; n.loop = true;
+  const lp = actx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.setValueAtTime(420, t); lp.frequency.exponentialRampToValueAtTime(90, t + 3.2);
+  const gn = actx.createGain(); gn.gain.setValueAtTime(0, t); gn.gain.linearRampToValueAtTime(0.55, t + 0.15); gn.gain.exponentialRampToValueAtTime(0.001, t + 3.4);
+  n.connect(lp); lp.connect(gn); gn.connect(master); n.start(t); n.stop(t + 3.5);
+  const o = actx.createOscillator(); o.type = 'sine'; o.frequency.setValueAtTime(62, t); o.frequency.exponentialRampToValueAtTime(34, t + 1.6);
+  const og = actx.createGain(); og.gain.setValueAtTime(0, t); og.gain.linearRampToValueAtTime(0.4, t + 0.05); og.gain.exponentialRampToValueAtTime(0.001, t + 1.8);
+  o.connect(og); og.connect(master); o.start(t); o.stop(t + 1.9);
+}
+function thunder() {
+  const f = $('flash');
+  f.style.transition = 'none'; f.style.opacity = reduce ? 0.12 : 0.55;
+  requestAnimationFrame(() => { f.style.transition = 'opacity ' + (reduce ? 0.6 : 0.9) + 's ease-out'; f.style.opacity = 0; });
+  if (!reduce && emitters.length) {
+    const e = emitters[(Math.random() * emitters.length) | 0], pts = [[e.x, e.y + 8 * S]];
+    let x = e.x, y = e.y + 8 * S; const step = Math.max(14, (poolY - y) / 9);
+    while (y < poolY) { x += (Math.random() - 0.5) * 46 * S; y += step * (0.7 + Math.random() * 0.6); pts.push([x, Math.min(y, poolY)]); }
+    bolt = pts; boltT = 0.35;
+  }
+  rumble();
+  for (const e of emitters) for (let i = 0; i < 6 && balls.length < 90; i++) { const b = newBall(e); b.x += (Math.random() - 0.5) * 26 * S; b.vx = (Math.random() - 0.5) * 220 * S; balls.push(b); }
+  if (window.Toybox && Toybox.vibrate) try { Toybox.vibrate(30); } catch (e) {}
+}
+const slotKey = (n) => 'kalimba.slot' + n;
+function slotFull(n) { try { return !!localStorage.getItem(slotKey(n)); } catch (e) { return false; } }
+function refreshSlots() {
+  document.querySelectorAll('[data-slot]').forEach((b) => {
+    const f = slotFull(b.dataset.slot); b.classList.toggle('full', f); b.title = f ? 'Load saved waterhole ' + b.dataset.slot : 'Empty slot';
+  });
+}
+function slotClick(n) {
+  wake();
+  if (slotArmed) {
+    slotArmed = false; $('btnSaveSlot').setAttribute('aria-pressed', 'false');
+    try { localStorage.setItem(slotKey(n), JSON.stringify(snapshot())); say('Saved to slot ' + n + '.', 3000); } catch (e) { say('Could not save here.', 3000); }
+    refreshSlots(); return;
+  }
+  let d = null; try { d = JSON.parse(localStorage.getItem(slotKey(n)) || 'null'); } catch (e) {}
+  if (!d) { say('Slot ' + n + ' is empty. Press Save, then ' + n + ', to keep this waterhole.', 4000); return; }
+  const pre = barsState();
+  if (restore(d)) {
+    pushHist(pre); setChecked('data-scale', scaleKey); setChecked('data-rate', rateKey); setChecked('data-instr', instrKey);
+    changed(); plip(0, 0.7); say('Loaded slot ' + n + '.', 3000);
+  }
+}
+function takePhoto() {
+  wake();
+  try {
+    const c = document.createElement('canvas'); c.width = canvas.width; c.height = canvas.height;
+    const x = c.getContext('2d'); x.drawImage(canvas, 0, 0);
+    const k = c.width / Math.max(1, W); x.textAlign = 'right'; x.fillStyle = 'rgba(255,255,255,0.7)'; x.font = Math.round(15 * k) + 'px Georgia, serif';
+    x.fillText('Kalimba Rain', c.width - 16 * k, c.height - 16 * k);
+    c.toBlob(async (blob) => {
+      if (!blob) { say('Could not make a picture here.', 3000); return; }
+      const file = new File([blob], 'kalimba-rain.png', { type: 'image/png' });
+      try { if (navigator.canShare && navigator.canShare({ files: [file] }) && /Mobi|Android/i.test(navigator.userAgent)) { await navigator.share({ files: [file], title: 'Kalimba Rain' }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+      const url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url; a.download = 'kalimba-rain.png'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 30000);
+      say('Saved as kalimba-rain.png. Check your downloads.', 4500);
+    }, 'image/png');
+  } catch (e) { say('Could not make a picture here.', 3000); }
+}
+
 function simulate(dt) {
   acc += dt; let n = 0;
   while (acc >= DT && n < 12) {
@@ -647,6 +740,17 @@ function draw() {
     g.fillText(noteName(m), (s.x1 + s.x2) / 2 - 8 + (-(s.y2 - s.y1) / L) * 14, (s.y1 + s.y2) / 2 + 3 + ((s.x2 - s.x1) / L) * 14);
   }
 
+  if (playMode && matchMedia('(hover: hover)').matches) {
+    g.fillStyle = 'rgba(255,214,120,0.95)'; g.font = 'bold 12px "DM Mono", ui-monospace, monospace';
+    sortedBars().forEach((s, i) => g.fillText(KEY_LABEL[i], (s.x1 + s.x2) / 2 - 4, (s.y1 + s.y2) / 2 - 12));
+    g.font = '10px "DM Mono", ui-monospace, monospace';
+  }
+  if (bolt && boltT > 0) {
+    g.save(); g.globalCompositeOperation = 'lighter'; g.lineJoin = 'round'; g.lineCap = 'round';
+    g.strokeStyle = 'rgba(200,235,255,' + Math.min(1, boltT * 3).toFixed(2) + ')'; g.lineWidth = 2.5 * S;
+    g.shadowColor = 'rgba(160,220,255,0.9)'; g.shadowBlur = 14;
+    g.beginPath(); bolt.forEach((q, i) => (i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]))); g.stroke(); g.restore();
+  }
   for (const e of emitters) {
     const cx = e.x, cy = e.y, k = 1 + e.puff * 0.12;
     g.fillStyle = '#16323f'; g.strokeStyle = 'rgba(150,220,230,0.4)'; g.lineWidth = 1;
@@ -868,7 +972,10 @@ function endDrag() {
       pluck(freqOf(m), clamp((d.x0 / W) * 2 - 1, -1, 1) * 0.6, 0.7, s.sp);
     }
   } else if (d.type === 'bar') {
-    if (!d.moved) { pushHist(barsState()); bars = bars.filter((o) => o !== d.s); changed(); plip(0, 0.7); }
+    if (!d.moved) {
+      if (playMode) { ringBar(d.s, 0.85); }
+      else { pushHist(barsState()); bars = bars.filter((o) => o !== d.s); changed(); plip(0, 0.7); }
+    }
     else { pushHist(d.pre); changed(); }
   } else { save(); }
 }
@@ -923,6 +1030,27 @@ $('btnBouncy').addEventListener('click', () => {
   say(bouncy ? 'Bouncy on. New bars are springs. Beads bounce higher off them.' : 'Bouncy off. New bars are plain chimes.', 4000);
 });
 $('btnShare').addEventListener('click', share);
+$('btnPlay').addEventListener('click', () => {
+  wake(); playMode = !playMode; $('btnPlay').setAttribute('aria-pressed', String(playMode));
+  say(playMode ? 'Tap to play on. Tapping a bar rings it. On a computer, press A S D F G H J K L ; too.' : 'Tap to play off. Tapping a bar removes it.', 4500);
+});
+$('btnThunder').addEventListener('click', () => {
+  wake(); thunderOn = !thunderOn; $('btnThunder').setAttribute('aria-pressed', String(thunderOn)); thunderT = 2.5;
+  say(thunderOn ? 'Thunder on. A storm will roll through now and then.' : 'Thunder off.', 3500);
+});
+$('btnSaveSlot').addEventListener('click', () => {
+  slotArmed = !slotArmed; $('btnSaveSlot').setAttribute('aria-pressed', String(slotArmed));
+  if (slotArmed) say('Pick slot 1, 2 or 3 to save this waterhole.', 4000);
+});
+document.querySelectorAll('[data-slot]').forEach((b) => b.addEventListener('click', () => slotClick(b.dataset.slot)));
+$('btnPhoto').addEventListener('click', takePhoto);
+window.addEventListener('keydown', (e) => {
+  if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
+  const i = PLAY_KEYS.indexOf(e.code); if (i < 0) return;
+  const t = e.target; if (t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
+  const s = sortedBars()[i]; if (!s) return;
+  wake(); ringBar(s, 0.8); e.preventDefault();
+});
 $('btnRec').addEventListener('click', () => { if (rec) stopRecord(); else startRecord(); });
 $('btnTune').addEventListener('click', () => {
   const t = $('tune'); t.hidden = !t.hidden;
@@ -953,7 +1081,10 @@ function frame(now) {
   if (dt > 0.1 || dt < 0) dt = 0.016;
   time += dt;
   const k = paused ? 0 : slow ? 0.3 : 1;
-  simulate(dt * k); cull(); tick(dt * k); draw();
+  simulate(dt * k); cull(); tick(dt * k);
+  if (boltT > 0) boltT -= dt;
+  if (thunderOn && !paused && !document.hidden) { thunderT -= dt * k; if (thunderT <= 0) { thunder(); thunderT = 8 + Math.random() * 8; } }
+  draw();
   meterT += dt;
   if (meterT > 0.25) { meterT = 0; if (metered !== notes) updateMeter(); }
   requestAnimationFrame(frame);
@@ -971,7 +1102,7 @@ function boot(data) {
   if (!ok) preset();
   layout();
   setChecked('data-scale', scaleKey); setChecked('data-rate', rateKey); setChecked('data-instr', instrKey);
-  updateMeter(); syncSound();
+  updateMeter(); syncSound(); refreshSlots();
   if (window.innerWidth >= 820) { $('tune').hidden = false; $('btnTune').setAttribute('aria-expanded', 'true'); $('btnTune').classList.add('on'); }
   if (shared) say('You opened a shared waterhole. Tap anywhere to wake the sound.', 6000);
   if (window.ResizeObserver) {
