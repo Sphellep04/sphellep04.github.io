@@ -132,6 +132,15 @@ button.rec { color: #ff8e8e; border-color: #ff8e8e; }
     <p id="hint">Tap the sky to place a star. Higher stars sing higher. Tap a star to take it back.</p>
     <div class="deck tune" id="tune" role="group" aria-label="Tuning" hidden>
       <div class="grp">
+        <span class="cap">Mood</span>
+        <div class="seg" role="group" aria-label="Mood presets">
+          <button type="button" data-mood="calm" title="Slow, soft pads under a moon">Calm</button>
+          <button type="button" data-mood="bright" title="Quick bells at sunset">Bright</button>
+          <button type="button" data-mood="spooky" title="Hushed and tense, in the dark">Spooky</button>
+          <button type="button" data-mood="surprise" title="A random mix of everything">Surprise</button>
+        </div>
+      </div>
+      <div class="grp">
         <span class="cap">Sky</span>
         <div class="seg" role="radiogroup" aria-label="Constellation">
           <button type="button" role="radio" aria-checked="true" data-sky="crux" title="The Southern Cross with its pointers">Crux</button>
@@ -174,8 +183,10 @@ button.rec { color: #ff8e8e; border-color: #ff8e8e; }
       <button id="btnSnap" type="button" aria-pressed="false" title="Lock stars to 24 evenly spaced beats around the sweep">Snap to beat</button>
       <button id="btnShare" type="button" title="Copy a link to this exact sky">Share</button>
       <button id="btnRec" type="button" title="Record one full sweep as a video with sound">Record</button>
+      <button id="btnPhoto" type="button" title="Save a picture of this sky">Photo</button>
       <button id="btnWish" type="button">Wish</button>
       <button id="btnTune" type="button" aria-expanded="false" aria-controls="tune">Tune</button>
+      <button id="btnUndo" type="button" title="Undo the last change (Ctrl or Cmd + Z)">Undo</button>
       <button id="btnClear" type="button">Clear</button>
     </div>
   </div>
@@ -188,7 +199,8 @@ button.rec { color: #ff8e8e; border-color: #ff8e8e; }
 const $ = (id) => document.getElementById(id);
 const canvas = $('sky');
 const g = canvas.getContext('2d');
-const reduce = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+let reduce = window.Toybox ? Toybox.reduced : !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+document.addEventListener('toybox:motion', (e) => { reduce = !!e.detail; });
 const TAU = Math.PI * 2;
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -616,7 +628,13 @@ function spawnShooter(big) {
     y: H * (-0.02 + Math.random() * 0.22),
     vx: Math.cos(ang) * speed, vy: Math.sin(ang) * speed, life: 0, max: big ? 1.8 : 1.4, trail: [], big
   });
-  whoosh();
+  whoosh(); sparkleRun(big);
+}
+/* a shooting star sings a short falling run, walking down the current scale */
+function sparkleRun(big) {
+  if (!actx || muted) return;
+  const n = big ? 7 : 4, top = 10 + Math.floor(Math.random() * 4);
+  for (let i = 0; i < n; i++) setTimeout(() => { if (!muted) playNote(freqOf(midiOf(Math.max(0, top - i))), (Math.random() - 0.5) * 0.6, big ? 0.42 : 0.26); }, 60 + i * (big ? 80 : 95));
 }
 
 /* ---------- update ---------- */
@@ -780,7 +798,20 @@ function save() {
   clearTimeout(saveT);
   saveT = setTimeout(() => { try { localStorage.setItem(KEY, JSON.stringify(snapshot())); } catch (e) {} }, 250);
 }
-function changed() { updateMeter(); save(); }
+const hist = [];
+const starsJson = () => JSON.stringify(stars.map((s) => [s.id, s.nx, s.ny, s.mag, s.name, s.links]));
+function pushHist() { const j = starsJson(); if (hist[hist.length - 1] !== j) { hist.push(j); if (hist.length > 30) hist.shift(); } }
+function changed() { updateMeter(); save(); pushHist(); }
+function undo() {
+  wake();
+  if (hist.length < 2) { say('Nothing to undo.', 2200); return; }
+  hist.pop(); const prev = JSON.parse(hist[hist.length - 1]);
+  const gone = stars.filter((s) => !prev.some((r) => r[0] === s.id));
+  gone.forEach((s) => puffs.push({ x: sx(s), y: sy(s), t: 0, rgb: tintAt(sy(s)).join(',') }));
+  stars = prev.map((r, i) => { const s = newStar(r[1], r[2]); s.id = r[0]; s.mag = r[3]; s.name = r[4]; s.links = r[5].slice(); s.born = time + 0.05 + i * 0.03; return s; });
+  nextId = stars.reduce((m, s) => Math.max(m, s.id), 0) + 1;
+  updateMeter(); save(); say('Undone.', 1800);
+}
 
 function restore(d) {
   if (!d || !Array.isArray(d.stars)) return false;
@@ -954,6 +985,43 @@ $('btnSnap').addEventListener('click', () => {
   say(snapOn ? 'Snap on. Stars now lock to 24 beats around the sweep.' : 'Snap off. Stars go anywhere.', 3500);
 });
 $('btnShare').addEventListener('click', share);
+const MOODS = {
+  calm: { scale: 'dust', voice: 'pad', scene: 'moon', period: 22, text: 'Calm. Slow, soft and moonlit.' },
+  bright: { scale: 'dawn', voice: 'bell', scene: 'sunset', period: 11, text: 'Bright. Quick bells at sunset.' },
+  spooky: { scale: 'dunes', voice: 'glass', scene: 'night', period: 17, text: 'Spooky. Hushed and tense.' }
+};
+function applyMood(name) {
+  wake(); let m = MOODS[name];
+  if (name === 'surprise') {
+    const pick = (a) => a[Math.floor(Math.random() * a.length)];
+    m = { scale: pick(Object.keys(SCALES)), voice: pick(VOICES), scene: pick(Object.keys(SCENES)), period: 8 + Math.floor(Math.random() * 17), text: 'A surprise mix. Tap Surprise again for another.' };
+    if (!stars.length) { preset(); }
+  }
+  setScale(m.scale); setVoice(m.voice); setScene(m.scene); setPeriod(m.period); changed();
+  SCALES[scaleKey].forEach((st, i) => setTimeout(() => playNote(freqOf(62 + st), 0, 0.5), i * 100));
+  say(m.text, 3500);
+}
+document.querySelectorAll('[data-mood]').forEach((b) => b.addEventListener('click', () => applyMood(b.dataset.mood)));
+$('btnUndo').addEventListener('click', undo);
+window.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); } });
+/* photo: the sky as a picture. Phones get the share sheet, computers get a download. */
+function takePhoto() {
+  wake();
+  try {
+    const c = document.createElement('canvas'); c.width = canvas.width; c.height = canvas.height;
+    const x = c.getContext('2d'); x.drawImage(canvas, 0, 0);
+    const k = c.width / Math.max(1, W); x.textAlign = 'right'; x.fillStyle = 'rgba(255,255,255,0.7)'; x.font = Math.round(15 * k) + 'px "Bellefair", Georgia, serif';
+    x.fillText('Starlight', c.width - 16 * k, c.height - 16 * k);
+    c.toBlob(async (blob) => {
+      if (!blob) { say('Could not make a picture here.', 3000); return; }
+      const file = new File([blob], 'starlight-sky.png', { type: 'image/png' });
+      try { if (navigator.canShare && navigator.canShare({ files: [file] }) && /Mobi|Android/i.test(navigator.userAgent)) { await navigator.share({ files: [file], title: 'Starlight' }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+      const url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url; a.download = 'starlight-sky.png'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 30000);
+      say('Saved as starlight-sky.png. Check your downloads.', 4500);
+    }, 'image/png');
+  } catch (e) { say('Could not make a picture here.', 3000); }
+}
+$('btnPhoto').addEventListener('click', takePhoto);
 $('btnTune').addEventListener('click', () => {
   const t = $('tune'); t.hidden = !t.hidden;
   $('btnTune').setAttribute('aria-expanded', String(!t.hidden)); $('btnTune').classList.toggle('on', !t.hidden);
@@ -1042,6 +1110,7 @@ function boot(data) {
     try { ok = restore(JSON.parse(localStorage.getItem(KEY) || 'null')); } catch (e) { ok = false; }
   }
   if (!ok) preset();
+  pushHist();
   setScene(sceneKey); setScale(scaleKey); setVoice(voiceKey); setSnap(snapOn); syncSky(); setPeriod(period); updateMeter(); syncSound();
   if (window.innerWidth >= 820) { $('tune').hidden = false; $('btnTune').setAttribute('aria-expanded', 'true'); $('btnTune').classList.add('on'); }
   if (shared) say('You opened a shared sky. Tap anywhere to wake the sound.', 6000);
