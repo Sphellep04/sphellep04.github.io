@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Draw any creature and watch it come alive as a bouncy jelly animal that hops, looks at you, eats treats and can be thrown.">
+<meta name="theme-color" content="#f6efe0">
+<title>Doodle Zoo</title>
+<meta property="og:type" content="website">
+<meta property="og:title" content="Doodle Zoo">
+<meta property="og:description" content="Draw any creature and watch it come alive as a bouncy jelly animal that hops, looks at you, eats treats and can be thrown.">
+<meta property="og:image" content="https://sphellep04.github.io/doodle-zoo/img/preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://sphellep04.github.io/doodle-zoo/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Doodle Zoo">
+<meta name="twitter:description" content="Draw any creature and watch it come alive as a bouncy jelly animal that hops, looks at you, eats treats and can be thrown.">
+<meta name="twitter:image" content="https://sphellep04.github.io/doodle-zoo/img/preview.png">
+<link rel="icon" type="image/png" sizes="64x64" href="img/favicon-64.png">
+<link rel="apple-touch-icon" href="img/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@700&family=Patrick+Hand&display=swap">
+<style>
+:root {
+  /* Layout: a notebook page filling the screen. Creatures live on canvas, the title floats top left, a slim crayon toolbar sits at the bottom. */
+  --paper: #f6efe0;
+  --paper-2: #efe4cd;
+  --ink: #3a2f2a;
+  --mute: #7b6c62;
+  --line: rgba(58, 47, 42, 0.28);
+  --accent: #e2493a;
+  --display: "Gaegu", "Comic Sans MS", "Segoe Print", cursive;
+  --hand: "Patrick Hand", "Comic Sans MS", "Segoe Print", cursive;
+  color-scheme: light;
+}
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 17px/1.3 var(--hand); overflow: hidden; overscroll-behavior: none; }
+#app { position: relative; height: 100%; overflow: hidden; background: var(--paper); }
+#zoo { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+.top { position: absolute; inset: 0 0 auto 0; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px 16px; padding: 14px 18px; pointer-events: none; }
+h1 { margin: 0; font: 700 clamp(2.4rem, 8vw, 4rem)/0.9 var(--display); color: var(--ink); transform: rotate(-2deg); transform-origin: left bottom; }
+.tag { margin: 6px 0 0; color: var(--mute); font-size: 16px; }
+.meter { font-size: 16px; color: var(--mute); padding-top: 8px; }
+.meter b { color: var(--ink); font-weight: 400; font-variant-numeric: tabular-nums; }
+.bottom { position: absolute; inset: auto 0 0 0; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 10px 14px 16px; pointer-events: none; }
+#hint { margin: 0; min-height: 2.7em; max-width: 52ch; text-align: center; color: var(--mute); font-size: 16px; text-wrap: balance; transition: opacity 0.8s ease; }
+.deck { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; pointer-events: auto; }
+button { font: 400 18px/1 var(--hand); color: #3a2f2a; background: #fffaf0; border: 2px solid #3a2f2a; border-radius: 14px 10px 16px 9px / 10px 15px 9px 14px; min-height: 44px; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; box-shadow: 2px 3px 0 rgba(58, 47, 42, 0.85); }
+button:hover { transform: translateY(-1px); }
+button:active { transform: translate(2px, 3px); box-shadow: none; }
+button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+button.primary { background: var(--accent); color: #fffaf0; }
+button:disabled { opacity: 0.45; cursor: default; }
+.swatches { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.sw { width: 38px; min-height: 38px; height: 38px; padding: 0; border-radius: 50%; box-shadow: 1px 2px 0 rgba(58, 47, 42, 0.85); }
+.sw[aria-checked="true"] { outline: 3px solid var(--ink); outline-offset: 2px; transform: scale(1.1); }
+#app[data-night="1"] { --paper: #1f2438; --ink: #f1e7d2; --mute: #a9a2b8; --line: rgba(241, 231, 210, 0.3); }
+#app[data-night="1"] h1 { color: #f1e7d2; }
+@media (max-width: 520px) { button { padding: 0 12px; } .sw { width: 34px; height: 34px; min-height: 34px; } }
+</style>
+
+<style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #f6efe0; }</style>
+</head>
+<body>
+<main id="app">
+  <canvas id="zoo" aria-label="A notebook meadow with hand drawn creatures. Tap a creature to tickle it, drag to throw it. Press Draw a creature to make your own."></canvas>
+  <div class="top">
+    <div>
+      <h1>Doodle Zoo</h1>
+      <p class="tag">Draw anything. It comes alive.</p>
+    </div>
+    <div class="meter" aria-hidden="true">Creatures <b id="nCr">0</b></div>
+  </div>
+  <div class="bottom">
+    <p id="hint">Tap a creature to tickle it. Tap empty space to drop a treat. Drag one to throw it.</p>
+    <div class="deck" id="deckZoo" role="group" aria-label="Zoo controls">
+      <button id="btnDraw" type="button" class="primary">Draw a creature</button>
+      <button id="btnNight" type="button" aria-pressed="false">Night</button>
+      <button id="btnShare" type="button" title="Copy a link to this exact zoo">Share</button>
+      <button id="btnPhoto" type="button" title="Save a picture of your zoo">Photo</button>
+      <button id="btnClear" type="button">Clear zoo</button>
+    </div>
+    <div class="deck" id="deckDraw" role="group" aria-label="Drawing tools" hidden>
+      <div class="swatches" id="swatches" role="radiogroup" aria-label="Crayon colour"></div>
+      <button id="btnUndo" type="button">Undo</button>
+      <button id="btnWipe" type="button">Start over</button>
+      <button id="btnCancel" type="button">Cancel</button>
+      <button id="btnLive" type="button" class="primary">Bring to life</button>
+    </div>
+  </div>
+</main>
+
+<script>
+(() => {
+'use strict';
+const $ = (id) => document.getElementById(id);
+const canvas = $('zoo'), g = canvas.getContext('2d');
+const reduce = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+const TAU = Math.PI * 2;
+const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+const KEY = 'doodlezoo.v1', MAX_C = 10;
+const INK = '#3a2f2a';
+const COLORS = [['#e2493a', 'Red'], ['#f28c28', 'Orange'], ['#f2c230', 'Yellow'], ['#4aa564', 'Green'], ['#3f7fd0', 'Blue'], ['#8a52c8', 'Purple'], ['#ee6fa8', 'Pink'], ['#3a2f2a', 'Black']];
+const NAMES = ['Bloop', 'Wobbles', 'Mr Noodle', 'Pip', 'Gizmo', 'Biscuit', 'Sprout', 'Zigzag', 'Fluffkin', 'Captain Squish', 'Doodlebug', 'Nibbles', 'Mochi', 'Pudding', 'Gloop', 'Tumble', 'Twiddle', 'Bumble', 'Jellybean', 'Waffles', 'Pebble', 'Muffin', 'Quibble', 'Sir Boing'];
+
+let W = 1, H = 1, dpr = 1, U = 1, S = 1, groundY = 1, bg = null, G = 1000;
+let zoo = [], parts = [], mode = 'zoo';
+let draft = [], cur = null, colorIdx = 0;
+let night = false, treats = [];
+const fg = () => (night ? '#f1e7d2' : INK);
+const colHex = (i) => (i === 7 && night ? '#e9e2d3' : COLORS[i][0]);
+let time = 0, lastT = 0, hintT = 0, saveT = 0, clearArmed = 0, touched = false, nameIdx = 0;
+const ptr = { x: 0, y: 0, in: false, down: false };
+let held = null, tap = null;
+
+/* ---------- geometry helpers ---------- */
+function resample(pts, sp) {
+  const out = [pts[0]]; let acc = 0, prev = pts[0];
+  for (let i = 1; i < pts.length; i++) {
+    let a = prev; const b = pts[i]; let d = Math.hypot(b.x - a.x, b.y - a.y);
+    while (d > 0 && acc + d >= sp) {
+      const t = (sp - acc) / d, q = { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+      out.push(q); a = q; d = Math.hypot(b.x - a.x, b.y - a.y); acc = 0;
+    }
+    acc += d; prev = b;
+  }
+  const last = pts[pts.length - 1], lo = out[out.length - 1];
+  if (Math.hypot(last.x - lo.x, last.y - lo.y) > sp * 0.4) out.push(last);
+  return out;
+}
+const pathLen = (pts) => { let l = 0; for (let i = 1; i < pts.length; i++) l += Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y); return l; };
+
+/* ---------- creature ---------- */
+function makeCreature(strokes, name, sx0, y0, dropIn) {
+  let minx = 1e9, miny = 1e9, maxx = -1e9, maxy = -1e9;
+  strokes.forEach((s) => s.pts.forEach((p) => { minx = Math.min(minx, p.x); maxx = Math.max(maxx, p.x); miny = Math.min(miny, p.y); maxy = Math.max(maxy, p.y); }));
+  const dim = Math.max(maxx - minx, maxy - miny, 1), target = clamp(dim, U * 0.11, U * 0.27), k = target / dim;
+  const cx = (minx + maxx) / 2, cy = (miny + maxy) / 2;
+  const norm = strokes.map((s) => ({ c: s.c, pts: s.pts.map((p) => ({ x: (p.x - cx) * k, y: (p.y - cy) * k })) }));
+  let total = 0; norm.forEach((s) => { s.len = pathLen(s.pts); total += s.len; });
+  const sp = clamp(total / 36, 7 * S, 20 * S);
+  const nodes = [], info = [];
+  norm.forEach((s) => {
+    let pts = resample(s.pts, sp);
+    if (pts.length < 2) pts = [s.pts[0], { x: s.pts[0].x + 2, y: s.pts[0].y }];
+    const closed = pts.length >= 5 && s.len > sp * 5 && Math.hypot(pts[0].x - pts[pts.length - 1].x, pts[0].y - pts[pts.length - 1].y) < Math.max(sp * 1.7, s.len * 0.12);
+    if (closed) pts.pop();
+    const start = nodes.length;
+    pts.forEach((p) => nodes.push({ rx: p.x, ry: p.y }));
+    info.push({ c: s.c, start, end: nodes.length, closed });
+  });
+  let mx = 0, my = 0; nodes.forEach((n) => { mx += n.rx; my += n.ry; }); mx /= nodes.length; my /= nodes.length;
+  let dmax = 1, top = 1e9, bot = -1e9, lft = 1e9, rgt = -1e9;
+  nodes.forEach((n) => { n.rx -= mx; n.ry -= my; dmax = Math.max(dmax, Math.hypot(n.rx, n.ry)); top = Math.min(top, n.ry); bot = Math.max(bot, n.ry); lft = Math.min(lft, n.rx); rgt = Math.max(rgt, n.rx); });
+  nodes.forEach((n) => { n.b = 0.5 - 0.36 * (Math.hypot(n.rx, n.ry) / dmax); n.g = 0; });
+  // eyes sit in the upper part of the drawing
+  const h = bot - top, w = rgt - lft;
+  let ex = 0, cnt = 0; nodes.forEach((n) => { if (n.ry < top + 0.3 * h) { ex += n.rx; cnt++; } });
+  ex = cnt ? ex / cnt : 0;
+  const gap = Math.max(w * 0.2, 11 * S);
+  const c = {
+    name, info, nodes, top, bot, w, h, gap, ex, ey: top + Math.max(0.3 * h, 8 * S),
+    cx: 0, cy: 0, cos: 1, sin: 0, sx: 1, sy: 1, state: 'idle', t: 0.4 + Math.random(), air: 0, dir: Math.random() < 0.5 ? -1 : 1,
+    phase: Math.random() * TAU, blink: 2 + Math.random() * 4, blinking: 0, grabbed: false, born: time, size: target / (U * 0.27),
+    awake: 0, eat: 0, zt: 1, raw: norm.map((s) => ({ c: s.c, pts: s.pts.map((p) => ({ x: p.x, y: p.y })) })), squeal: 0
+  };
+  const px = sx0, py = (y0 !== undefined ? y0 : groundY - bot - 6) - (dropIn ? U * 0.3 : 0);
+  nodes.forEach((n) => { n.x = px + n.rx; n.y = py + n.ry; n.px = n.x; n.py = n.y; n.vx = 0; n.vy = 0; });
+  return c;
+}
+
+function nearestTreat(c) {
+  let best = null, bd = 1e9;
+  for (const t of treats) { const d = Math.abs(t.x - c.cx); if (d < bd) { bd = d; best = t; } }
+  return best;
+}
+function pickDir(c) {
+  const tr = nearestTreat(c);
+  if (tr && Math.random() < 0.9) return tr.x < c.cx ? -1 : 1;
+  const r = Math.random();
+  if (ptr.in && r < 0.35) return ptr.x < c.cx ? -1 : 1;
+  if (r < 0.7) return c.dir;
+  return -c.dir;
+}
+
+function control(c, dt) {
+  c.t -= dt;
+  const ph = time * 3 + c.phase;
+  if (c.grabbed) { const f = Math.sin(time * 16 + c.phase); c.sx = 1 + 0.1 * f; c.sy = 1 - 0.1 * f; return; }
+  if (c.state === 'idle') {
+    const sleeping = night && c.awake <= 0;
+    const b = sleeping ? 0.045 * Math.sin(time * 1.6 + c.phase) : 0.03 * Math.sin(ph); c.sx = 1 + b; c.sy = 1 - b;
+    if (sleeping) { c.t = Math.max(c.t, 0.3); return; }
+    if (c.t <= 0) { c.state = 'crouch'; c.t = 0.2 + 0.1 * c.size; c.dir = pickDir(c); }
+  } else if (c.state === 'crouch') {
+    const p = 1 - clamp(c.t / (0.2 + 0.1 * c.size), 0, 1);
+    c.sx = 1 + 0.2 * p; c.sy = 1 - 0.3 * p;
+    if (c.t <= 0) {
+      const h = U * (0.13 + Math.random() * 0.1) * (1.15 - 0.3 * c.size), vy = Math.sqrt(2 * G * h);
+      let vx = c.dir * U * (0.3 + Math.random() * 0.3) * (1.1 - 0.3 * c.size);
+      const tr = nearestTreat(c);
+      if (tr) { const airT = 2 * vy / G; vx = clamp((tr.x - c.cx) / airT * 0.95, -U * 0.7, U * 0.7); }
+      c.nodes.forEach((n) => { n.vx = vx; n.vy = -vy; });
+      c.state = 'air'; c.air = 0; c.t = 0.14;
+    }
+  } else if (c.state === 'air') {
+    c.air += dt; c.sx = 0.9; c.sy = 1.14;
+    let touch = false; c.nodes.forEach((n) => { if (n.g) touch = true; });
+    if (c.air > 0.12 && touch) { c.state = 'land'; c.t = 0.16; puff(c); }
+  } else if (c.state === 'land') {
+    const p = clamp(c.t / 0.16, 0, 1); c.sx = 1 + 0.15 * p; c.sy = 1 - 0.2 * p;
+    if (c.t <= 0) { c.state = 'idle'; c.t = 0.25 + Math.random() * 1.3; }
+  }
+}
+
+function puff(c) {
+  let lo = -1e9; c.nodes.forEach((n) => { lo = Math.max(lo, n.y); });
+  if (lo < groundY - 4) return;
+  for (let i = 0; i < 4; i++) parts.push({ k: 'dust', x: c.cx + (Math.random() - 0.5) * c.w, y: groundY - 2, vx: (Math.random() - 0.5) * 60 * S, vy: -20 * S - Math.random() * 30 * S, t: 0, life: 0.5, r: (3 + Math.random() * 4) * S });
+}
+
+function stepCreature(c, dt) {
+  control(c, dt);
+  const n = c.nodes, N = n.length, up = c.grabbed ? 0.2 : 0.6;
+  for (let i = 0; i < N; i++) {
+    const p = n[i]; p.px = p.x; p.py = p.y; p.vy += G * dt; p.x += p.vx * dt; p.y += p.vy * dt;
+  }
+  if (c.grabbed && held) { const p = n[held.i]; p.x += (ptr.x - p.x) * 0.55; p.y += (ptr.y - p.y) * 0.55; }
+  let mx = 0, my = 0; for (let i = 0; i < N; i++) { mx += n[i].x; my += n[i].y; } mx /= N; my /= N;
+  let a = 0, b = 0;
+  for (let i = 0; i < N; i++) { const dx = n[i].x - mx, dy = n[i].y - my; a += n[i].rx * dy - n[i].ry * dx; b += n[i].rx * dx + n[i].ry * dy; }
+  let th = Math.atan2(a, b); th *= (1 - up);
+  const cs = Math.cos(th), sn = Math.sin(th), sx = c.sx, sy = c.sy;
+  for (let i = 0; i < N; i++) {
+    const p = n[i], rx = p.rx * sx, ry = p.ry * sy, gx = mx + cs * rx - sn * ry, gy = my + sn * rx + cs * ry;
+    p.x += (gx - p.x) * p.b; p.y += (gy - p.y) * p.b;
+  }
+  c.cx = mx; c.cy = my; c.cos = cs; c.sin = sn;
+  for (let i = 0; i < N; i++) {
+    const p = n[i];
+    if (p.y > groundY) { p.y = groundY; p.g = 1; } else p.g = p.y > groundY - 1.5 ? 1 : 0;
+    if (p.x < 10) { p.x = 10; if (c.state !== 'idle') c.dir = 1; } else if (p.x > W - 10) { p.x = W - 10; if (c.state !== 'idle') c.dir = -1; }
+    p.vx = (p.x - p.px) / dt; p.vy = (p.y - p.py) / dt;
+    if (p.g) p.vx *= 0.5; else p.vx *= 0.999;
+    p.vx = clamp(p.vx, -U * 3, U * 3); p.vy = clamp(p.vy, -U * 3.5, U * 3.5);
+  }
+}
+
+function collide() {
+  const R = 9 * S;
+  for (let i = 0; i < zoo.length; i++) for (let j = i + 1; j < zoo.length; j++) {
+    const A = zoo[i], B = zoo[j];
+    if (Math.abs(A.cx - B.cx) > (A.w + B.w) * 0.6 + R * 2 || Math.abs(A.cy - B.cy) > (A.h + B.h) * 0.6 + R * 2) continue;
+    const ox = (A.w + B.w) * 0.5 * 0.85 - Math.abs(A.cx - B.cx), oy = (A.h + B.h) * 0.5 * 0.85 - Math.abs(A.cy - B.cy);
+    if (ox > 0 && oy > 0) { const sgn = A.cx < B.cx ? 1 : -1, push = Math.min(ox, 6) * 0.35; A.nodes.forEach((n) => { n.x -= sgn * push; }); B.nodes.forEach((n) => { n.x += sgn * push; }); }
+    for (const p of A.nodes) for (const q of B.nodes) {
+      const dx = q.x - p.x, dy = q.y - p.y, d2 = dx * dx + dy * dy;
+      if (d2 < R * R && d2 > 0.01) { const d = Math.sqrt(d2), s = (R - d) / d * 0.5; p.x -= dx * s; p.y -= dy * s; q.x += dx * s; q.y += dy * s; }
+    }
+  }
+}
+
+function simulate(dt) {
+  const sub = 3, h = dt / sub;
+  for (let s = 0; s < sub; s++) { zoo.forEach((c) => stepCreature(c, h)); collide(); }
+  for (const t of treats) {
+    if (!t.rest) { t.vy += G * dt; t.y += t.vy * dt; if (t.y >= groundY - 6 * S) { t.y = groundY - 6 * S; t.rest = true; } }
+    t.t += dt;
+  }
+  for (const c of zoo) {
+    if (c.awake > 0) c.awake -= dt;
+    if (c.eat > 0) c.eat -= dt;
+    if (night && c.awake <= 0 && !c.grabbed) { c.zt -= dt; if (c.zt <= 0) { c.zt = 1.6 + Math.random(); parts.push({ k: 'z', x: c.cx + c.w * 0.3, y: c.cy - c.h * 0.5, vx: 12, vy: -26, t: 0, life: 2 }); } }
+    if (!(night && c.awake <= 0)) {
+      for (let i = treats.length - 1; i >= 0; i--) {
+        const t = treats[i];
+        if (Math.abs(t.x - c.cx) < c.w * 0.5 + 12 * S && t.y > c.cy - c.h * 0.6 - 10 && t.y < c.cy + c.h * 0.6 + 24) {
+          treats.splice(i, 1); c.eat = 1.3; c.squeal = 1.2;
+          parts.push({ k: 'heart', x: c.cx, y: c.cy - c.h * 0.6, vx: 0, vy: -50, t: 0, life: 1 }); parts.push({ k: 'star', x: c.cx + 14, y: c.cy - c.h * 0.4, vx: 20, vy: -40, t: 0, life: 0.9 });
+        }
+      }
+    }
+    c.blink -= dt; if (c.blink <= 0) { c.blinking = 0.14; c.blink = 2.5 + Math.random() * 4; }
+    if (c.blinking > 0) c.blinking -= dt;
+    if (c.squeal > 0) c.squeal -= dt;
+  }
+  for (const p of parts) { p.t += dt; p.x += (p.vx || 0) * dt; p.y += (p.vy || 0) * dt; if (p.k === 'heart') p.vy -= 0; }
+  parts = parts.filter((p) => p.t < p.life);
+}
+
+/* ---------- drawing the creatures ---------- */
+function strokePath(c, s) {
+  const n = c.nodes, a = s.start, e = s.end, cnt = e - a;
+  g.beginPath();
+  if (cnt === 1) { g.arc(n[a].x, n[a].y, 2, 0, TAU); return; }
+  if (s.closed) {
+    const mid = (i, j) => [(n[a + i].x + n[a + j].x) / 2, (n[a + i].y + n[a + j].y) / 2];
+    let m0 = mid(cnt - 1, 0); g.moveTo(m0[0], m0[1]);
+    for (let i = 0; i < cnt; i++) { const m = mid(i, (i + 1) % cnt); g.quadraticCurveTo(n[a + i].x, n[a + i].y, m[0], m[1]); }
+    g.closePath();
+  } else {
+    g.moveTo(n[a].x, n[a].y);
+    for (let i = 1; i < cnt - 1; i++) g.quadraticCurveTo(n[a + i].x, n[a + i].y, (n[a + i].x + n[a + i + 1].x) / 2, (n[a + i].y + n[a + i + 1].y) / 2);
+    g.lineTo(n[e - 1].x, n[e - 1].y);
+  }
+}
+
+function drawCreature(c, alpha) {
+  let lo = -1e9; c.nodes.forEach((n) => { lo = Math.max(lo, n.y); });
+  const lift = clamp((groundY - lo) / (U * 0.3), 0, 1);
+  g.fillStyle = (night ? 'rgba(0,0,0,' : 'rgba(58,47,42,') + (0.16 * (1 - 0.6 * lift) * alpha).toFixed(3) + ')';
+  g.beginPath(); g.ellipse(c.cx, groundY + 4, (c.w * 0.5 + 6 * S) * (1 - 0.3 * lift), 5 * S * (1 - 0.3 * lift), 0, 0, TAU); g.fill();
+  g.lineCap = 'round'; g.lineJoin = 'round';
+  const lw = Math.max(3.5, 5.2 * S);
+  for (const s of c.info) {
+    const col = colHex(s.c);
+    g.globalAlpha = alpha;
+    if (s.closed) { strokePath(c, s); g.fillStyle = col; g.globalAlpha = 0.26 * alpha; g.fill(); g.globalAlpha = alpha; }
+    strokePath(c, s); g.strokeStyle = col; g.lineWidth = lw; g.stroke();
+    g.globalAlpha = 0.45 * alpha; g.strokeStyle = '#fffaf0'; g.lineWidth = lw * 0.3; g.save(); g.translate(-0.8 * S, -0.8 * S); strokePath(c, s); g.stroke(); g.restore();
+    g.globalAlpha = 1;
+  }
+  // eyes and mouth
+  const sleeping = night && c.awake <= 0, chew = c.eat > 0, held = c.grabbed || (c.state === 'air' && c.air < 0);
+  const R = clamp(6 * S + c.size * 2, 5.5, 11), tgt = ptr.in && Math.hypot(ptr.x - c.cx, ptr.y - c.cy) < U * 0.9 ? [ptr.x, ptr.y] : [c.cx + c.dir * 100, c.cy - 10];
+  g.globalAlpha = alpha;
+  const at = (rx0, ry0) => { const rx = rx0 * c.sx, ry = ry0 * c.sy; return [c.cx + c.cos * rx - c.sin * ry, c.cy + c.sin * rx + c.cos * ry]; };
+  for (const side of [-1, 1]) {
+    const [x, y] = at(c.ex + side * c.gap * 0.5, c.ey);
+    if (sleeping || c.blinking > 0) { g.strokeStyle = fg(); g.lineWidth = 2.2; g.beginPath(); if (sleeping) g.arc(x, y - 1, R * 0.7, 0.15 * Math.PI, 0.85 * Math.PI); else { g.moveTo(x - R * 0.8, y); g.lineTo(x + R * 0.8, y); } g.stroke(); continue; }
+    g.fillStyle = '#fffaf0'; g.strokeStyle = INK; g.lineWidth = 2; g.beginPath(); g.arc(x, y, R * (held ? 1.2 : 1), 0, TAU); g.fill(); g.stroke();
+    const dx = tgt[0] - x, dy = tgt[1] - y, d = Math.hypot(dx, dy) || 1, o = R * 0.38;
+    g.fillStyle = INK; g.beginPath(); g.arc(x + (dx / d) * o, y + (dy / d) * o, R * (held ? 0.32 : 0.48), 0, TAU); g.fill();
+  }
+  {
+    const [mx, my] = at(c.ex, c.ey + R * 1.9);
+    g.strokeStyle = INK; g.fillStyle = INK; g.lineWidth = 2.2; g.lineCap = 'round'; g.beginPath();
+    if (held) { g.arc(mx, my + 2, R * 0.55, 0, TAU); g.fill(); }
+    else if (chew) { const o = 0.5 + 0.5 * Math.abs(Math.sin(time * 14)); g.ellipse(mx, my, R * 0.7, R * 0.5 * o + 1, 0, 0, TAU); g.fill(); }
+    else if (sleeping) { g.moveTo(mx - R * 0.4, my); g.lineTo(mx + R * 0.4, my); g.stroke(); }
+    else if (c.squeal > 0) { g.arc(mx, my - R * 0.3, R * 0.8, 0.05 * Math.PI, 0.95 * Math.PI); g.closePath(); g.fill(); }
+    else { g.arc(mx, my - R * 0.55, R * 0.7, 0.2 * Math.PI, 0.8 * Math.PI); g.stroke(); }
+  }
+  g.globalAlpha = 1;
+  if (c.squeal > 0) {
+    g.fillStyle = fg(); g.font = '15px "Patrick Hand", cursive'; g.textAlign = 'center';
+    let top = 1e9; c.nodes.forEach((n) => { top = Math.min(top, n.y); });
+    g.fillText(c.name, c.cx, top - 12); g.textAlign = 'start';
+  }
+}
+
+function drawTreats() {
+  for (const t of treats) {
+    const r = 8 * S, wob = t.rest ? 0 : Math.sin(t.t * 12) * 0.2;
+    g.save(); g.translate(t.x, t.y); g.rotate(wob);
+    g.fillStyle = '#e2493a'; g.strokeStyle = INK; g.lineWidth = 2;
+    g.beginPath(); g.arc(-r * 0.35, 0, r * 0.85, 0, TAU); g.arc(r * 0.35, 0, r * 0.85, 0, TAU); g.fill();
+    g.beginPath(); g.arc(0, 0, r * 1.15, 0, TAU); g.stroke();
+    g.strokeStyle = '#4a7a3a'; g.lineWidth = 2.4; g.beginPath(); g.moveTo(0, -r); g.quadraticCurveTo(r * 0.2, -r * 1.7, r * 0.8, -r * 1.5); g.stroke();
+    g.fillStyle = 'rgba(255,255,255,0.6)'; g.beginPath(); g.arc(-r * 0.45, -r * 0.3, r * 0.22, 0, TAU); g.fill();
+    g.restore();
+  }
+}
+function drawParts() {
+  for (const p of parts) {
+    const a = 1 - p.t / p.life;
+    if (p.k === 'dust') { g.fillStyle = 'rgba(120,100,80,' + (0.35 * a).toFixed(3) + ')'; g.beginPath(); g.arc(p.x, p.y, p.r * (1 + p.t), 0, TAU); g.fill(); }
+    else if (p.k === 'heart') { g.fillStyle = 'rgba(226,73,58,' + a.toFixed(3) + ')'; g.font = (16 + 8 * (1 - a)) + 'px sans-serif'; g.fillText('♥', p.x, p.y); }
+    else if (p.k === 'z') { g.fillStyle = 'rgba(241,231,210,' + (0.85 * a).toFixed(3) + ')'; g.font = (14 + 10 * (1 - a)) + 'px "Gaegu", cursive'; g.fillText('z', p.x, p.y); }
+    else if (p.k === 'star') { g.fillStyle = 'rgba(242,194,48,' + a.toFixed(3) + ')'; g.font = '16px sans-serif'; g.fillText('✦', p.x, p.y); }
+  }
+}
+
+/* ---------- backdrop ---------- */
+function buildBg() {
+  const cv = document.createElement('canvas');
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  const b = cv.getContext('2d'); b.scale(dpr, dpr);
+  b.fillStyle = night ? '#1f2438' : '#f6efe0'; b.fillRect(0, 0, W, H);
+  b.strokeStyle = night ? 'rgba(200,215,255,0.07)' : 'rgba(80,130,190,0.16)'; b.lineWidth = 1;
+  for (let y = 34; y < H; y += 34) { b.beginPath(); b.moveTo(0, y + 0.5); b.lineTo(W, y + 0.5); b.stroke(); }
+  b.strokeStyle = night ? 'rgba(226,120,110,0.25)' : 'rgba(226,73,58,0.22)'; b.beginPath(); b.moveTo(54.5, 0); b.lineTo(54.5, H); b.stroke();
+  let seed = 11; const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  // pencil sun and clouds
+  b.strokeStyle = night ? 'rgba(241,231,210,0.5)' : 'rgba(58,47,42,0.35)'; b.lineWidth = 2; b.lineCap = 'round';
+  const sx = W * 0.82, sy = Math.min(H * 0.2, 130), sr = Math.max(22, U * 0.06);
+  b.beginPath(); b.arc(sx, sy, sr, 0, TAU); b.stroke();
+  if (night) { b.fillStyle = '#1f2438'; b.beginPath(); b.arc(sx + sr * 0.45, sy - sr * 0.2, sr * 0.85, 0, TAU); b.fill(); b.stroke(); b.beginPath(); b.arc(sx, sy, sr, 0.5 * Math.PI, 1.5 * Math.PI); b.stroke(); for (let i = 0; i < 26; i++) { const x = rnd() * W, y = rnd() * groundY * 0.8, r = 1 + rnd() * 1.6; b.fillStyle = 'rgba(241,231,210,' + (0.35 + rnd() * 0.5).toFixed(2) + ')'; b.beginPath(); b.arc(x, y, r, 0, TAU); b.fill(); } }
+  else for (let i = 0; i < 12; i++) { const a = i / 12 * TAU; b.beginPath(); b.moveTo(sx + Math.cos(a) * sr * 1.35, sy + Math.sin(a) * sr * 1.35); b.lineTo(sx + Math.cos(a) * sr * 1.75, sy + Math.sin(a) * sr * 1.75); b.stroke(); }
+  const cloud = (x, y, s) => { b.beginPath(); b.arc(x, y, 14 * s, Math.PI, 0); b.arc(x + 22 * s, y - 6 * s, 18 * s, Math.PI, 0); b.arc(x + 46 * s, y, 13 * s, Math.PI, 0); b.lineTo(x - 14 * s, y); b.stroke(); };
+  cloud(W * 0.5, H * 0.16 + 30, Math.max(0.8, U / 600)); cloud(W * 0.14, H * 0.27, Math.max(0.7, U / 700));
+  // meadow: soil band and grass tufts
+  b.fillStyle = night ? 'rgba(10,14,30,0.35)' : 'rgba(180,150,100,0.18)'; b.fillRect(0, groundY + 6, W, H - groundY);
+  b.strokeStyle = night ? '#e9e2d3' : INK; b.lineWidth = 2.6;
+  b.beginPath(); b.moveTo(0, groundY + 6);
+  for (let x = 0; x <= W; x += 10) b.lineTo(x, groundY + 6 + Math.sin(x * 0.06) * 1.6 + (rnd() - 0.5) * 1.2);
+  b.stroke();
+  b.strokeStyle = '#4aa564'; b.lineWidth = 2.2;
+  for (let x = 6; x < W; x += 12 + rnd() * 26) {
+    const h = 8 + rnd() * 12;
+    b.beginPath(); b.moveTo(x, groundY + 6); b.quadraticCurveTo(x - 3, groundY + 6 - h * 0.6, x - 5 - rnd() * 3, groundY + 6 - h);
+    b.moveTo(x + 2, groundY + 6); b.quadraticCurveTo(x + 2, groundY + 6 - h * 0.7, x + 4 + rnd() * 3, groundY + 6 - h * 0.9); b.stroke();
+  }
+  bg = cv;
+}
+
+function resize() {
+  const r = canvas.getBoundingClientRect();
+  W = Math.max(1, Math.round(r.width)); H = Math.max(1, Math.round(r.height));
+  dpr = Math.min(2, window.devicePixelRatio || 1); U = Math.min(W, H); S = clamp(U / 520, 0.7, 1.6);
+  const ui = document.querySelector('.bottom');
+  groundY = clamp(H - (ui ? ui.offsetHeight : 90) - 26, H * 0.5, H * 0.92);
+  G = U * 2.7;
+  canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+  buildBg();
+}
+
+/* ---------- starters and persistence ---------- */
+function circle(r, n, sx, sy) { const p = []; for (let i = 0; i <= n; i++) { const a = i / n * TAU; p.push({ x: Math.cos(a) * r * (sx || 1), y: Math.sin(a) * r * (sy || 1) }); } return p; }
+function starters() {
+  const blob = [{ c: 1, pts: circle(40, 22, 1.05, 0.95) }, { c: 1, pts: [{ x: -30, y: -28 }, { x: -36, y: -56 }, { x: -12, y: -38 }] }, { c: 1, pts: [{ x: 30, y: -28 }, { x: 36, y: -56 }, { x: 12, y: -38 }] }];
+  const worm = [{ c: 3, pts: (() => { const p = []; for (let i = 0; i <= 30; i++) { const x = -80 + i * 160 / 30; p.push({ x, y: Math.sin(i * 0.55) * 14 }); } return p; })() }];
+  const star = [{ c: 2, pts: (() => { const p = []; for (let i = 0; i <= 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 22 : 48; p.push({ x: Math.cos(a) * r, y: Math.sin(a) * r }); } return p; })() }];
+  return [[blob, 'Bloop'], [worm, 'Mr Noodle'], [star, 'Twinkle']];
+}
+const b64 = {
+  enc: (str) => btoa(unescape(encodeURIComponent(str))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''),
+  dec: (str) => decodeURIComponent(escape(atob(str.replace(/-/g, '+').replace(/_/g, '/'))))
+};
+function serialise() {
+  const q = (v) => Math.round(v / U * 200);
+  return zoo.map((c) => ({ n: c.name, s: c.info.map((s) => ({ c: s.c, p: c.nodes.slice(s.start, s.end).map((n) => [q(n.rx), q(n.ry)]) })) }));
+}
+function save() { clearTimeout(saveT); saveT = setTimeout(() => { try { localStorage.setItem(KEY, JSON.stringify({ v: 2, z: serialise() })); } catch (e) {} }, 300); }
+function fromList(d, div) {
+  if (!Array.isArray(d)) return 0;
+  let ok = 0;
+  const list = d.slice(0, MAX_C);
+  list.forEach((o, i) => {
+    if (!o || !Array.isArray(o.s)) return;
+    const strokes = o.s.slice(0, 14).filter((s) => s && Array.isArray(s.p) && s.p.length >= 2 && COLORS[s.c]).map((s) => ({ c: s.c | 0, pts: s.p.slice(0, 90).filter((q) => Array.isArray(q) && isFinite(q[0]) && isFinite(q[1])).map((q) => ({ x: q[0] * U / div, y: q[1] * U / div })) })).filter((s) => s.pts.length >= 2);
+    if (!strokes.length) return;
+    add(strokes, String(o.n || 'Friend').slice(0, 20), W * (0.15 + 0.7 * ((i + 0.5) / list.length)), true);
+    ok++;
+  });
+  return ok;
+}
+function load() {
+  let d = null; try { d = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) {}
+  if (!d) return false;
+  return (Array.isArray(d) ? fromList(d, 1000) : d && d.v === 2 ? fromList(d.z, 200) : 0) > 0;
+}
+function shareUrl() { let base = ''; try { base = location.href.split('#')[0]; } catch (e) {} return base + '#z=' + b64.enc(JSON.stringify({ v: 2, k: night ? 1 : 0, z: serialise() })); }
+async function share() {
+  if (!zoo.length) { say('Draw or keep a few creatures first, then share your zoo.', 3500); return; }
+  const url = shareUrl();
+  try { if (navigator.share && /Mobi|Android/i.test(navigator.userAgent)) { await navigator.share({ title: 'Doodle Zoo', text: 'Meet my little zoo', url }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+  try { await navigator.clipboard.writeText(url); say('Link copied. Anyone who opens it meets your zoo.', 4000); } catch (e) { say(url, 0); }
+}
+function photo() {
+  try {
+    canvas.toBlob((blob) => {
+      if (!blob) { say('Could not take a photo here.', 3000); return; }
+      const url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url; a.download = 'doodle-zoo.png';
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 30000);
+      say('Photo saved as doodle-zoo.png. Check your downloads.', 4000);
+    }, 'image/png');
+  } catch (e) { say('Could not take a photo here.', 3000); }
+}
+function setNight(v) {
+  night = !!v; $('app').dataset.night = night ? '1' : '0'; $('btnNight').setAttribute('aria-pressed', String(night)); $('btnNight').textContent = night ? 'Day' : 'Night';
+  if (W > 1) buildBg();
+  try { localStorage.setItem(KEY + '.night', night ? '1' : '0'); } catch (e) {}
+}
+function add(strokes, name, x, drop) {
+  if (zoo.length >= MAX_C) { const old = zoo.shift(); poof(old); }
+  const c = makeCreature(strokes, name, x, undefined, drop); zoo.push(c); updateMeter(); return c;
+}
+function poof(c) { for (let i = 0; i < 5; i++) parts.push({ k: 'dust', x: c.cx, y: c.cy + (Math.random() - 0.5) * c.h, vx: (Math.random() - 0.5) * 120, vy: (Math.random() - 0.5) * 120, t: 0, life: 0.6, r: 6 * S }); }
+
+/* ---------- interface ---------- */
+function updateMeter() { $('nCr').textContent = zoo.length + '/' + MAX_C; }
+function say(t, ms) { const h = $('hint'); h.textContent = t; h.style.opacity = 1; clearTimeout(hintT); if (ms) hintT = setTimeout(() => { h.style.opacity = 0; }, ms); }
+function setMode(m) {
+  mode = m; $('deckZoo').hidden = m !== 'zoo'; $('deckDraw').hidden = m !== 'draw';
+  canvas.style.cursor = m === 'draw' ? 'crosshair' : 'grab';
+  if (m === 'draw') say('Draw anything: a cat, a cloud, a scribble. Then bring it to life.', 0);
+  else say('Tap a creature to tickle it. Drag one to throw it.', 5000);
+  requestAnimationFrame(resize);
+}
+function pos(e) { const r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+function findNode(x, y) {
+  let best = null, bd = (ptr.type === 'touch' ? 42 : 30) * Math.max(0.8, S);
+  for (const c of zoo) for (let i = 0; i < c.nodes.length; i++) { const d = Math.hypot(c.nodes[i].x - x, c.nodes[i].y - y); if (d < bd) { bd = d; best = { c, i }; } }
+  if (!best) for (const c of zoo) { const d = Math.hypot(c.cx - x, c.cy - y); if (d < Math.max(c.w, c.h) * 0.5 + 10) { let bi = 0, bb = 1e9; c.nodes.forEach((n, i) => { const dd = Math.hypot(n.x - x, n.y - y); if (dd < bb) { bb = dd; bi = i; } }); return { c, i: bi }; } }
+  return best;
+}
+function dropTreat(x, y) {
+  if (treats.length >= 4) treats.shift();
+  treats.push({ x, y, vy: 0, rest: false, t: 0 });
+  zoo.forEach((c) => { if (night && Math.abs(c.cx - x) < U * 0.6) c.awake = Math.max(c.awake, 5); });
+}
+function tickle(c) {
+  c.squeal = 1.4; c.awake = 6; c.state = 'crouch'; c.t = 0.12; c.dir = c.cx < W / 2 ? 1 : -1;
+  for (let i = 0; i < 3; i++) parts.push({ k: i ? 'star' : 'heart', x: c.cx + (Math.random() - 0.5) * c.w, y: c.cy - c.h * 0.5, vx: (Math.random() - 0.5) * 30, vy: -50 - Math.random() * 40, t: 0, life: 1.1 });
+}
+
+canvas.addEventListener('pointerdown', (e) => {
+  const p = pos(e); ptr.x = p.x; ptr.y = p.y; ptr.in = true; ptr.down = true; ptr.type = e.pointerType;
+  try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+  if (!touched) { touched = true; clearTimeout(hintT); hintT = setTimeout(() => { $('hint').style.opacity = 0; }, 5000); }
+  if (mode === 'draw') { cur = { c: colorIdx, pts: [{ x: p.x, y: p.y }] }; draft.push(cur); return; }
+  const f = findNode(p.x, p.y);
+  if (!f) { if (p.y < groundY - 6) dropTreat(p.x, p.y); return; }
+  if (f) { held = f; f.c.grabbed = true; f.c.state = 'air'; f.c.air = -1; tap = { t: time, x: p.x, y: p.y, c: f.c, moved: false }; canvas.style.cursor = 'grabbing'; }
+});
+canvas.addEventListener('pointermove', (e) => {
+  const p = pos(e); ptr.x = p.x; ptr.y = p.y; ptr.in = true;
+  if (mode === 'draw') { if (cur) { const l = cur.pts[cur.pts.length - 1]; if (Math.hypot(p.x - l.x, p.y - l.y) > 2.5) cur.pts.push({ x: p.x, y: p.y }); } return; }
+  if (tap && Math.hypot(p.x - tap.x, p.y - tap.y) > 8) tap.moved = true;
+});
+function release() {
+  ptr.down = false;
+  if (mode === 'draw') { if (cur && pathLen(cur.pts) < 6) draft.pop(); cur = null; syncDraw(); return; }
+  if (held) {
+    const c = held.c; c.grabbed = false; c.state = 'air'; c.air = 0; c.t = 0.1;
+    if (tap && !tap.moved && time - tap.t < 0.35) tickle(c); else c.squeal = 1.2;
+    held = null; tap = null; canvas.style.cursor = 'grab';
+  }
+}
+canvas.addEventListener('pointerup', release);
+canvas.addEventListener('pointercancel', release);
+canvas.addEventListener('pointerleave', () => { if (!ptr.down) ptr.in = false; });
+
+function syncDraw() { $('btnUndo').disabled = !draft.length; $('btnWipe').disabled = !draft.length; $('btnLive').disabled = !draft.length; }
+COLORS.forEach((c, i) => {
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'sw'; b.setAttribute('role', 'radio'); b.setAttribute('aria-label', c[1]); b.setAttribute('aria-checked', String(i === 0)); b.style.background = c[0];
+  b.addEventListener('click', () => { colorIdx = i; $('swatches').querySelectorAll('.sw').forEach((s, k) => s.setAttribute('aria-checked', String(k === i))); });
+  $('swatches').appendChild(b);
+});
+$('btnDraw').addEventListener('click', () => { draft = []; cur = null; syncDraw(); setMode('draw'); });
+$('btnCancel').addEventListener('click', () => { draft = []; cur = null; setMode('zoo'); });
+$('btnUndo').addEventListener('click', () => { draft.pop(); syncDraw(); });
+$('btnWipe').addEventListener('click', () => { draft = []; syncDraw(); });
+$('btnLive').addEventListener('click', () => {
+  const total = draft.reduce((s, d) => s + pathLen(d.pts), 0);
+  if (total < U * 0.14) { say('Draw a little more, then bring it to life.', 3000); return; }
+  const name = NAMES[(nameIdx++ + Math.floor(Math.random() * NAMES.length)) % NAMES.length];
+  const strokes = draft.filter((d) => d.pts.length >= 2).map((d) => ({ c: d.c, pts: d.pts.map((p) => ({ x: p.x, y: p.y })) }));
+  draft = []; setMode('zoo');
+  const c = add(strokes, name, W * (0.2 + Math.random() * 0.6), true);
+  poof(c); save();
+  say('Meet ' + name + '! Tap it to say hello.', 5000);
+});
+$('btnNight').addEventListener('click', () => { setNight(!night); say(night ? 'Night time. The creatures fall asleep. Tickle one to wake it.' : 'Good morning! Everyone is awake.', 4000); });
+$('btnShare').addEventListener('click', share);
+$('btnPhoto').addEventListener('click', photo);
+$('btnClear').addEventListener('click', () => {
+  if (!zoo.length) { starters().forEach((s, i) => add(s[0], s[1], W * (0.25 + 0.25 * i), true)); save(); say('The starter animals are back.', 3500); updateBtn(); return; }
+  if (!clearArmed) { clearArmed = setTimeout(() => { clearArmed = 0; updateBtn(); }, 2600); $('btnClear').textContent = 'Sure?'; return; }
+  clearTimeout(clearArmed); clearArmed = 0; zoo.forEach(poof); zoo = []; treats = []; updateMeter(); save(); updateBtn();
+  say('The zoo is empty. Draw the first animal.', 5000);
+});
+function updateBtn() { $('btnClear').textContent = zoo.length ? 'Clear zoo' : 'Restore starters'; }
+
+/* ---------- draw ---------- */
+function drawDraft() {
+  g.lineCap = 'round'; g.lineJoin = 'round';
+  for (const s of draft) {
+    if (s.pts.length < 2) continue;
+    g.strokeStyle = colHex(s.c); g.lineWidth = Math.max(3.5, 5.2 * S); g.beginPath(); g.moveTo(s.pts[0].x, s.pts[0].y);
+    for (let i = 1; i < s.pts.length; i++) g.lineTo(s.pts[i].x, s.pts[i].y);
+    g.stroke();
+  }
+}
+function draw() {
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.drawImage(bg, 0, 0, W, H);
+  const dim = mode === 'draw' ? 0.35 : 1;
+  drawTreats();
+  for (const c of zoo) drawCreature(c, dim);
+  drawParts();
+  if (mode === 'draw') {
+    g.fillStyle = night ? 'rgba(31,36,56,0.6)' : 'rgba(246,239,224,0.55)'; g.fillRect(0, 0, W, H);
+    g.setLineDash([8, 8]); g.strokeStyle = night ? 'rgba(241,231,210,0.4)' : 'rgba(58,47,42,0.35)'; g.lineWidth = 2;
+    g.strokeRect(14, 100, W - 28, Math.max(60, groundY - 100 + 30)); g.setLineDash([]);
+    drawDraft();
+  }
+}
+
+function frame(now) {
+  const t = now / 1000; let dt = t - lastT; lastT = t;
+  if (dt > 0.05 || dt <= 0) dt = 0.016;
+  time += dt;
+  if (mode !== 'draw') simulate(reduce ? dt * 0.6 : dt); else { zoo.forEach((c) => { c.sx = 1; c.sy = 1; }); }
+  draw();
+  requestAnimationFrame(frame);
+}
+
+function boot() {
+  resize();
+  try { setNight(localStorage.getItem(KEY + '.night') === '1'); } catch (e) {}
+  let shared = false;
+  try {
+    const m = /^#z=([A-Za-z0-9_-]+)$/.exec(location.hash || '');
+    if (m) { const d = JSON.parse(b64.dec(m[1])); if (d && d.v === 2 && fromList(d.z, 200) > 0) { shared = true; setNight(!!d.k); } }
+  } catch (e) { zoo = []; }
+  if (!shared && !load()) starters().forEach((s, i) => add(s[0], s[1], W * (0.25 + 0.25 * i), true));
+  if (shared) say('You opened a shared zoo. Tap a creature to say hello.', 6000);
+  updateMeter(); updateBtn(); syncDraw();
+  if (window.ResizeObserver) { const ro = new ResizeObserver(resize); ro.observe(canvas); const ui = document.querySelector('.bottom'); if (ui) ro.observe(ui); } else window.addEventListener('resize', resize);
+  lastT = performance.now() / 1000;
+  requestAnimationFrame(frame);
+  try { if (location.hash === '#debug') window.__dz = { zoo: () => zoo, sim: (n) => { for (let i = 0; i < n; i++) { time += 1 / 60; simulate(1 / 60); } }, ptr }; } catch (e) {}
+}
+boot();
+})();
+</script>
+</body>
+</html>

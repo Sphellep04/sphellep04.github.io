@@ -10,13 +10,10 @@ Each toy is a self-contained folder with its own `index.html` and `img/` folder,
 | --- | --- | --- |
 | `sand-lab/` | [Sand Lab](https://sphellep04.github.io/sand-lab/) | Falling sand with water, plants, fire and lava |
 | `shatter/` | [Shatter](https://sphellep04.github.io/shatter/) | Crack a window in the dark and watch the glass fall |
+| `starlight/` | [Starlight](https://sphellep04.github.io/starlight/) | A musical desert night sky |
+| `kalimba-rain/` | [Kalimba Rain](https://sphellep04.github.io/kalimba-rain/) | Chime bars played by falling rain |
+| `doodle-zoo/` | [Doodle Zoo](https://sphellep04.github.io/doodle-zoo/) | Drawings that come alive as bouncy creatures |
 | `goo-lab/` | [Goo Lab](https://sphellep04.github.io/goo-lab/) | Squishy candy goo you can drag, slice and mix |
-
-## Toys in their own repos
-
-- [Starlight](https://sphellep04.github.io/starlight/) is a musical desert night sky.
-- [Kalimba Rain](https://sphellep04.github.io/Kalimba/) is a rain and chimes physics toy.
-- [Doodle Zoo](https://sphellep04.github.io/doodle-zoo/) turns your drawings into bouncy living creatures.
 
 ## Adding a toy
 
@@ -24,3 +21,5 @@ Each toy is a self-contained folder with its own `index.html` and `img/` folder,
 2. Copy the preview to `img/<name>-preview.png` and add a card to the home page `index.html`.
 
 Plain HTML, CSS and JavaScript. No build step.
+
+`Kalimba/` is only a redirect so the old capital K link still works.
