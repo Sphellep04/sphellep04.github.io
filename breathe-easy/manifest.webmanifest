@@ -1,0 +1,25 @@
+{
+  "name": "Breathe Easy | Toybox",
+  "short_name": "Breathe Easy",
+  "description": "A calm breathing pacer with short stress awareness tips. Pick a rhythm and follow the glow.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#150f2b",
+  "theme_color": "#150f2b",
+  "icons": [
+    {
+      "src": "img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

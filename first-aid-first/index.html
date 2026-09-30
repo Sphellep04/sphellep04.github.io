@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="A first aid awareness game. Put the steps in the right order for six common emergencies.">
+<meta name="theme-color" content="#0b1d17">
+<title>First Aid First</title>
+<meta property="og:type" content="website">
+<meta property="og:title" content="First Aid First">
+<meta property="og:description" content="A first aid awareness game. Put the steps in the right order for six common emergencies.">
+<meta property="og:image" content="https://tinytoybox.me/first-aid-first/img/preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://tinytoybox.me/first-aid-first/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="First Aid First">
+<meta name="twitter:description" content="A first aid awareness game. Put the steps in the right order for six common emergencies.">
+<meta name="twitter:image" content="https://tinytoybox.me/first-aid-first/img/preview.png">
+<link rel="icon" type="image/png" sizes="64x64" href="img/favicon-64.png">
+<link rel="apple-touch-icon" href="img/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600&family=DM+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --bg: #0a1622; --bg2: #10243a; --ink: #edf3fa; --mute: #9db2c8; --line: rgba(170, 200, 235, 0.22);
+  --card: rgba(255, 255, 255, 0.06); --acc: #ffcf4a; --acc-ink: #1a1400; --good: #4ad9a0; --bad: #ff6b7a;
+  --display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --body: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { min-height: 100%; }
+body { margin: 0; min-height: 100vh; color: var(--ink); font: 400 16px/1.55 var(--body); background: radial-gradient(800px 480px at 12% 0%, var(--glow1, rgba(255, 207, 74, 0.10)), transparent 60%), radial-gradient(700px 480px at 100% 40%, var(--glow2, rgba(74, 217, 160, 0.09)), transparent 60%), linear-gradient(180deg, var(--bg), var(--bg2)); background-color: var(--bg); padding-inline: 16px; padding-block: 0 24px; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+.wrap { max-width: 640px; margin: 0 auto; }
+.top { padding-top: 60px; }
+.kicker { margin: 0; font: 500 12px/1 var(--body); letter-spacing: 0.16em; text-transform: uppercase; color: var(--acc); }
+h1 { margin: 8px 0 0; font: 600 clamp(2.1rem, 9vw, 3.2rem)/1 var(--display); letter-spacing: -0.02em; text-wrap: balance; }
+.lede { margin: 12px 0 0; color: var(--mute); max-width: 52ch; text-wrap: pretty; }
+h2 { margin: 0; font: 600 1.5rem/1.15 var(--display); letter-spacing: -0.01em; text-wrap: balance; }
+.stats { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 0; padding: 0; list-style: none; }
+.stats li { font: 500 13px/1 var(--body); padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--mute); font-variant-numeric: tabular-nums; }
+.stats b { color: var(--ink); font-weight: 600; }
+.bar { height: 6px; margin-top: 14px; border-radius: 999px; background: rgba(255, 255, 255, 0.10); overflow: hidden; }
+.bar > i { display: block; height: 100%; width: 0; background: var(--acc); border-radius: inherit; transition: width 0.35s ease; }
+.panel { margin-top: 20px; padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 22px; border: 0; border-radius: 12px; font: 600 16px/1 var(--body); color: var(--acc-ink); background: var(--acc); cursor: pointer; }
+.btn:hover { filter: brightness(1.06); }
+.btn:active { transform: translateY(1px); }
+.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.btn.ghost:hover { border-color: var(--acc); }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.btn:focus-visible, .opt:focus-visible, .chip:focus-visible, a:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.opt { display: block; width: 100%; text-align: left; padding: 14px 16px; margin-top: 10px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink); font: 500 16px/1.4 var(--body); cursor: pointer; }
+.opt:hover:not(:disabled) { border-color: var(--acc); }
+.opt.right { border-color: var(--good); background: rgba(74, 217, 160, 0.14); }
+.opt.wrong { border-color: var(--bad); background: rgba(255, 107, 122, 0.14); }
+.opt:disabled { cursor: default; }
+.why { margin-top: 16px; padding: 14px 16px; border-left: 4px solid var(--acc); border-radius: 4px 10px 10px 4px; background: rgba(255, 255, 255, 0.05); }
+.why.good { border-left-color: var(--good); } .why.bad { border-left-color: var(--bad); }
+.why p { margin: 0; } .why p + p { margin-top: 8px; }
+.why .tag { display: block; margin-bottom: 6px; font: 600 12px/1 var(--body); letter-spacing: 0.14em; text-transform: uppercase; }
+.why.good .tag { color: var(--good); } .why.bad .tag { color: var(--bad); }
+.result { text-align: center; }
+.result .big { margin: 6px 0 0; font: 600 clamp(3rem, 14vw, 5rem)/1 var(--display); color: var(--acc); font-variant-numeric: tabular-nums; }
+.result .rank { margin: 8px 0 0; font: 600 1.3rem/1.2 var(--display); }
+.remember { margin: 18px 0 0; padding: 0; list-style: none; text-align: left; display: grid; gap: 10px; }
+.remember li { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255, 255, 255, 0.04); }
+.remember b { color: var(--acc); }
+.note { margin: 18px 0 0; font-size: 13px; color: var(--mute); }
+.credit { margin: 32px 0 0; text-align: center; font-size: 13px; color: var(--mute); }
+.credit a { color: var(--ink); }
+@keyframes pop { 0% { transform: scale(0.96); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+.pop { animation: pop 0.25s ease-out; }
+@media (prefers-reduced-motion: reduce) { .pop { animation: none; } .bar > i { transition: none; } }
+html.tb-reduced .pop { animation: none; } html.tb-reduced .bar > i { transition: none; }
+@media (max-width: 380px) { .panel { padding: 16px; } .btn { padding: 0 16px; } }
+@media (max-height: 520px) and (orientation: landscape) {
+  body.playing .top { display: none; }
+  body.playing .wrap { padding-top: 52px; }
+  .top { padding-top: 52px; }
+  .scene canvas { max-height: 46vh; width: auto; margin: 0 auto; }
+}
+
+:root { --bg: #0a1a14; --bg2: #10302a; --acc: #7ff0b0; --acc-ink: #04241a; --glow1: rgba(127, 240, 176, 0.10); --glow2: rgba(255, 138, 91, 0.08); }
+body.playing .lede.top-lede, body.playing .top .lede { display: none; }
+body.playing .top { padding-top: 56px; }
+.mini { margin: 18px 0 8px; font: 600 12px/1 var(--body); letter-spacing: 0.14em; text-transform: uppercase; color: var(--mute); }
+.slots { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; counter-reset: s; }
+.slots li { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border: 1px solid rgba(127, 240, 176, 0.5); border-radius: 12px; background: rgba(127, 240, 176, 0.10); animation: pop 0.25s ease-out; }
+.slots li::before { counter-increment: s; content: counter(s); flex: 0 0 26px; height: 26px; border-radius: 50%; background: var(--acc); color: var(--acc-ink); font: 700 14px/26px var(--body); text-align: center; }
+.slots li.empty { border-style: dashed; border-color: var(--line); background: transparent; color: var(--mute); }
+.slots li.empty::before { background: transparent; border: 1px solid var(--line); color: var(--mute); line-height: 24px; }
+.pool { display: grid; gap: 8px; }
+.tile { text-align: left; padding: 13px 14px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink); font: 500 16px/1.4 var(--body); cursor: pointer; }
+.tile:hover { border-color: var(--acc); }
+.tile:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+.tile.no { border-color: var(--bad); background: rgba(255, 107, 122, 0.16); animation: shake 0.3s; }
+.tile.hint { border-color: var(--acc); box-shadow: 0 0 0 3px rgba(127, 240, 176, 0.35); }
+@keyframes shake { 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+@media (prefers-reduced-motion: reduce) { .tile.no, .slots li { animation: none; } }
+html.tb-reduced .tile.no, html.tb-reduced .slots li { animation: none; }
+.stars { letter-spacing: 0.15em; color: var(--acc); }
+
+</style>
+<style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #0b1d17; }</style>
+<!-- toybox-shared -->
+<link rel="manifest" href="manifest.webmanifest">
+<script src="../toybox.js"></script>
+</head>
+<body>
+<main class="wrap">
+  <header class="top">
+    <p class="kicker">Awareness · First aid</p>
+    <h1>First Aid First</h1>
+    <p class="lede">Six common emergencies. Tap the steps in the right order and learn the myths to leave behind.</p>
+  </header>
+
+  <section id="intro" class="panel">
+    <h2>How it works</h2>
+    <p class="note" style="margin-top:8px;font-size:15px">Each emergency gives you a set of shuffled steps. Tap them in the order you would do them. You earn up to three stars for each one. Wrong taps cost a star, and Hint shows you the next step.</p>
+    <p class="note">This is awareness, not training. A hands-on first aid course teaches the real skills, and in an emergency call for help straight away.</p>
+    <div class="row"><button class="btn" id="bStart" type="button">Start</button></div>
+    <p class="note" id="bestLine" hidden></p>
+  </section>
+
+  <section id="play" hidden aria-live="polite">
+    <ul class="stats"><li>Emergency <b id="sN">1</b>/<span id="sT">6</span></li><li>Stars <b id="sS">0</b></li><li>This one <b id="sC">3</b> left</li></ul>
+    <div class="bar" aria-hidden="true"><i id="pBar"></i></div>
+    <h2 id="qTitle" style="margin-top:18px"></h2>
+    <p id="qText" class="lede" style="margin-top:6px"></p>
+    <p class="mini">Your order</p>
+    <ol id="slots" class="slots"></ol>
+    <p class="mini" id="poolLabel">Tap the next step</p>
+    <div id="pool" class="pool"></div>
+    <div class="row" id="hintRow"><button class="btn ghost" id="bHint" type="button">Hint (costs a star)</button></div>
+    <div id="why" class="why" hidden></div>
+    <div class="row" id="nextRow" hidden><button class="btn" id="bNext" type="button">Next emergency</button></div>
+  </section>
+
+  <section id="end" class="panel result" hidden>
+    <p class="kicker">All six done</p>
+    <p class="big" id="eScore">0</p>
+    <p class="rank" id="eRank"></p>
+    <p class="note" id="eBest"></p>
+    <ul class="remember">
+      <li><b>Stay safe first.</b> Check for danger before you help so you do not become a second casualty.</li>
+      <li><b>Call for help early.</b> In Namibia the police number is 10111. Ambulance numbers differ from town to town, so save the one for your area.</li>
+      <li><b>Do the simple things well.</b> Pressure on a bleed, cool water on a burn and hard, fast chest compressions really do save lives.</li>
+      <li><b>Learn it properly.</b> Ask a recognised provider about a first aid course. It is a skill you never regret having.</li>
+    </ul>
+    <div class="row" style="justify-content:center"><button class="btn" id="bAgain" type="button">Play again</button><button class="btn ghost" id="bShare" type="button">Share</button></div>
+  </section>
+
+  <p class="credit">Made by <a href="https://phellep.vercel.app">Phellep Shapopi</a></p>
+</main>
+
+<script>
+/* Awareness shell: small helpers shared by the Awareness toys */
+const A = (() => {
+  const $ = (id) => document.getElementById(id);
+  const store = { get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+  const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const reduced = () => !!(window.Toybox && Toybox.reduced);
+  const soundOn = () => !(window.Toybox) || Toybox.sound;
+  let ctx = null;
+  function audio() { if (!ctx) { try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; } } if (ctx.state === 'suspended') ctx.resume(); return ctx; }
+  function tone(f, d, type, vol, slide, delay) {
+    if (!soundOn()) return; const c = audio(); if (!c) return;
+    const t = c.currentTime + (delay || 0), o = c.createOscillator(), g = c.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(f, t); if (slide) o.frequency.linearRampToValueAtTime(Math.max(30, f + slide), t + d);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol || 0.1, t + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + d + 0.05);
+  }
+  const sfx = {
+    good() { tone(660, 0.12, 'triangle', 0.10); tone(880, 0.18, 'triangle', 0.10, 0, 0.09); },
+    bad() { tone(220, 0.22, 'sawtooth', 0.07, -90); },
+    tap() { tone(520, 0.05, 'triangle', 0.06); },
+    done() { [523, 659, 784, 1046].forEach((f, i) => tone(f, 0.22, 'triangle', 0.09, 0, i * 0.11)); }
+  };
+  function bestKey(slug) { return 'aware.' + slug + '.best'; }
+  function best(slug) { const v = +store.get(bestKey(slug), 0); return isFinite(v) ? v : 0; }
+  function saveBest(slug, n) { const old = best(slug); if (n > old) { store.set(bestKey(slug), String(n)); return true; } return false; }
+  function plays(slug) { const n = (+store.get('aware.' + slug + '.plays', 0) || 0) + 1; store.set('aware.' + slug + '.plays', String(n)); return n; }
+  return { $, store, shuffle, esc, reduced, soundOn, audio, tone, sfx, best, saveBest, plays };
+})();
+
+const CASES = [
+  { title: 'A splash of boiling water', text: 'Your friend has spilled boiling water over their hand. The skin is red and painful.', steps: ['Move them away from the heat source', 'Cool the burn under cool running water for 10 to 20 minutes', 'Take off rings or tight items near the burn before it swells', 'Cover it loosely with a clean, non-fluffy dressing or cling film', 'Get medical help if the burn is large, deep, blistering badly or on the face or hands'], why: 'Cooling stops the burn from going deeper and eases pain. Cover it loosely afterwards.', myth: 'Leave the butter, toothpaste and oil in the kitchen, and do not use ice. Do not pop blisters either, they protect the skin underneath.' },
+  { title: 'A nosebleed', text: 'A classmate has a nosebleed that started suddenly. There was no blow to the head.', steps: ['Sit them down and lean them slightly forward', 'Pinch the soft part of the nose firmly', 'Keep pinching and breathe through the mouth for about 10 minutes', 'Let go gently and rest, with no nose blowing for a while', 'Get medical help if it lasts more than 20 minutes or follows a head injury'], why: 'Leaning forward stops blood running down the throat, and firm steady pressure lets a clot form.', myth: 'Do not tilt the head back. Blood can run down the throat and make them cough or vomit.' },
+  { title: 'A deep cut that will not stop bleeding', text: 'Someone has cut their forearm badly on broken glass. Blood is coming out steadily.', steps: ['Make sure the area is safe and shout for help', 'Press firmly on the wound with a clean cloth, and wear gloves or a plastic bag on your hands if you can', 'Keep pressing. If blood soaks through, add more cloth on top rather than removing it', 'Lay them down and raise the injured limb if you can', 'Bandage firmly and wait for medical help'], why: 'Firm, steady pressure is the single most effective way to slow serious bleeding.', myth: 'Do not keep lifting the cloth to look. Each time you do you disturb the clot that is forming.' },
+  { title: 'Someone is choking', text: 'An adult at a table suddenly cannot speak or cough properly and is holding their throat.', steps: ['If they can still cough, encourage them to keep coughing', 'If they cannot, lean them forward and give up to 5 firm back blows between the shoulder blades', 'If that fails, give up to 5 abdominal thrusts, inwards and upwards above the belly button', 'Call emergency help and keep alternating 5 back blows with 5 thrusts', 'If they become unresponsive, start CPR'], why: 'Coughing is the body\'s best tool, so you only step in when it is not working. If anyone is with you, ask them to call for help straight away.', myth: 'Do not slap someone on the back while they are still coughing, and do not put your fingers in their mouth unless you can see the object.' },
+  { title: 'A person has collapsed', text: 'You find an adult lying on the ground. They do not move.', steps: ['Check it is safe for you to go closer', 'Tap their shoulders and shout to see if they respond', 'Shout for help and call emergency services, with the phone on speaker', 'Open the airway and check for normal breathing for no more than 10 seconds', 'If they are not breathing normally, push hard and fast in the centre of the chest, about 100 to 120 times a minute'], why: 'Every minute without circulation matters. Calling early and starting chest compressions gives them the best chance.', myth: 'You do not need to be perfect. Hands-only compressions are far better than doing nothing, and you should carry on until help arrives.' },
+  { title: 'A snake bite', text: 'On a hike, a friend has been bitten on the ankle by a snake you did not identify.', steps: ['Move away from the snake and keep your friend calm and still', 'Call emergency services or arrange transport to a hospital straight away', 'Remove rings, watches and tight clothing near the bite before swelling starts', 'Keep the limb still and rest them, with a loose bandage or splint if you have one', 'Note the time of the bite and what the snake looked like if it is safe to do so'], why: 'Keeping still slows how fast venom spreads, and fast treatment at a hospital is what matters most.', myth: 'Do not cut the bite, suck out the venom, use ice or a tight tourniquet, or give alcohol. And never chase or catch the snake.' }
+];
+let deck = [], ci = 0, total = 0, left = 3, nextStep = 0, cur = null, hinting = false;
+const $ = A.$;
+
+function stars(n) { return '★'.repeat(n) + '☆'.repeat(3 - n); }
+function show() {
+  cur = deck[ci]; nextStep = 0; left = 3; hinting = false;
+  $('qTitle').textContent = cur.title; $('qText').textContent = cur.text;
+  const slots = $('slots'); slots.innerHTML = ''; cur.steps.forEach(() => { const li = document.createElement('li'); li.className = 'empty'; li.textContent = '...'; slots.appendChild(li); });
+  const pool = $('pool'); pool.innerHTML = '';
+  A.shuffle(cur.steps.map((t, i) => i)).forEach((si) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'tile'; b.dataset.i = si; b.textContent = cur.steps[si]; b.addEventListener('click', () => tap(b, si)); pool.appendChild(b); });
+  $('why').hidden = true; $('nextRow').hidden = true; $('hintRow').hidden = false; $('poolLabel').hidden = false; $('bHint').disabled = false;
+  $('sN').textContent = ci + 1; $('sS').textContent = total; $('sC').textContent = left; $('pBar').style.width = (ci / deck.length * 100) + '%';
+}
+function place(b, si) {
+  const li = $('slots').children[nextStep]; li.className = ''; li.textContent = cur.steps[si]; b.remove(); nextStep++;
+  document.querySelectorAll('.tile.hint').forEach((x) => x.classList.remove('hint'));
+  if (nextStep >= cur.steps.length) done();
+}
+function tap(b, si) {
+  if (si === nextStep) { A.sfx.tap(); place(b, si); }
+  else { A.sfx.bad(); left = Math.max(0, left - 1); $('sC').textContent = left; b.classList.remove('no'); void b.offsetWidth; b.classList.add('no'); }
+}
+function hint() {
+  if (left <= 0) return; left--; $('sC').textContent = left; A.sfx.tap();
+  const t = document.querySelector('.tile[data-i="' + nextStep + '"]'); if (t) t.classList.add('hint');
+}
+function done() {
+  total += left; A.sfx.good();
+  $('hintRow').hidden = true; $('poolLabel').hidden = true;
+  const w = $('why'); w.className = 'why pop good';
+  w.innerHTML = '<span class="tag">Done <span class="stars">' + stars(left) + '</span></span><p>' + A.esc(cur.why) + '</p><p><b>Leave this myth behind:</b> ' + A.esc(cur.myth) + '</p>'; w.hidden = false;
+  $('nextRow').hidden = false; $('bNext').textContent = ci + 1 >= deck.length ? 'See my result' : 'Next emergency';
+  $('sS').textContent = total; $('pBar').style.width = ((ci + 1) / deck.length * 100) + '%'; $('bNext').focus({ preventScroll: true });
+}
+function next() { ci++; if (ci >= deck.length) return finish(); show(); window.scrollTo({ top: 0, behavior: A.reduced() ? 'auto' : 'smooth' }); }
+function finish() {
+  document.body.classList.remove('playing'); $('play').hidden = true; $('end').hidden = false;
+  const max = deck.length * 3, isBest = A.saveBest('first-aid-first', total), n = A.plays('first-aid-first');
+  $('eScore').textContent = total + '/' + max;
+  $('eRank').textContent = total >= 17 ? 'Calm in a crisis' : total >= 13 ? 'Ready to help' : total >= 8 ? 'Learning fast' : 'A good start';
+  $('eBest').textContent = (isBest && n > 1 ? 'New best. ' : '') + 'Your best is ' + A.best('first-aid-first') + '/' + max + '.';
+  if (window.Toybox) Toybox.setResult('First Aid First', total + '/' + max);
+  A.sfx.done(); window.scrollTo(0, 0);
+}
+function start() {
+  deck = A.shuffle(CASES); ci = 0; total = 0;
+  document.body.classList.add('playing'); $('intro').hidden = true; $('end').hidden = true; $('play').hidden = false; $('sT').textContent = deck.length; show(); A.audio();
+}
+$('bStart').addEventListener('click', start); $('bAgain').addEventListener('click', start); $('bNext').addEventListener('click', next); $('bHint').addEventListener('click', hint);
+$('bShare').addEventListener('click', () => window.Toybox && Toybox.share());
+(function () { const b = A.best('first-aid-first'); if (b) { const el = $('bestLine'); el.textContent = 'Your best so far: ' + b + '/18'; el.hidden = false; } })();
+
+</script>
+</body>
+</html>

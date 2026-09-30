@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="A road safety awareness game. Ten everyday driving and walking situations, one safe choice each.">
+<meta name="theme-color" content="#12151d">
+<title>Road Ready</title>
+<meta property="og:type" content="website">
+<meta property="og:title" content="Road Ready">
+<meta property="og:description" content="A road safety awareness game. Ten everyday driving and walking situations, one safe choice each.">
+<meta property="og:image" content="https://tinytoybox.me/road-ready/img/preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://tinytoybox.me/road-ready/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Road Ready">
+<meta name="twitter:description" content="A road safety awareness game. Ten everyday driving and walking situations, one safe choice each.">
+<meta name="twitter:image" content="https://tinytoybox.me/road-ready/img/preview.png">
+<link rel="icon" type="image/png" sizes="64x64" href="img/favicon-64.png">
+<link rel="apple-touch-icon" href="img/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600&family=DM+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --bg: #0a1622; --bg2: #10243a; --ink: #edf3fa; --mute: #9db2c8; --line: rgba(170, 200, 235, 0.22);
+  --card: rgba(255, 255, 255, 0.06); --acc: #ffcf4a; --acc-ink: #1a1400; --good: #4ad9a0; --bad: #ff6b7a;
+  --display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --body: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { min-height: 100%; }
+body { margin: 0; min-height: 100vh; color: var(--ink); font: 400 16px/1.55 var(--body); background: radial-gradient(800px 480px at 12% 0%, var(--glow1, rgba(255, 207, 74, 0.10)), transparent 60%), radial-gradient(700px 480px at 100% 40%, var(--glow2, rgba(74, 217, 160, 0.09)), transparent 60%), linear-gradient(180deg, var(--bg), var(--bg2)); background-color: var(--bg); padding-inline: 16px; padding-block: 0 24px; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+.wrap { max-width: 640px; margin: 0 auto; }
+.top { padding-top: 60px; }
+.kicker { margin: 0; font: 500 12px/1 var(--body); letter-spacing: 0.16em; text-transform: uppercase; color: var(--acc); }
+h1 { margin: 8px 0 0; font: 600 clamp(2.1rem, 9vw, 3.2rem)/1 var(--display); letter-spacing: -0.02em; text-wrap: balance; }
+.lede { margin: 12px 0 0; color: var(--mute); max-width: 52ch; text-wrap: pretty; }
+h2 { margin: 0; font: 600 1.5rem/1.15 var(--display); letter-spacing: -0.01em; text-wrap: balance; }
+.stats { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 0; padding: 0; list-style: none; }
+.stats li { font: 500 13px/1 var(--body); padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--mute); font-variant-numeric: tabular-nums; }
+.stats b { color: var(--ink); font-weight: 600; }
+.bar { height: 6px; margin-top: 14px; border-radius: 999px; background: rgba(255, 255, 255, 0.10); overflow: hidden; }
+.bar > i { display: block; height: 100%; width: 0; background: var(--acc); border-radius: inherit; transition: width 0.35s ease; }
+.panel { margin-top: 20px; padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 22px; border: 0; border-radius: 12px; font: 600 16px/1 var(--body); color: var(--acc-ink); background: var(--acc); cursor: pointer; }
+.btn:hover { filter: brightness(1.06); }
+.btn:active { transform: translateY(1px); }
+.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.btn.ghost:hover { border-color: var(--acc); }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.btn:focus-visible, .opt:focus-visible, .chip:focus-visible, a:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.opt { display: block; width: 100%; text-align: left; padding: 14px 16px; margin-top: 10px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink); font: 500 16px/1.4 var(--body); cursor: pointer; }
+.opt:hover:not(:disabled) { border-color: var(--acc); }
+.opt.right { border-color: var(--good); background: rgba(74, 217, 160, 0.14); }
+.opt.wrong { border-color: var(--bad); background: rgba(255, 107, 122, 0.14); }
+.opt:disabled { cursor: default; }
+.why { margin-top: 16px; padding: 14px 16px; border-left: 4px solid var(--acc); border-radius: 4px 10px 10px 4px; background: rgba(255, 255, 255, 0.05); }
+.why.good { border-left-color: var(--good); } .why.bad { border-left-color: var(--bad); }
+.why p { margin: 0; } .why p + p { margin-top: 8px; }
+.why .tag { display: block; margin-bottom: 6px; font: 600 12px/1 var(--body); letter-spacing: 0.14em; text-transform: uppercase; }
+.why.good .tag { color: var(--good); } .why.bad .tag { color: var(--bad); }
+.result { text-align: center; }
+.result .big { margin: 6px 0 0; font: 600 clamp(3rem, 14vw, 5rem)/1 var(--display); color: var(--acc); font-variant-numeric: tabular-nums; }
+.result .rank { margin: 8px 0 0; font: 600 1.3rem/1.2 var(--display); }
+.remember { margin: 18px 0 0; padding: 0; list-style: none; text-align: left; display: grid; gap: 10px; }
+.remember li { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255, 255, 255, 0.04); }
+.remember b { color: var(--acc); }
+.note { margin: 18px 0 0; font-size: 13px; color: var(--mute); }
+.credit { margin: 32px 0 0; text-align: center; font-size: 13px; color: var(--mute); }
+.credit a { color: var(--ink); }
+@keyframes pop { 0% { transform: scale(0.96); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+.pop { animation: pop 0.25s ease-out; }
+@media (prefers-reduced-motion: reduce) { .pop { animation: none; } .bar > i { transition: none; } }
+html.tb-reduced .pop { animation: none; } html.tb-reduced .bar > i { transition: none; }
+@media (max-width: 380px) { .panel { padding: 16px; } .btn { padding: 0 16px; } }
+@media (max-height: 520px) and (orientation: landscape) {
+  body.playing .top { display: none; }
+  body.playing .wrap { padding-top: 52px; }
+  .top { padding-top: 52px; }
+  .scene canvas { max-height: 46vh; width: auto; margin: 0 auto; }
+}
+
+:root { --bg: #11141c; --bg2: #1c2230; --acc: #ffb020; --acc-ink: #1a1000; --glow1: rgba(255, 176, 32, 0.10); --glow2: rgba(90, 160, 255, 0.08); }
+.scene { margin-top: 16px; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: #000; }
+.scene canvas { display: block; width: 100%; height: auto; aspect-ratio: 640 / 280; }
+body.playing .lede { display: none; }
+body.playing .top { padding-top: 56px; }
+.opt .k { display: inline-block; min-width: 1.6em; color: var(--acc); font-weight: 700; }
+
+</style>
+<style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #12151d; }</style>
+<!-- toybox-shared -->
+<link rel="manifest" href="manifest.webmanifest">
+<script src="../toybox.js"></script>
+</head>
+<body>
+<main class="wrap">
+  <header class="top">
+    <p class="kicker">Awareness · Road safety</p>
+    <h1>Road Ready</h1>
+    <p class="lede">Ten everyday moments on Namibian roads, from goats at dusk to gravel corners. Pick the safest choice each time.</p>
+  </header>
+
+  <section id="intro" class="panel">
+    <h2>How it works</h2>
+    <p class="note" style="margin-top:8px;font-size:15px">Each round is ten situations picked from a bigger set. Choose an answer, then read why it is safest. There is no timer, so take your time.</p>
+    <div class="row"><button class="btn" id="bStart" type="button">Start</button></div>
+    <p class="note" id="bestLine" hidden></p>
+  </section>
+
+  <section id="play" hidden aria-live="polite">
+    <ul class="stats"><li>Question <b id="sN">1</b>/<span id="sT">10</span></li><li>Score <b id="sS">0</b></li></ul>
+    <div class="bar" aria-hidden="true"><i id="pBar"></i></div>
+    <div class="scene"><canvas id="cv" width="640" height="280" role="img" aria-label="Illustration of the situation"></canvas></div>
+    <h2 id="qText" style="margin-top:16px"></h2>
+    <div id="opts"></div>
+    <div id="why" class="why" hidden></div>
+    <div class="row" id="nextRow" hidden><button class="btn" id="bNext" type="button">Next</button></div>
+  </section>
+
+  <section id="end" class="panel result" hidden>
+    <p class="kicker">Round complete</p>
+    <p class="big" id="eScore">0</p>
+    <p class="rank" id="eRank"></p>
+    <p class="note" id="eBest"></p>
+    <ul class="remember">
+      <li><b>Slow down early.</b> Speed decides how far you need to stop and how badly a crash hurts.</li>
+      <li><b>Give yourself space.</b> Leave a big gap, more in rain, and never overtake without a clear view.</li>
+      <li><b>Full attention.</b> No phone, no alcohol and stop for a rest when you are tired.</li>
+      <li><b>Everyone buckles up.</b> Seatbelts for every passenger and a proper child seat for small children.</li>
+    </ul>
+    <p class="note">The Motor Vehicle Accident Fund has said that around 72% of crashes in Namibia are caused by human error, so most are down to choices like these. Source: <a href="https://www.namibian.com.na/human-error-causes-72-of-accidents-in-namibia/" style="color:var(--ink)">The Namibian</a>.</p>
+    <div class="row" style="justify-content:center"><button class="btn" id="bAgain" type="button">Play again</button><button class="btn ghost" id="bShare" type="button">Share</button></div>
+  </section>
+
+  <p class="credit">Made by <a href="https://phellep.vercel.app">Phellep Shapopi</a></p>
+</main>
+
+<script>
+/* Awareness shell: small helpers shared by the Awareness toys */
+const A = (() => {
+  const $ = (id) => document.getElementById(id);
+  const store = { get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+  const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const reduced = () => !!(window.Toybox && Toybox.reduced);
+  const soundOn = () => !(window.Toybox) || Toybox.sound;
+  let ctx = null;
+  function audio() { if (!ctx) { try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; } } if (ctx.state === 'suspended') ctx.resume(); return ctx; }
+  function tone(f, d, type, vol, slide, delay) {
+    if (!soundOn()) return; const c = audio(); if (!c) return;
+    const t = c.currentTime + (delay || 0), o = c.createOscillator(), g = c.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(f, t); if (slide) o.frequency.linearRampToValueAtTime(Math.max(30, f + slide), t + d);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol || 0.1, t + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + d + 0.05);
+  }
+  const sfx = {
+    good() { tone(660, 0.12, 'triangle', 0.10); tone(880, 0.18, 'triangle', 0.10, 0, 0.09); },
+    bad() { tone(220, 0.22, 'sawtooth', 0.07, -90); },
+    tap() { tone(520, 0.05, 'triangle', 0.06); },
+    done() { [523, 659, 784, 1046].forEach((f, i) => tone(f, 0.22, 'triangle', 0.09, 0, i * 0.11)); }
+  };
+  function bestKey(slug) { return 'aware.' + slug + '.best'; }
+  function best(slug) { const v = +store.get(bestKey(slug), 0); return isFinite(v) ? v : 0; }
+  function saveBest(slug, n) { const old = best(slug); if (n > old) { store.set(bestKey(slug), String(n)); return true; } return false; }
+  function plays(slug) { const n = (+store.get('aware.' + slug + '.plays', 0) || 0) + 1; store.set('aware.' + slug + '.plays', String(n)); return n; }
+  return { $, store, shuffle, esc, reduced, soundOn, audio, tone, sfx, best, saveBest, plays };
+})();
+
+const QS = [
+  { scene: 'goats', q: 'You are driving at night on a rural road. Your lights catch the eyes of goats near the road edge, and some are drifting towards the tar.', o: ['Speed up and get past them before they move', 'Slow down early, be ready to stop and expect more animals', 'Flash your lights and keep your speed'], a: 1, why: 'Livestock is hard to see at night and moves without warning. Slowing early gives you room to stop inside the reach of your headlights. Where there is one animal there are usually more, so keep watching the verge.' },
+  { scene: 'crossing', q: 'A person is waiting at a zebra crossing. The car in the other lane is slowing down.', o: ['Slow down and be ready to stop, checking both lanes', 'Hoot so they wait for you to pass', 'Overtake the slowing car'], a: 0, why: 'A slowing or stopped car can hide someone stepping out. Never overtake near a crossing. Slow down and give way to people on the crossing.' },
+  { scene: 'rain', q: 'It is raining hard and the road is slick. The car in front brakes.', o: ['Keep your normal gap, you will manage', 'Leave a much bigger gap and brake early and gently', 'Brake as hard as you can at the last moment'], a: 1, why: 'Wet roads can double your stopping distance. Leave at least twice the gap you would in the dry, slow down and brake smoothly.' },
+  { scene: 'gravel', q: 'You leave the tar and move onto a gravel road at high speed. The car feels light and starts to slide a little.', o: ['Stay at the same speed, gravel is fine', 'Ease off smoothly, avoid sudden braking or sharp steering', 'Brake hard to stop the slide'], a: 1, why: 'Loose gravel gives tyres far less grip. Sudden braking or jerking the wheel can turn a small slide into a rollover. Slow down before the gravel starts and keep every movement smooth.' },
+  { scene: 'rise', q: 'There is a blind rise ahead with a solid line, and a slow truck is in front of you.', o: ['Overtake quickly before the top of the rise', 'Stay behind until you can see a clear, legal stretch', 'Flash your lights so the truck pulls over'], a: 1, why: 'You cannot see what is coming over the rise, and head-on crashes are among the deadliest. Overtaking in the wrong place is one of the causes named by the Motor Vehicle Accident Fund. Patience costs a minute.' },
+  { scene: 'tired', q: 'You have been driving for three hours after a long day. Your eyes feel heavy and you drift across the lane.', o: ['Open the window and turn the music up', 'Pull over safely and rest or swap drivers', 'Carry on, you are nearly there'], a: 1, why: 'Tiredness slows your reactions like alcohol does. Fresh air and loud music only hide it for a moment. On long trips plan a break about every two hours and stop as soon as you feel drowsy.' },
+  { scene: 'phone', q: 'Your phone lights up with a message while you are driving at 100 km/h.', o: ['A quick glance is fine, it only takes a second', 'Leave it until you have stopped somewhere safe', 'Hold it up near the windscreen so you can still see the road'], a: 1, why: 'At 100 km/h you travel about 28 metres every second. A one second glance means driving that far blind. Use Do Not Disturb while driving, or ask a passenger to read it for you.' },
+  { scene: 'belt', q: 'Two friends in the back seat say they do not need seatbelts for a short trip home.', o: ['Fine for a short trip', 'Everyone buckles up, every trip, in every seat', 'Only the front seat needs belts'], a: 1, why: 'In a crash an unbelted passenger is thrown around the car and can seriously hurt the people in front too. Short trips count. Wait until every belt is clipped before you move off.' },
+  { scene: 'walker', q: 'You are walking home along a road with no streetlights, wearing dark clothes.', o: ['Walk with the traffic behind you so you are out of the way', 'Walk facing oncoming traffic, well off the road, with something bright or a torch', 'Walk in the middle where drivers can see you'], a: 1, why: 'Drivers often see a dark figure too late. Facing the traffic lets you see it coming and step aside, and something bright or reflective, or the torch on your phone, helps drivers see you from further away.' },
+  { scene: 'school', q: 'You are driving past a school as children are leaving for the day.', o: ['Keep your speed, you have right of way', 'Slow right down and watch for children running out', 'Hoot to warn them'], a: 1, why: 'Children move fast and do not judge speed well. Slow down well before the school, watch the gaps between parked cars and be ready to stop.' },
+  { scene: 'tail', q: 'A minibus is tailgating you on the highway and flashing its lights.', o: ['Brake suddenly to teach them a lesson', 'Stay calm, hold a steady speed and let them pass when it is safe', 'Speed up to get away from them'], a: 1, why: 'Reacting angrily makes a crash more likely. Keep to your lane, do not brake suddenly and let them go by when it is safe. You will not win by racing.' },
+  { scene: 'tyre', q: 'You are about to set off on a 400 km journey on a Friday afternoon.', o: ['Just go, the car is fine', 'Check the tyres including the spare, fuel and water, and plan rest stops', 'Only check that there is enough fuel'], a: 1, why: 'A blown tyre at speed is dangerous, and the long empty stretches are far from help. Ten minutes checking the tyres, spare, fuel and water before you leave can prevent a serious problem.' },
+  { scene: 'braai', q: 'You had two beers at a braai and you feel fine. You are about to drive home.', o: ['Drive, you feel fine', 'Do not drive: get a lift, use a sober driver or stay over', 'Drive home very slowly on back roads'], a: 1, why: 'Alcohol slows your reactions and judgement well before you feel drunk. The safest amount before driving is none. Plan your ride home before the first drink.' },
+  { scene: 'seat', q: 'You are driving with a small child who is too little for an adult seatbelt.', o: ['Hold the child on your lap', 'Use a child seat that fits their size and is fitted properly', 'Belt the adult and child in together'], a: 1, why: 'In a crash you cannot hold a child in your arms. A child seat suited to their size, fitted correctly, holds them safely. Adult belts alone do not fit small bodies.' }
+];
+const ROUND = 10;
+let deck = [], i = 0, score = 0, answered = false, cur = null, raf = 0, t0 = 0;
+const cv = A.$('cv'), g = cv.getContext('2d'), W = 640, H = 280, HZ = 108;
+
+/* ---------- little scene painter ---------- */
+function sky(a, b) { const gr = g.createLinearGradient(0, 0, 0, HZ); gr.addColorStop(0, a); gr.addColorStop(1, b); g.fillStyle = gr; g.fillRect(0, 0, W, HZ + 1); }
+function ground(c) { g.fillStyle = c; g.fillRect(0, HZ, W, H - HZ); }
+function road(c, t, line) {
+  g.fillStyle = c; g.beginPath(); g.moveTo(306, HZ); g.lineTo(334, HZ); g.lineTo(590, H); g.lineTo(50, H); g.closePath(); g.fill();
+  g.fillStyle = line || 'rgba(255,255,255,0.85)';
+  for (let k = 0; k < 6; k++) { const p = ((k + t * 0.9) % 6) / 6, q = Math.pow(p, 1.9), y = HZ + q * (H - HZ), w = 1.5 + q * 9, h = 3 + q * 26; g.fillRect(320 - w / 2, y, w, h); }
+}
+function dash() { g.fillStyle = '#0c0d12'; g.beginPath(); g.moveTo(0, H); g.lineTo(0, H - 18); g.quadraticCurveTo(W / 2, H - 46, W, H - 18); g.lineTo(W, H); g.fill(); }
+function cone() { const gr = g.createLinearGradient(0, H, 0, HZ); gr.addColorStop(0, 'rgba(255,244,190,0.55)'); gr.addColorStop(1, 'rgba(255,244,190,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(230, H - 20); g.lineTo(410, H - 20); g.lineTo(380, HZ + 6); g.lineTo(260, HZ + 6); g.closePath(); g.fill(); }
+function stars(n) { g.fillStyle = 'rgba(255,255,255,0.8)'; for (let k = 0; k < n; k++) g.fillRect((k * 97 + 31) % W, (k * 53 + 11) % (HZ - 14), 2, 2); }
+function goat(x, y, s, eyes) {
+  g.save(); g.translate(x, y); g.scale(s, s); g.fillStyle = '#4a433d'; g.beginPath(); g.ellipse(0, 0, 26, 13, 0, 0, 7); g.fill(); g.beginPath(); g.ellipse(26, -12, 9, 7, 0.3, 0, 7); g.fill();
+  g.strokeStyle = '#4a433d'; g.lineWidth = 3; for (const lx of [-18, -8, 12, 20]) { g.beginPath(); g.moveTo(lx, 8); g.lineTo(lx, 26); g.stroke(); } g.beginPath(); g.moveTo(24, -18); g.lineTo(21, -30); g.moveTo(29, -18); g.lineTo(31, -30); g.stroke();
+  if (eyes) { g.fillStyle = '#ffe36a'; g.beginPath(); g.arc(28, -13, 1.8, 0, 7); g.arc(33, -12, 1.8, 0, 7); g.fill(); } g.restore();
+}
+function person(x, y, s, col, bright) {
+  g.save(); g.translate(x, y); g.scale(s, s); g.fillStyle = col; g.beginPath(); g.arc(0, -34, 7, 0, 7); g.fill(); g.fillRect(-7, -26, 14, 26); g.fillRect(-7, 0, 5, 22); g.fillRect(2, 0, 5, 22);
+  if (bright) { g.fillStyle = '#d9ff4a'; g.fillRect(-7, -18, 14, 4); g.fillRect(-7, 6, 5, 3); g.fillRect(2, 6, 5, 3); } g.restore();
+}
+function carAhead(x, y, s, brake) {
+  g.save(); g.translate(x, y); g.scale(s, s); g.fillStyle = '#3b4557'; g.fillRect(-34, -22, 68, 22); g.fillStyle = '#26303f'; g.fillRect(-24, -34, 48, 14);
+  g.fillStyle = brake ? '#ff2a2a' : '#7a1a1a'; g.fillRect(-32, -18, 10, 6); g.fillRect(22, -18, 10, 6);
+  if (brake) { g.fillStyle = 'rgba(255,42,42,0.25)'; g.beginPath(); g.arc(-27, -15, 16, 0, 7); g.arc(27, -15, 16, 0, 7); g.fill(); } g.restore();
+}
+function truck(x, y, s) { g.save(); g.translate(x, y); g.scale(s, s); g.fillStyle = '#7b8494'; g.fillRect(-40, -62, 80, 58); g.fillStyle = '#2a303b'; g.fillRect(-40, -8, 80, 8); g.fillStyle = '#ff3b30'; g.fillRect(-36, -14, 9, 6); g.fillRect(27, -14, 9, 6); g.restore(); }
+function sign(kind) {
+  const x = 520, y = 92; g.save(); g.translate(x, y); g.fillStyle = '#f6d84a'; g.strokeStyle = '#c00'; g.lineWidth = 5; g.beginPath(); g.moveTo(0, -46); g.lineTo(40, 22); g.lineTo(-40, 22); g.closePath(); g.fill(); g.stroke();
+  g.fillStyle = '#111'; g.strokeStyle = '#111'; g.lineWidth = 3;
+  if (kind === 'school') { g.beginPath(); g.arc(-8, -8, 4, 0, 7); g.arc(9, -6, 3.5, 0, 7); g.fill(); g.fillRect(-11, -3, 7, 14); g.fillRect(6, -1, 6, 12); }
+  else if (kind === 'tyre') { g.beginPath(); g.arc(0, 2, 13, 0, 7); g.stroke(); g.beginPath(); g.arc(0, 2, 5, 0, 7); g.fill(); }
+  else if (kind === 'belt') { g.beginPath(); g.moveTo(-12, -12); g.lineTo(10, 12); g.stroke(); g.beginPath(); g.arc(-13, -14, 5, 0, 7); g.fill(); }
+  else if (kind === 'seat') { g.fillRect(-10, -14, 9, 26); g.fillRect(-10, 6, 24, 7); g.beginPath(); g.arc(4, -9, 5, 0, 7); g.fill(); }
+  else if (kind === 'braai') { g.fillRect(-4, -14, 8, 10); g.fillRect(-7, -4, 14, 16); g.strokeStyle = '#c00'; g.lineWidth = 4; g.beginPath(); g.moveTo(-17, -17); g.lineTo(17, 17); g.stroke(); }
+  g.restore();
+}
+function drops(t, n, col) { g.strokeStyle = col; g.lineWidth = 1.2; for (let k = 0; k < n; k++) { const x = (k * 71 + t * 260) % (W + 40) - 20, y = (k * 37 + t * 520) % H; g.beginPath(); g.moveTo(x, y); g.lineTo(x - 5, y + 14); g.stroke(); } }
+function dust(t) { for (let k = 0; k < 7; k++) { const p = (t * 0.3 + k / 7) % 1, x = 300 + Math.sin(k * 2.4) * 120 * p, y = HZ + 60 + p * 60; g.fillStyle = 'rgba(210,175,120,' + (0.34 * (1 - p)) + ')'; g.beginPath(); g.arc(x, y, 14 + p * 44, 0, 7); g.fill(); } }
+
+const SCENES = {
+  goats(t) { sky('#020510', '#0c1630'); stars(30); ground('#0c0b09'); road('#1a1a1f', t, 'rgba(255,255,255,0.55)'); goat(205, 218, 1.75, true); goat(452, 200, 1.4, true); goat(372, 150, 0.7, true); cone(); dash(); },
+  crossing(t) { sky('#7fc4ff', '#dff0ff'); ground('#8db36c'); road('#454a55', t * 0.2); g.fillStyle = 'rgba(255,255,255,0.9)'; for (let k = 0; k < 7; k++) { const y = 190 + k * 8, q = (y - HZ) / (H - HZ), w = 80 + q * 470; g.fillRect(320 - w / 2 + (k % 2) * 6, y, w * 0.72, 5); } person(190, 190, 1.0, '#c0392b', false); carAhead(420, 152, 0.9, true); dash(); },
+  rain(t) { sky('#4a5563', '#7b8794'); ground('#4d5642'); road('#20242b', t); carAhead(322, 150, 1.05, true); drops(t, 70, 'rgba(190,215,240,0.6)'); dash(); },
+  gravel(t) { sky('#f2c98d', '#fbe7c1'); ground('#c9a26d'); road('#b98e5c', t * 1.2, 'rgba(255,255,255,0.0)'); g.fillStyle = 'rgba(90,60,30,0.25)'; for (let k = 0; k < 9; k++) { const p = ((k + t) % 9) / 9, y = HZ + Math.pow(p, 1.8) * (H - HZ), w = 40 + p * 360; g.fillRect(320 - w / 2, y, w, 2 + p * 3); } dust(t); dash(); },
+  rise(t) { sky('#8fd0ff', '#eaf6ff'); ground('#9fbf7a'); g.fillStyle = '#7fa35d'; g.beginPath(); g.moveTo(0, 150); g.quadraticCurveTo(320, 60, 640, 150); g.lineTo(640, H); g.lineTo(0, H); g.fill(); g.fillStyle = '#4a4e57'; g.beginPath(); g.moveTo(300, 92); g.lineTo(340, 92); g.lineTo(590, H); g.lineTo(50, H); g.closePath(); g.fill(); g.fillStyle = '#ffd400'; g.fillRect(314, 100, 3, 180); g.fillRect(324, 100, 3, 180); truck(322, 170, 1.4); dash(); },
+  tired(t) { sky('#2b1a4f', '#ff9b5d'); ground('#2a1f18'); g.fillStyle = '#ffd27a'; g.beginPath(); g.arc(320, HZ - 4, 34, Math.PI, 0); g.fill(); road('#2a2630', t * 0.8, 'rgba(255,255,255,0.7)'); g.fillStyle = 'rgba(0,0,0,0.5)'; g.fillRect(24, 22, 150, 40); g.fillStyle = '#fff'; g.font = '600 20px sans-serif'; g.fillText('3 hours driving', 34, 49); dash(); },
+  phone(t) { sky('#7fc4ff', '#dff0ff'); ground('#b9a77c'); road('#4a4f5b', t); dash(); g.fillStyle = '#151820'; g.fillRect(470, 190, 80, 90); g.fillStyle = '#9fd0ff'; g.fillRect(476, 196, 68, 84); g.fillStyle = '#1a3a60'; g.font = '600 13px sans-serif'; g.fillText('1 new', 484, 222); g.fillText('message', 484, 240); g.fillStyle = 'rgba(159,208,255,0.25)'; g.beginPath(); g.arc(510, 235, 70, 0, 7); g.fill(); },
+  belt(t) { sky('#7fc4ff', '#dff0ff'); ground('#8db36c'); road('#454a55', t); sign('belt'); dash(); },
+  walker(t) { sky('#020510', '#0d1834'); stars(24); ground('#0b0a08'); road('#17171b', t * 0.4, 'rgba(255,255,255,0.4)'); cone(); person(482, 178, 1.0, '#1a1d24', false); g.fillStyle = 'rgba(255,255,255,0.9)'; g.font = '600 15px sans-serif'; g.fillText('Dark clothes, hard to see', 24, 36); dash(); },
+  school(t) { sky('#7fc4ff', '#dff0ff'); ground('#8db36c'); road('#454a55', t * 0.5); sign('school'); person(150, 176, 0.8, '#2f80ed', false); person(190, 178, 0.7, '#f2994a', false); dash(); },
+  tail(t) { sky('#7fc4ff', '#dff0ff'); ground('#b9a77c'); road('#454a55', t); g.fillStyle = '#f5f5f5'; g.fillRect(180, 40, 280, 8); g.fillStyle = '#fff'; g.beginPath(); g.moveTo(240, 258); g.lineTo(400, 258); g.lineTo(382, 224); g.lineTo(258, 224); g.closePath(); g.fillStyle = 'rgba(30,40,60,0.9)'; g.fill(); g.fillStyle = '#ffe36a'; g.fillRect(262, 232, 24, 10); g.fillRect(354, 232, 24, 10); g.fillStyle = 'rgba(255,227,106,0.25)'; g.beginPath(); g.arc(274, 237, 26, 0, 7); g.arc(366, 237, 26, 0, 7); g.fill(); dash(); },
+  tyre(t) { sky('#7fc4ff', '#dff0ff'); ground('#b9a77c'); road('#454a55', t * 0.4); sign('tyre'); dash(); },
+  braai(t) { sky('#0b1230', '#2b2448'); stars(20); ground('#161219'); road('#1b1a22', t * 0.5, 'rgba(255,255,255,0.5)'); cone(); sign('braai'); dash(); },
+  seat(t) { sky('#7fc4ff', '#dff0ff'); ground('#8db36c'); road('#454a55', t * 0.6); sign('seat'); dash(); }
+};
+function paint(ts) { const t = (ts - t0) / 1000; g.clearRect(0, 0, W, H); (SCENES[cur.scene] || SCENES.belt)(A.reduced() ? 0 : t); if (!A.reduced()) raf = requestAnimationFrame(paint); }
+function drawScene() { cancelAnimationFrame(raf); t0 = performance.now(); paint(t0); }
+
+/* ---------- game ---------- */
+function show() {
+  cur = deck[i]; answered = false;
+  A.$('qText').textContent = cur.q;
+  const opts = A.$('opts'); opts.innerHTML = '';
+  cur.order.forEach((oi, n) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'opt pop'; b.dataset.i = oi; b.innerHTML = '<span class="k">' + 'ABC'[n] + '</span> ' + A.esc(cur.o[oi]); b.addEventListener('click', () => pick(oi, b)); opts.appendChild(b); });
+  A.$('why').hidden = true; A.$('nextRow').hidden = true;
+  A.$('sN').textContent = i + 1; A.$('sS').textContent = score; A.$('pBar').style.width = (i / ROUND * 100) + '%';
+  drawScene();
+}
+function pick(oi, btn) {
+  if (answered) return; answered = true;
+  const ok = oi === cur.a; if (ok) { score++; A.sfx.good(); } else A.sfx.bad();
+  document.querySelectorAll('#opts .opt').forEach((b) => { b.disabled = true; if (+b.dataset.i === cur.a) b.classList.add('right'); });
+  if (!ok) btn.classList.add('wrong');
+  const w = A.$('why'); w.className = 'why pop ' + (ok ? 'good' : 'bad'); w.innerHTML = '<span class="tag">' + (ok ? 'Safe choice' : 'Not the safest') + '</span><p>' + A.esc(cur.why) + '</p>'; w.hidden = false;
+  A.$('nextRow').hidden = false; A.$('bNext').textContent = i + 1 >= ROUND ? 'See my result' : 'Next situation';
+  A.$('sS').textContent = score; A.$('pBar').style.width = ((i + 1) / ROUND * 100) + '%'; A.$('bNext').focus({ preventScroll: true });
+}
+function next() { i++; if (i >= ROUND) return finish(); show(); window.scrollTo({ top: 0, behavior: A.reduced() ? 'auto' : 'smooth' }); }
+function finish() {
+  cancelAnimationFrame(raf); document.body.classList.remove('playing'); A.$('play').hidden = true; A.$('end').hidden = false;
+  const isBest = A.saveBest('road-ready', score), n = A.plays('road-ready');
+  A.$('eScore').textContent = score + '/' + ROUND;
+  A.$('eRank').textContent = score >= 9 ? 'Road ready' : score >= 7 ? 'Safe and steady' : score >= 4 ? 'Learner licence energy' : 'Time for a slow lap';
+  A.$('eBest').textContent = (isBest && n > 1 ? 'New best. ' : '') + 'Your best is ' + A.best('road-ready') + '/' + ROUND + '.';
+  if (window.Toybox) Toybox.setResult('Road Ready', score + '/' + ROUND);
+  A.sfx.done(); window.scrollTo(0, 0);
+}
+function start() {
+  deck = A.shuffle(QS).slice(0, ROUND).map((q) => Object.assign({}, q, { order: A.shuffle([0, 1, 2]) })); i = 0; score = 0;
+  document.body.classList.add('playing'); A.$('intro').hidden = true; A.$('end').hidden = true; A.$('play').hidden = false; show(); A.audio();
+}
+A.$('bStart').addEventListener('click', start); A.$('bAgain').addEventListener('click', start); A.$('bNext').addEventListener('click', next);
+A.$('bShare').addEventListener('click', () => window.Toybox && Toybox.share());
+document.addEventListener('keydown', (e) => { if (A.$('play').hidden) return; const n = { a: 0, b: 1, c: 2, 1: 0, 2: 1, 3: 2 }[e.key.toLowerCase()]; if (n !== undefined && !answered) { const b = A.$('opts').children[n]; if (b) b.click(); } else if (answered && (e.key === 'Enter') && document.activeElement !== A.$('bNext')) next(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) cancelAnimationFrame(raf); else if (!A.$('play').hidden && cur) drawScene(); });
+(function () { const b = A.best('road-ready'); if (b) { const el = A.$('bestLine'); el.textContent = 'Your best so far: ' + b + '/' + ROUND; el.hidden = false; } })();
+
+</script>
+</body>
+</html>

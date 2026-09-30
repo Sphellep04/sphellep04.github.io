@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="A water saving awareness game. Fix the leaks and running taps before your tank runs dry.">
+<meta name="theme-color" content="#061a2b">
+<title>Water Wise</title>
+<meta property="og:type" content="website">
+<meta property="og:title" content="Water Wise">
+<meta property="og:description" content="A water saving awareness game. Fix the leaks and running taps before your tank runs dry.">
+<meta property="og:image" content="https://tinytoybox.me/water-wise/img/preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://tinytoybox.me/water-wise/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Water Wise">
+<meta name="twitter:description" content="A water saving awareness game. Fix the leaks and running taps before your tank runs dry.">
+<meta name="twitter:image" content="https://tinytoybox.me/water-wise/img/preview.png">
+<link rel="icon" type="image/png" sizes="64x64" href="img/favicon-64.png">
+<link rel="apple-touch-icon" href="img/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600&family=DM+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --bg: #0a1622; --bg2: #10243a; --ink: #edf3fa; --mute: #9db2c8; --line: rgba(170, 200, 235, 0.22);
+  --card: rgba(255, 255, 255, 0.06); --acc: #ffcf4a; --acc-ink: #1a1400; --good: #4ad9a0; --bad: #ff6b7a;
+  --display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --body: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { min-height: 100%; }
+body { margin: 0; min-height: 100vh; color: var(--ink); font: 400 16px/1.55 var(--body); background: radial-gradient(800px 480px at 12% 0%, var(--glow1, rgba(255, 207, 74, 0.10)), transparent 60%), radial-gradient(700px 480px at 100% 40%, var(--glow2, rgba(74, 217, 160, 0.09)), transparent 60%), linear-gradient(180deg, var(--bg), var(--bg2)); background-color: var(--bg); padding-inline: 16px; padding-block: 0 24px; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+.wrap { max-width: 640px; margin: 0 auto; }
+.top { padding-top: 60px; }
+.kicker { margin: 0; font: 500 12px/1 var(--body); letter-spacing: 0.16em; text-transform: uppercase; color: var(--acc); }
+h1 { margin: 8px 0 0; font: 600 clamp(2.1rem, 9vw, 3.2rem)/1 var(--display); letter-spacing: -0.02em; text-wrap: balance; }
+.lede { margin: 12px 0 0; color: var(--mute); max-width: 52ch; text-wrap: pretty; }
+h2 { margin: 0; font: 600 1.5rem/1.15 var(--display); letter-spacing: -0.01em; text-wrap: balance; }
+.stats { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 0; padding: 0; list-style: none; }
+.stats li { font: 500 13px/1 var(--body); padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--mute); font-variant-numeric: tabular-nums; }
+.stats b { color: var(--ink); font-weight: 600; }
+.bar { height: 6px; margin-top: 14px; border-radius: 999px; background: rgba(255, 255, 255, 0.10); overflow: hidden; }
+.bar > i { display: block; height: 100%; width: 0; background: var(--acc); border-radius: inherit; transition: width 0.35s ease; }
+.panel { margin-top: 20px; padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 22px; border: 0; border-radius: 12px; font: 600 16px/1 var(--body); color: var(--acc-ink); background: var(--acc); cursor: pointer; }
+.btn:hover { filter: brightness(1.06); }
+.btn:active { transform: translateY(1px); }
+.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.btn.ghost:hover { border-color: var(--acc); }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.btn:focus-visible, .opt:focus-visible, .chip:focus-visible, a:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.opt { display: block; width: 100%; text-align: left; padding: 14px 16px; margin-top: 10px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink); font: 500 16px/1.4 var(--body); cursor: pointer; }
+.opt:hover:not(:disabled) { border-color: var(--acc); }
+.opt.right { border-color: var(--good); background: rgba(74, 217, 160, 0.14); }
+.opt.wrong { border-color: var(--bad); background: rgba(255, 107, 122, 0.14); }
+.opt:disabled { cursor: default; }
+.why { margin-top: 16px; padding: 14px 16px; border-left: 4px solid var(--acc); border-radius: 4px 10px 10px 4px; background: rgba(255, 255, 255, 0.05); }
+.why.good { border-left-color: var(--good); } .why.bad { border-left-color: var(--bad); }
+.why p { margin: 0; } .why p + p { margin-top: 8px; }
+.why .tag { display: block; margin-bottom: 6px; font: 600 12px/1 var(--body); letter-spacing: 0.14em; text-transform: uppercase; }
+.why.good .tag { color: var(--good); } .why.bad .tag { color: var(--bad); }
+.result { text-align: center; }
+.result .big { margin: 6px 0 0; font: 600 clamp(3rem, 14vw, 5rem)/1 var(--display); color: var(--acc); font-variant-numeric: tabular-nums; }
+.result .rank { margin: 8px 0 0; font: 600 1.3rem/1.2 var(--display); }
+.remember { margin: 18px 0 0; padding: 0; list-style: none; text-align: left; display: grid; gap: 10px; }
+.remember li { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255, 255, 255, 0.04); }
+.remember b { color: var(--acc); }
+.note { margin: 18px 0 0; font-size: 13px; color: var(--mute); }
+.credit { margin: 32px 0 0; text-align: center; font-size: 13px; color: var(--mute); }
+.credit a { color: var(--ink); }
+@keyframes pop { 0% { transform: scale(0.96); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+.pop { animation: pop 0.25s ease-out; }
+@media (prefers-reduced-motion: reduce) { .pop { animation: none; } .bar > i { transition: none; } }
+html.tb-reduced .pop { animation: none; } html.tb-reduced .bar > i { transition: none; }
+@media (max-width: 380px) { .panel { padding: 16px; } .btn { padding: 0 16px; } }
+@media (max-height: 520px) and (orientation: landscape) {
+  body.playing .top { display: none; }
+  body.playing .wrap { padding-top: 52px; }
+  .top { padding-top: 52px; }
+  .scene canvas { max-height: 46vh; width: auto; margin: 0 auto; }
+}
+
+:root { --bg: #061a2b; --bg2: #0a3350; --acc: #6ad8ff; --acc-ink: #03202e; --glow1: rgba(106, 216, 255, 0.12); --glow2: rgba(74, 217, 160, 0.08); }
+body.playing .lede { display: none; }
+body.playing .top { padding-top: 56px; }
+.stage { margin-top: 16px; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: #04121f; touch-action: manipulation; }
+.stage canvas { display: block; width: 100%; height: auto; aspect-ratio: 360 / 440; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+.tip { min-height: 3em; margin: 12px 0 0; color: var(--mute); font-size: 15px; text-align: center; text-wrap: balance; }
+
+</style>
+<style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #061a2b; }</style>
+<!-- toybox-shared -->
+<link rel="manifest" href="manifest.webmanifest">
+<script src="../toybox.js"></script>
+</head>
+<body>
+<main class="wrap">
+  <header class="top">
+    <p class="kicker">Awareness · Saving water</p>
+    <h1>Water Wise</h1>
+    <p class="lede">Namibia is one of the driest countries in Africa, and every drop counts. Fix the leaks and running taps before your tank runs dry.</p>
+  </header>
+
+  <section id="intro" class="panel">
+    <h2>How it works</h2>
+    <p class="note" style="margin-top:8px;font-size:15px">Leaks pop up around the house and drain your tank. Tap a leaking spot to fix it. The longer a leak runs the faster it drains. Tap a passing rain cloud to top the tank up. Keyboard: number keys 1 to 9.</p>
+    <div class="row"><button class="btn" id="bStart" type="button">Start</button></div>
+    <p class="note" id="bestLine" hidden></p>
+  </section>
+
+  <section id="play" hidden>
+    <ul class="stats"><li>Days <b id="sD">0</b></li><li>Leaks fixed <b id="sF">0</b></li><li>Tank <b id="sT">100</b>%</li></ul>
+    <div class="stage"><canvas id="cv" width="360" height="440" role="img" aria-label="A house with nine water fixtures. Tap the ones that are leaking."></canvas></div>
+    <p class="tip" id="tip" aria-live="polite">Tap the spots that start to drip.</p>
+    <div class="row"><button class="btn ghost" id="bPause" type="button">Pause</button></div>
+  </section>
+
+  <section id="end" class="panel result" hidden>
+    <p class="kicker">The tank ran dry</p>
+    <p class="big" id="eScore">0</p>
+    <p class="rank" id="eRank"></p>
+    <p class="note" id="eBest"></p>
+    <ul class="remember" id="facts"></ul>
+    <div class="row" style="justify-content:center"><button class="btn" id="bAgain" type="button">Play again</button><button class="btn ghost" id="bShare" type="button">Share</button></div>
+  </section>
+
+  <p class="credit">Made by <a href="https://phellep.vercel.app">Phellep Shapopi</a></p>
+</main>
+
+<script>
+/* Awareness shell: small helpers shared by the Awareness toys */
+const A = (() => {
+  const $ = (id) => document.getElementById(id);
+  const store = { get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+  const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const reduced = () => !!(window.Toybox && Toybox.reduced);
+  const soundOn = () => !(window.Toybox) || Toybox.sound;
+  let ctx = null;
+  function audio() { if (!ctx) { try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; } } if (ctx.state === 'suspended') ctx.resume(); return ctx; }
+  function tone(f, d, type, vol, slide, delay) {
+    if (!soundOn()) return; const c = audio(); if (!c) return;
+    const t = c.currentTime + (delay || 0), o = c.createOscillator(), g = c.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(f, t); if (slide) o.frequency.linearRampToValueAtTime(Math.max(30, f + slide), t + d);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol || 0.1, t + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + d + 0.05);
+  }
+  const sfx = {
+    good() { tone(660, 0.12, 'triangle', 0.10); tone(880, 0.18, 'triangle', 0.10, 0, 0.09); },
+    bad() { tone(220, 0.22, 'sawtooth', 0.07, -90); },
+    tap() { tone(520, 0.05, 'triangle', 0.06); },
+    done() { [523, 659, 784, 1046].forEach((f, i) => tone(f, 0.22, 'triangle', 0.09, 0, i * 0.11)); }
+  };
+  function bestKey(slug) { return 'aware.' + slug + '.best'; }
+  function best(slug) { const v = +store.get(bestKey(slug), 0); return isFinite(v) ? v : 0; }
+  function saveBest(slug, n) { const old = best(slug); if (n > old) { store.set(bestKey(slug), String(n)); return true; } return false; }
+  function plays(slug) { const n = (+store.get('aware.' + slug + '.plays', 0) || 0) + 1; store.set('aware.' + slug + '.plays', String(n)); return n; }
+  return { $, store, shuffle, esc, reduced, soundOn, audio, tone, sfx, best, saveBest, plays };
+})();
+
+const W = 360, H = 440, N = 9;
+const FIX = [
+  { n: 'Kitchen tap', tip: 'A slow drip can waste thousands of litres over a year, so fix it early.' },
+  { n: 'Basin tap', tip: 'Turn the tap off while you brush your teeth or shave.' },
+  { n: 'Shower', tip: 'A shorter shower saves several litres every minute.' },
+  { n: 'Toilet', tip: 'Drop food colouring in the cistern. If it shows in the bowl without flushing, you have a silent leak.' },
+  { n: 'Garden hose', tip: 'Water plants early or late in the day so less is lost to the sun.' },
+  { n: 'Washing machine', tip: 'Run full loads only, and reuse the rinse water on plants.' },
+  { n: 'Outdoor tap', tip: 'A tap left running outside can empty a tank without anyone noticing.' },
+  { n: 'Geyser pipe', tip: 'Insulate hot pipes so you do not run the tap while waiting for it to warm up.' },
+  { n: 'Water trough', tip: 'Walk the pipes and troughs regularly, slow leaks hide well.' }
+];
+const FACTS = [
+  'Namibia is often described as the driest country in sub-Saharan Africa, so water has to be used carefully.',
+  'Check for hidden leaks: read your water meter, use no water for two hours, then read it again. If the number moved, something is leaking.',
+  'Reuse grey water from washing up or showers on garden plants. Just avoid soaps with harsh chemicals on food plants.',
+  'Water the garden in the cool of the morning or evening. In the middle of the day much of it just evaporates.',
+  'A bucket to catch the shower water while it warms up is free irrigation for a pot plant.',
+  'Fixing a leaking tap or toilet is usually a cheap repair that pays for itself quickly on your water bill.'
+];
+const cv = A.$('cv'), g = cv.getContext('2d'); const $ = A.$;
+let run = false, paused = false, last = 0, raf = 0, t = 0, tank = 100, fixed = 0, spawn = 1.5, leaks = [], cloud = null, cloudT = 8, bursts = [], drips = [], shake = 0;
+const cells = []; for (let i = 0; i < N; i++) { const c = i % 3, r = (i / 3) | 0; cells.push({ x: 10 + c * 116, y: 110 + r * 108, w: 108, h: 100 }); }
+
+function rr(x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+function drop(x, y, s, col) { g.fillStyle = col; g.beginPath(); g.moveTo(x, y - 6 * s); g.quadraticCurveTo(x + 5 * s, y + 1 * s, x, y + 5 * s); g.quadraticCurveTo(x - 5 * s, y + 1 * s, x, y - 6 * s); g.fill(); }
+function icon(i, cx, cy, col) {
+  g.save(); g.translate(cx, cy); g.strokeStyle = col; g.fillStyle = col; g.lineWidth = 4; g.lineCap = 'round'; g.lineJoin = 'round';
+  switch (i) {
+    case 0: case 1: case 6: g.beginPath(); g.moveTo(-14, -4); g.lineTo(6, -4); g.lineTo(6, 8); g.stroke(); g.fillRect(-16, -12, 14, 6); if (i === 6) { g.beginPath(); g.moveTo(-14, 8); g.lineTo(-14, 14); g.stroke(); } break;
+    case 2: g.beginPath(); g.arc(-6, -6, 12, Math.PI, 0); g.closePath(); g.fill(); g.lineWidth = 2; for (let k = -12; k <= 8; k += 7) { g.beginPath(); g.moveTo(k, 8); g.lineTo(k - 2, 16); g.stroke(); } break;
+    case 3: g.beginPath(); g.ellipse(0, 4, 15, 9, 0, 0, 7); g.stroke(); g.strokeRect(-8, -18, 16, 12); break;
+    case 4: g.beginPath(); g.arc(0, 0, 13, 0, 7); g.stroke(); g.beginPath(); g.arc(0, 0, 6, 0, 7); g.stroke(); g.beginPath(); g.moveTo(13, 0); g.lineTo(20, 8); g.stroke(); break;
+    case 5: g.lineWidth = 3; rr(-15, -16, 30, 32, 5); g.stroke(); g.beginPath(); g.arc(0, 4, 8, 0, 7); g.stroke(); break;
+    case 7: g.lineWidth = 3; g.beginPath(); g.ellipse(0, -12, 12, 4, 0, 0, 7); g.stroke(); g.beginPath(); g.moveTo(-12, -12); g.lineTo(-12, 12); g.moveTo(12, -12); g.lineTo(12, 12); g.stroke(); g.beginPath(); g.ellipse(0, 12, 12, 4, 0, 0, Math.PI); g.stroke(); break;
+    case 8: g.beginPath(); g.moveTo(-18, -8); g.lineTo(18, -8); g.lineTo(13, 10); g.lineTo(-13, 10); g.closePath(); g.stroke(); g.fillStyle = 'rgba(106,216,255,0.6)'; g.fillRect(-14, -3, 28, 5); break;
+  }
+  g.restore();
+}
+function draw() {
+  g.clearRect(0, 0, W, H);
+  const bg = g.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, '#0b2a45'); bg.addColorStop(1, '#04121f'); g.fillStyle = bg; g.fillRect(0, 0, W, H);
+  const sx = shake > 0 && !A.reduced() ? (Math.random() - 0.5) * 6 : 0; g.save(); g.translate(sx, 0);
+  /* tank */
+  g.fillStyle = 'rgba(255,255,255,0.08)'; rr(10, 12, W - 20, 62, 14); g.fill(); g.save(); rr(10, 12, W - 20, 62, 14); g.clip();
+  const lvl = Math.max(0, tank) / 100, fw = (W - 20) * lvl, col = tank < 25 ? '#ff6b7a' : '#3fbcf0';
+  g.fillStyle = col; g.fillRect(10, 12, fw, 62); g.fillStyle = 'rgba(255,255,255,0.18)'; g.beginPath(); for (let x = 0; x <= fw; x += 6) { const y = 12 + 4 * Math.sin(x / 14 + t * 3); if (x === 0) g.moveTo(10, 12); g.lineTo(10 + x, y + 6); } g.lineTo(10 + fw, 12); g.fill(); g.restore();
+  g.strokeStyle = 'rgba(255,255,255,0.35)'; g.lineWidth = 2; rr(10, 12, W - 20, 62, 14); g.stroke();
+  g.fillStyle = '#fff'; g.font = '600 15px "DM Sans", sans-serif'; g.textAlign = 'left'; g.fillText('Water tank', 24, 38); g.font = '700 26px "Bricolage Grotesque", sans-serif'; g.fillText(Math.ceil(tank) + '%', 24, 64);
+  g.font = '500 12px "DM Sans", sans-serif'; g.textAlign = 'right'; g.fillText(leaks.length ? leaks.length + ' leaking' : 'All good', W - 24, 38);
+  /* cells */
+  g.textAlign = 'center';
+  for (let i = 0; i < N; i++) {
+    const c = cells[i], lk = leaks.find((l) => l.i === i);
+    const pulse = lk ? 0.5 + 0.5 * Math.sin(t * 8 + i) : 0;
+    g.fillStyle = lk ? 'rgba(255,107,122,' + (0.16 + 0.16 * pulse) + ')' : 'rgba(255,255,255,0.07)'; rr(c.x, c.y, c.w, c.h, 14); g.fill();
+    g.strokeStyle = lk ? '#ff6b7a' : 'rgba(255,255,255,0.18)'; g.lineWidth = lk ? 3 : 1.5; rr(c.x, c.y, c.w, c.h, 14); g.stroke();
+    icon(i, c.x + c.w / 2, c.y + 40, lk ? '#ffd0d5' : '#9fd8f2');
+    g.fillStyle = lk ? '#fff' : '#a9c4d8'; g.font = '500 12px "DM Sans", sans-serif'; g.fillText(FIX[i].n, c.x + c.w / 2, c.y + 84);
+    g.fillStyle = 'rgba(255,255,255,0.35)'; g.font = '600 11px "DM Sans", sans-serif'; g.textAlign = 'left'; g.fillText(String(i + 1), c.x + 9, c.y + 18); g.textAlign = 'center';
+    if (lk) { const big = lk.age > 6; for (let k = 0; k < (big ? 3 : 2); k++) { const ph = (t * (big ? 2.2 : 1.4) + k * 0.37 + i) % 1; drop(c.x + c.w - 22 + k * 7 - 6, c.y + 34 + ph * 30, big ? 1.4 : 1, '#5fd0ff'); } if (big) { g.fillStyle = '#ff6b7a'; g.font = '700 11px "DM Sans", sans-serif'; g.fillText('BIG LEAK', c.x + c.w / 2, c.y + 18); } }
+  }
+  /* bursts */
+  for (const b of bursts) { g.globalAlpha = Math.max(0, 1 - b.t * 2.2); g.strokeStyle = '#7ff0b0'; g.lineWidth = 3; g.beginPath(); g.arc(b.x, b.y, 8 + b.t * 50, 0, 7); g.stroke(); g.globalAlpha = 1; }
+  /* cloud */
+  if (cloud) { g.fillStyle = 'rgba(255,255,255,0.94)'; const x = cloud.x, y = cloud.y; g.beginPath(); g.arc(x, y, 14, 0, 7); g.arc(x + 16, y - 8, 18, 0, 7); g.arc(x + 34, y, 15, 0, 7); g.fill(); g.fillStyle = '#3fbcf0'; drop(x + 8, y + 24 + Math.sin(t * 6) * 3, 1, '#3fbcf0'); drop(x + 24, y + 28 + Math.cos(t * 6) * 3, 1, '#3fbcf0'); }
+  g.restore();
+  if (paused) { g.fillStyle = 'rgba(0,0,0,0.55)'; g.fillRect(0, 0, W, H); g.fillStyle = '#fff'; g.font = '600 28px "Bricolage Grotesque", sans-serif'; g.textAlign = 'center'; g.fillText('Paused', W / 2, H / 2); }
+}
+function addLeak() {
+  const free = []; for (let i = 0; i < N; i++) if (!leaks.some((l) => l.i === i)) free.push(i);
+  if (!free.length) return; const i = free[(Math.random() * free.length) | 0]; leaks.push({ i, age: 0 }); A.tone(900, 0.05, 'sine', 0.05); A.tone(700, 0.06, 'sine', 0.04, 0, 0.09);
+}
+function tick(now) {
+  if (!run) return; raf = requestAnimationFrame(tick);
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  if (!paused) {
+    t += dt; shake = Math.max(0, shake - dt);
+    spawn -= dt; if (spawn <= 0) { addLeak(); spawn = Math.max(0.75, 2.5 - t * 0.022) * (0.7 + Math.random() * 0.6); }
+    let drain = 0; for (const l of leaks) { l.age += dt; drain += l.age > 6 ? 1.6 : 0.8; } tank -= drain * dt;
+    cloudT -= dt; if (!cloud && cloudT <= 0) { cloud = { x: -50, y: 88 }; }
+    if (cloud) { cloud.x += 34 * dt; if (cloud.x > W + 10) { cloud = null; cloudT = 9 + Math.random() * 6; } }
+    for (const b of bursts) b.t += dt; bursts = bursts.filter((b) => b.t < 0.5);
+    $('sD').textContent = Math.floor(t / 3); $('sT').textContent = Math.max(0, Math.ceil(tank));
+    if (tank <= 0) return over();
+  }
+  draw();
+}
+function hit(x, y) {
+  if (paused || !run) return;
+  if (cloud && x > cloud.x - 20 && x < cloud.x + 56 && y > cloud.y - 26 && y < cloud.y + 40) { tank = Math.min(100, tank + 15); cloud = null; cloudT = 10; bursts.push({ x, y, t: 0 }); A.tone(660, 0.12, 'triangle', 0.09); A.tone(990, 0.2, 'triangle', 0.08, 0, 0.1); $('tip').textContent = 'Rain harvested. Catching rainwater is a great way to stretch your supply.'; return; }
+  for (let i = 0; i < N; i++) { const c = cells[i]; if (x >= c.x && x <= c.x + c.w && y >= c.y && y <= c.y + c.h) return fixLeak(i); }
+}
+function fixLeak(i) {
+  const k = leaks.findIndex((l) => l.i === i); if (k < 0) { shake = 0.12; A.sfx.bad(); return; }
+  leaks.splice(k, 1); fixed++; tank = Math.min(100, tank + 1.5); $('sF').textContent = fixed; bursts.push({ x: cells[i].x + 54, y: cells[i].y + 50, t: 0 }); A.sfx.good(); $('tip').textContent = FIX[i].tip;
+}
+function over() {
+  run = false; cancelAnimationFrame(raf); document.body.classList.remove('playing'); $('play').hidden = true; $('end').hidden = false;
+  const days = Math.floor(t / 3), isBest = A.saveBest('water-wise', days), n = A.plays('water-wise');
+  $('eScore').textContent = days + (days === 1 ? ' day' : ' days');
+  $('eRank').textContent = days >= 30 ? 'Water hero' : days >= 20 ? 'Leak buster' : days >= 10 ? 'Handy with a spanner' : 'Every drop counts';
+  $('eBest').textContent = (isBest && n > 1 ? 'New best. ' : '') + 'Your best is ' + A.best('water-wise') + ' days. You fixed ' + fixed + ' leaks.';
+  const f = A.shuffle(FACTS).slice(0, 3); $('facts').innerHTML = f.map((x) => '<li>' + A.esc(x) + '</li>').join('');
+  if (window.Toybox) Toybox.setResult('Water Wise', days + ' days');
+  A.sfx.bad(); window.scrollTo(0, 0);
+}
+function start() {
+  run = true; paused = false; t = 0; tank = 100; fixed = 0; spawn = 1.2; leaks = []; cloud = null; cloudT = 8; bursts = []; shake = 0;
+  document.body.classList.add('playing'); $('intro').hidden = true; $('end').hidden = true; $('play').hidden = false; $('sF').textContent = 0; $('sD').textContent = 0; $('sT').textContent = 100; $('tip').textContent = 'Tap the spots that start to drip.'; $('bPause').textContent = 'Pause';
+  A.audio(); last = performance.now(); cancelAnimationFrame(raf); raf = requestAnimationFrame(tick);
+}
+function pause(v) { if (!run) return; paused = v === undefined ? !paused : v; $('bPause').textContent = paused ? 'Resume' : 'Pause'; draw(); }
+function pos(e) { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * W, (e.clientY - r.top) / r.height * H]; }
+cv.addEventListener('pointerdown', (e) => { const p = pos(e); hit(p[0], p[1]); });
+document.addEventListener('keydown', (e) => { if (!run) return; if (/^[1-9]$/.test(e.key)) fixLeak(+e.key - 1); else if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') pause(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) pause(true); });
+$('bStart').addEventListener('click', start); $('bAgain').addEventListener('click', start); $('bPause').addEventListener('click', () => pause());
+$('bShare').addEventListener('click', () => window.Toybox && Toybox.share());
+(function () { const b = A.best('water-wise'); if (b) { const el = $('bestLine'); el.textContent = 'Your best so far: ' + b + ' days'; el.hidden = false; } draw(); })();
+window.__ww = { leaks: () => leaks.map((l) => l.i), fix: fixLeak, state: () => ({ tank, t, fixed, run }), fastforward: (s) => { t += s; } };
+
+</script>
+</body>
+</html>

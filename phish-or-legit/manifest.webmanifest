@@ -1,0 +1,25 @@
+{
+  "name": "Phish or Legit | Toybox",
+  "short_name": "Phish or Legit",
+  "description": "An online scam awareness game. Read twelve messages and decide if each is a scam or the real thing.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0a1622",
+  "theme_color": "#0a1622",
+  "icons": [
+    {
+      "src": "img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

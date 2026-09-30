@@ -87,6 +87,7 @@ footer a { color: var(--ink); }
     <button class="chip" type="button" data-f="playful" aria-pressed="false">Playful</button>
     <button class="chip" type="button" data-f="games" aria-pressed="false">Games</button>
     <button class="chip" type="button" data-f="retro" aria-pressed="false">Retro</button>
+    <button class="chip" type="button" data-f="awareness" aria-pressed="false">Awareness</button>
     <button class="chip rand" type="button" id="rand">Play something random</button>
   </div>
   <div class="prefs" aria-label="Settings for every toy">
@@ -152,9 +153,9 @@ footer a { color: var(--ink); }
     </a>
   </section>
 
-  <h2 class="section-title">Retro Corner</h2>
-  <p class="section-note">Old school games, rebuilt for phones and keyboards.</p>
-  <section class="grid retro" aria-label="Retro games">
+  <h2 class="section-title" data-sec="retro">Retro Corner</h2>
+  <p class="section-note" data-sec="retro">Old school games, rebuilt for phones and keyboards.</p>
+  <section class="grid retro" data-sec="retro" aria-label="Retro games">
     <a class="card" href="snake/" data-cat="retro games" data-slug="snake">
       <img src="img/snake-preview.png" alt="A green snake growing along a checkered board toward candy" width="1200" height="630">
       <div class="body">
@@ -211,29 +212,78 @@ footer a { color: var(--ink); }
     </a>
   </section>
 
+  <h2 class="section-title" data-sec="aware">Awareness</h2>
+  <p class="section-note" data-sec="aware">Short, playful ways to learn how to stay safe. Not a replacement for proper training, just a good place to start.</p>
+  <section class="grid retro" data-sec="aware" aria-label="Awareness toys">
+    <a class="card" href="phish-or-legit/" data-cat="awareness" data-slug="phish-or-legit">
+      <img src="img/phish-or-legit-preview.png" alt="A message card with a fish hook, from the Phish or Legit awareness game" width="1200" height="630" loading="lazy">
+      <div class="body">
+        <h2>Phish or Legit</h2>
+        <p>Read twelve messages and decide if each is a scam or the real thing. Learn the warning signs as you go.</p>
+        <span class="tags">Awareness · Online scams</span>
+        <span class="best" data-best="phish-or-legit" data-best-label="Your best" data-best-suffix="/12" hidden></span>
+      </div>
+    </a>
+    <a class="card" href="road-ready/" data-cat="awareness" data-slug="road-ready">
+      <img src="img/road-ready-preview.png" alt="A warning sign on a road, from the Road Ready awareness game" width="1200" height="630" loading="lazy">
+      <div class="body">
+        <h2>Road Ready</h2>
+        <p>Ten everyday moments on Namibian roads, from goats at dusk to gravel corners. Pick the safest choice.</p>
+        <span class="tags">Awareness · Road safety</span>
+        <span class="best" data-best="road-ready" data-best-label="Your best" data-best-suffix="/10" hidden></span>
+      </div>
+    </a>
+    <a class="card" href="first-aid-first/" data-cat="awareness" data-slug="first-aid-first">
+      <img src="img/first-aid-first-preview.png" alt="A heart with a pulse line, from the First Aid First awareness game" width="1200" height="630" loading="lazy">
+      <div class="body">
+        <h2>First Aid First</h2>
+        <p>Six common emergencies. Tap the steps in the right order and drop the myths.</p>
+        <span class="tags">Awareness · First aid</span>
+        <span class="best" data-best="first-aid-first" data-best-label="Your best" data-best-suffix="/18" hidden></span>
+      </div>
+    </a>
+    <a class="card" href="water-wise/" data-cat="awareness" data-slug="water-wise">
+      <img src="img/water-wise-preview.png" alt="A water drop, from the Water Wise awareness game" width="1200" height="630" loading="lazy">
+      <div class="body">
+        <h2>Water Wise</h2>
+        <p>Namibia is dry. Fix leaks and running taps before your tank runs out.</p>
+        <span class="tags">Awareness · Saving water</span>
+        <span class="best" data-best="water-wise" data-best-label="Your best" data-best-suffix=" days" hidden></span>
+      </div>
+    </a>
+    <a class="card" href="breathe-easy/" data-cat="awareness" data-slug="breathe-easy">
+      <img src="img/breathe-easy-preview.png" alt="A glowing circle that grows and shrinks as you breathe, from the Breathe Easy game" width="1200" height="630" loading="lazy">
+      <div class="body">
+        <h2>Breathe Easy</h2>
+        <p>A gentle breathing pacer with a check-in and a short tip about looking after your mind.</p>
+        <span class="tags">Awareness · Calm</span>
+        <span class="best" data-best="breathe-easy" data-best-label="Sessions completed" data-best-suffix="" hidden></span>
+      </div>
+    </a>
+  </section>
+
   <footer>Made by Phellep Shapopi <a href="https://phellep.vercel.app">Portfolio</a></footer>
 </main>
 <script>
 (function () {
   var T = window.Toybox, $ = function (id) { return document.getElementById(id); };
   var cards = [].slice.call(document.querySelectorAll('.card[data-cat]'));
-  var retroHead = [].slice.call(document.querySelectorAll('.section-title, .section-note'));
-  var retroGrid = document.querySelector('.grid.retro'), mainGrid = document.querySelector('.grid:not(.retro)');
+  var secNodes = [].slice.call(document.querySelectorAll('[data-sec]')), mainGrid = document.querySelector('.grid:not([data-sec])');
   /* saved bests */
-  document.querySelectorAll('[data-best]').forEach(function (el) { var v = T.best(el.getAttribute('data-best')); if (v !== null) { el.textContent = 'Your best ' + v; el.hidden = false; } });
+  document.querySelectorAll('[data-best]').forEach(function (el) { var v = T.best(el.getAttribute('data-best')); if (v !== null) { el.textContent = (el.getAttribute('data-best-label') || 'Your best') + ' ' + v + (el.getAttribute('data-best-suffix') || ''); el.hidden = false; } });
   /* filter chips */
   function apply(f) {
     var shown = 0;
     cards.forEach(function (c) { var ok = f === 'all' || c.getAttribute('data-cat').split(' ').indexOf(f) > -1; c.hidden = !ok; if (ok) shown++; });
     document.querySelectorAll('.chip[data-f]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-f') === f)); });
-    var retroShown = cards.some(function (c) { return !c.hidden && c.getAttribute('data-cat').indexOf('retro') > -1; });
-    var mainShown = cards.some(function (c) { return !c.hidden && c.getAttribute('data-cat').indexOf('retro') === -1; });
-    retroHead.forEach(function (n) { n.classList.toggle('section-hidden', !retroShown); });
-    retroGrid.classList.toggle('section-hidden', !retroShown); mainGrid.classList.toggle('section-hidden', !mainShown);
+    var secShown = {};
+    cards.forEach(function (c) { if (c.hidden) return; var s = c.parentNode.getAttribute('data-sec') || 'main'; secShown[s] = true; });
+    secNodes.forEach(function (n) { n.classList.toggle('section-hidden', !secShown[n.getAttribute('data-sec')]); });
+    mainGrid.classList.toggle('section-hidden', !secShown.main);
     if (f !== 'all') { try { history.replaceState(null, '', '#' + f); } catch (e) {} } else { try { history.replaceState(null, '', location.pathname); } catch (e) {} }
   }
   document.querySelectorAll('.chip[data-f]').forEach(function (b) { b.addEventListener('click', function () { apply(b.getAttribute('data-f')); }); });
-  var h = location.hash.replace('#', ''); if (['music', 'playful', 'games', 'retro'].indexOf(h) > -1) apply(h);
+  var h = location.hash.replace('#', ''); if (['music', 'playful', 'games', 'retro', 'awareness'].indexOf(h) > -1) apply(h);
   $('rand').addEventListener('click', function () { var vis = cards.filter(function (c) { return !c.hidden; }); var c = vis[Math.floor(Math.random() * vis.length)]; if (c) location.href = c.getAttribute('href'); });
   /* shared settings */
   function syncSound() { var b = $('pSound'); b.textContent = 'Sound in every toy: ' + (T.sound ? 'on' : 'off'); b.setAttribute('aria-pressed', String(T.sound)); }
@@ -245,7 +295,7 @@ footer a { color: var(--ink); }
   function syncInstall() { $('pInstall').hidden = !(T.canInstall && !T.isStandalone()); $('iosHint').hidden = !(T.isIOS && !T.isStandalone()); }
   $('pInstall').addEventListener('click', function () { T.install(); });
   document.addEventListener('toybox:install-ready', syncInstall); syncInstall();
-  window.addEventListener('pageshow', function () { document.querySelectorAll('[data-best]').forEach(function (el) { var v = T.best(el.getAttribute('data-best')); if (v !== null) { el.textContent = 'Your best ' + v; el.hidden = false; } }); });
+  window.addEventListener('pageshow', function () { document.querySelectorAll('[data-best]').forEach(function (el) { var v = T.best(el.getAttribute('data-best')); if (v !== null) { el.textContent = (el.getAttribute('data-best-label') || 'Your best') + ' ' + v + (el.getAttribute('data-best-suffix') || ''); el.hidden = false; } }); });
 })();
 </script>
 </body>
