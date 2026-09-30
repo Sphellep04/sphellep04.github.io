@@ -101,7 +101,7 @@ body { margin: 0; background: var(--bg); color: var(--ink); font: 400 12px/1.5 v
   <div id="stage">
     <canvas id="game" aria-label="Hangman. Guess the hidden word by tapping letters or typing them."></canvas>
     
-    <div class="panel" id="pReady"><h1>HANGMAN</h1><p>Guess the hidden word one letter at a time. Tap the on-screen keys or type on your keyboard. Six wrong guesses and it is game over. Each word you solve scores points, and spare guesses earn a bonus.</p><div class="row"><button type="button" class="mbtn" hidden></button></div><span class="btn">TAP TO START</span></div>
+    <div class="panel" id="pReady"><h1>HANGMAN</h1><p>Guess the hidden word one letter at a time. A few letters are given free. Tap HINT (or press ?) once per word to reveal one more for the price of a heart. Six wrong guesses and it is game over.</p><div class="row"><button type="button" class="mbtn" hidden></button></div><span class="btn">TAP TO START</span></div>
     <div class="panel" id="pPause" hidden><h1>PAUSED</h1><p>Tap anywhere or press P to carry on.</p><span class="btn">RESUME</span></div>
     <div class="panel" id="pOver" hidden><p class="big" id="oHead">GAME OVER</p><h1 id="oScore">0</h1><p id="oSub">BEST 0</p><p id="oPlays"></p><div class="row"><button type="button" class="mbtn" hidden></button><button type="button" class="sbtn" id="bShare">SHARE</button></div><span class="btn">TAP TO PLAY AGAIN</span></div>
   </div>
@@ -248,16 +248,30 @@ const WORDS = {
   PLACE: ['LIGHTHOUSE','MOUNTAIN','VOLCANO','WATERFALL','DESERT','ISLAND','CASTLE','LIBRARY','AIRPORT','STADIUM','PYRAMID','RAINFOREST','GLACIER','HARBOUR','MUSEUM','CANYON']
 };
 const ROWS = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'];
-let queue = [], word = '', cat = '', guessed = {}, wrong = 0, score = 0, solved = 0, phase = 'play', pt = 0, keys = [], wide = false, gall = { x: 0, y: 0, w: 0, h: 0 }, wordBox = { x: 0, y: 0, w: 0, h: 0 }, parts = [], shake = 0, streakMsg = '';
+let queue = [], word = '', cat = '', guessed = {}, wrong = 0, score = 0, solved = 0, phase = 'play', pt = 0, keys = [], wide = false, gall = { x: 0, y: 0, w: 0, h: 0 }, wordBox = { x: 0, y: 0, w: 0, h: 0 }, parts = [], shake = 0, streakMsg = '', hinted = false;
 function refill() { const all = []; for (const c in WORDS) if (R.mode !== 'namibia' || c === 'NAMIBIA') for (const w of WORDS[c]) all.push([c, w]); for (let i = all.length - 1; i > 0; i--) { const j = (rnd() * (i + 1)) | 0; [all[i], all[j]] = [all[j], all[i]]; } queue = all; }
-function next() { if (!queue.length) refill(); const [c, w] = queue.pop(); cat = c; word = w; guessed = {}; wrong = 0; phase = 'play'; pt = 0; layout(); }
+function next() { if (!queue.length) refill(); const [c, w] = queue.pop(); cat = c; word = w; guessed = {}; wrong = 0; phase = 'play'; pt = 0; hinted = false;
+  // a few letters are given free, so a long word is never a blank wall
+  const u = [...new Set(word)]; for (let i = u.length - 1; i > 0; i--) { const j = (rnd() * (i + 1)) | 0; [u[i], u[j]] = [u[j], u[i]]; }
+  const free = Math.max(1, Math.min(3, Math.round(u.length * 0.3), u.length - 3)); for (let i = 0; i < free; i++) guessed[u[i]] = 1;
+  layout(); }
+function hint() {
+  if (R.state !== 'play' || phase !== 'play' || hinted || wrong >= 5) return;
+  const left = [...new Set(word)].filter((c) => guessed[c] !== 1); if (left.length < 2) return;
+  const c = left[(rnd() * left.length) | 0]; guessed[c] = 1; hinted = true; wrong++; shake = 0.25;
+  R.beep(660, 0.1, 'triangle', 0.1, 300); R.buzz(15);
+}
 function layout() {
   const W = R.W, H = R.H; wide = W > H * 1.2; keys = [];
   let kx, ky, kw, kh;
   if (wide) { const half = Math.floor(W * 0.42); gall = { x: 16, y: 16, w: half - 24, h: H - 32 }; kx = half + 8; kw = W - kx - 16; kh = Math.min(H * 0.42, 210); ky = H - kh - 16; wordBox = { x: kx, y: 56, w: kw, h: ky - 72 }; }
   else { kw = W - 16; kx = 8; kh = clamp(H * 0.3, 150, 250); ky = H - kh - 10; const top = 12; const gh = clamp((ky - top) * 0.62, 120, 340); gall = { x: 10, y: top, w: W - 20, h: gh }; wordBox = { x: 10, y: top + gh + 4, w: W - 20, h: ky - top - gh - 12 }; }
-  const rowH = kh / 3, gap = 5;
-  ROWS.forEach((row, ri) => { const n = row.length, kwid = Math.min((kw - gap * 9) / 10, 60), tot = n * kwid + (n - 1) * gap, x0 = kx + (kw - tot) / 2; for (let i = 0; i < n; i++) keys.push({ ch: row[i], x: x0 + i * (kwid + gap), y: ky + ri * rowH, w: kwid, h: rowH - gap }); });
+  const rowH = kh / 3, gap = 5, kwid0 = Math.min((kw - gap * 9) / 10, 60);
+  ROWS.forEach((row, ri) => {
+    const n = row.length, kwid = kwid0, hw = ri === 2 ? kwid * 2 + gap : 0, tot = n * kwid + (n - 1) * gap + (hw ? hw + gap : 0), x0 = kx + (kw - tot) / 2, off = hw ? hw + gap : 0;
+    if (hw) keys.push({ ch: 'HINT', x: x0, y: ky + ri * rowH, w: hw, h: rowH - gap });
+    for (let i = 0; i < n; i++) keys.push({ ch: row[i], x: x0 + off + i * (kwid + gap), y: ky + ri * rowH, w: kwid, h: rowH - gap });
+  });
 }
 function guess(ch) {
   if (R.state !== 'play' || phase !== 'play' || guessed[ch]) return;
@@ -305,6 +319,11 @@ function drawWord() {
 function drawKeys() {
   g.textAlign = 'center'; g.textBaseline = 'middle';
   for (const k of keys) {
+    if (k.ch === 'HINT') {
+      const off = hinted || wrong >= 5 || phase !== 'play'; g.fillStyle = off ? '#3a2a1c' : '#35a7ff'; rr(k.x, k.y, k.w, k.h, 8); g.fill();
+      if (!off) { g.fillStyle = 'rgba(255,255,255,0.18)'; rr(k.x, k.y, k.w, k.h * 0.45, 8); g.fill(); }
+      g.fillStyle = off ? '#7a6248' : '#0b1a2a'; g.font = Math.round(clamp(k.h * 0.32, 9, 18)) + 'px "Press Start 2P", monospace'; g.fillText('HINT', k.x + k.w / 2, k.y + k.h / 2 + 1); continue;
+    }
     const st = guessed[k.ch]; g.fillStyle = st === 1 ? '#2f8f3a' : st === 2 ? '#3a2a1c' : '#7a4a12'; rr(k.x, k.y, k.w, k.h, 8); g.fill();
     if (!st) { g.fillStyle = 'rgba(255,255,255,0.12)'; rr(k.x, k.y, k.w, k.h * 0.45, 8); g.fill(); }
     g.fillStyle = st === 2 ? '#7a6248' : '#fff3d9'; g.font = Math.round(clamp(k.h * 0.42, 12, 26)) + 'px "Press Start 2P", monospace'; g.fillText(k.ch, k.x + k.w / 2, k.y + k.h / 2 + 1);
@@ -326,10 +345,10 @@ R.loop = (dt) => {
 };
 R.onStart = () => { score = 0; solved = 0; queue = []; refill(); next(); };
 R.onResize = () => { if (!word) { refill(); next(); } else layout(); };
-R.onKey = (e) => { if (/^Key[A-Z]$/.test(e.code) && !e.ctrlKey && !e.metaKey && !e.altKey) guess(e.code[3]); };
-R.onPointer.down = (x, y) => { for (const k of keys) if (x >= k.x && x <= k.x + k.w && y >= k.y && y <= k.y + k.h) { guess(k.ch); break; } };
+R.onKey = (e) => { if (e.key === '?' || e.key === '/') { hint(); return; } if (/^Key[A-Z]$/.test(e.code) && !e.ctrlKey && !e.metaKey && !e.altKey) guess(e.code[3]); };
+R.onPointer.down = (x, y) => { for (const k of keys) if (x >= k.x && x <= k.x + k.w && y >= k.y && y <= k.y + k.h) { if (k.ch === 'HINT') hint(); else guess(k.ch); break; } };
 R.setModes([{ id: 'all', label: 'ALL WORDS' }, { id: 'namibia', label: 'NAMIBIA' }], () => { queue = []; });
-R.debug({ info: () => ({ score, solved, wrong, word, phase, cat, state: R.state }), guess });
+R.debug({ info: () => ({ hinted, free: Object.keys(guessed).length, score, solved, wrong, word, phase, cat, state: R.state }), guess, hint });
 R.run();
 
 })();
