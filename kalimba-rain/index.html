@@ -106,6 +106,13 @@ button:disabled { opacity: 0.4; cursor: default; }
   background: rgba(4, 11, 17, 0.78); border: 1px solid var(--line); border-radius: 6px;
 }
 @media (max-width: 520px) { button { padding: 0 11px; } }
+@media (max-height: 460px) and (orientation: landscape) {
+  .top { padding: 8px 76px 8px 12px; gap: 4px 12px; }
+  h1 { font-size: 1.5rem; line-height: 1; }
+  .tag { margin-top: 3px; font-size: 11px; max-width: 46ch; }
+  .meter { padding-top: 2px; }
+  .bottom { padding: 8px 12px; gap: 6px; }
+}
 </style>
 
 <style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #050d16; }</style>

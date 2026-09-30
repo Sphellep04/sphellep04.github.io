@@ -61,6 +61,19 @@ button[aria-pressed="true"]:not(#btnSound) { background: var(--accent); color: #
 #app[data-night="1"] { --paper: #1f2438; --ink: #f1e7d2; --mute: #a9a2b8; --line: rgba(241, 231, 210, 0.3); }
 #app[data-night="1"] h1 { color: #f1e7d2; }
 @media (max-width: 520px) { button { padding: 0 12px; } .sw { width: 34px; height: 34px; min-height: 34px; } }
+#btnSound { display: none; }
+@media (max-height: 460px) and (orientation: landscape) {
+  .top { padding: 8px 64px 8px 14px; }
+  h1 { font-size: 1.7rem; }
+  .tag { display: none; }
+  .meter { padding-top: 2px; font-size: 14px; }
+  .bottom { padding: 6px 10px 8px; gap: 4px; }
+  #hint { min-height: 0; font-size: 13px; }
+  .deck { flex-wrap: nowrap; overflow-x: auto; max-width: 100%; justify-content: flex-start; padding: 2px 4px 6px; scrollbar-width: none; }
+  .deck::-webkit-scrollbar { display: none; }
+  .deck button { flex: 0 0 auto; min-height: 40px; font-size: 16px; padding: 0 12px; }
+  .swatches { flex-wrap: nowrap; }
+}
 </style>
 
 <style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #f6efe0; }</style>
