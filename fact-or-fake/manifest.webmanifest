@@ -1,13 +1,13 @@
 {
-  "name": "Phish or Legit | Toybox",
-  "short_name": "Phish or Legit",
-  "description": "A cyber security awareness space. Swipe scams or legit, hunt red flags, take the quiz, run a breach drill and learn the words.",
+  "name": "Fact or Fake | Toybox",
+  "short_name": "Fact or Fake",
+  "description": "A misinformation awareness game. Decide if each claim, post or headline checks out or is fake.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#0a1622",
-  "theme_color": "#0a1622",
+  "background_color": "#101423",
+  "theme_color": "#101423",
   "icons": [
     {
       "src": "img/icon-192.png",

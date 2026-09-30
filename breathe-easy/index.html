@@ -134,6 +134,8 @@ body.playing .top { padding-top: 56px; }
     <div class="modes" id="modes" role="radiogroup" aria-label="Breathing rhythm">
       <button type="button" class="mode" data-m="calm" role="radio" aria-checked="true"><b>Calm</b><span>Breathe in for 4, out for 6. A good everyday reset.</span></button>
       <button type="button" class="mode" data-m="box" role="radio" aria-checked="false"><b>Box</b><span>In 4, hold 4, out 4, hold 4. Steady and focused.</span></button>
+      <button type="button" class="mode" data-m="even" role="radio" aria-checked="false"><b>Even</b><span>In 5, out 5. A smooth, steady rhythm, easy to keep.</span></button>
+      <button type="button" class="mode" data-m="gentle" role="radio" aria-checked="false"><b>Gentle start</b><span>In 3, out 5. Short and light, good if you are new to this.</span></button>
       <button type="button" class="mode" data-m="sleep" role="radio" aria-checked="false"><b>Wind down</b><span>In 4, hold 7, out 8. Slower, for the evening.</span></button>
     </div>
     <h2 style="margin-top:22px">3. How long?</h2>
@@ -145,6 +147,23 @@ body.playing .top { padding-top: 56px; }
     <div class="row"><button class="btn" id="bStart" type="button">Begin</button></div>
     <p class="note">Sit comfortably and breathe gently through your nose if you can. If you ever feel light-headed, stop and breathe normally. Sound can be switched in the top menu.</p>
     <p class="note" id="bestLine" hidden></p>
+    <div class="row" style="margin-top:16px"><button class="btn ghost" id="bGround" type="button">Or try a 5-4-3-2-1 grounding exercise</button></div>
+  </section>
+
+  <section id="ground" class="panel" hidden>
+    <p class="kicker" id="gStep">Step 1 of 5</p>
+    <h2>Grounding: 5-4-3-2-1</h2>
+    <div id="gStepBox">
+      <p class="big" id="gNum" style="font-size:64px;margin:6px 0 0">5</p>
+      <p class="rank" id="gWord" style="margin-top:0">things you can see</p>
+      <p class="note" id="gBody" style="font-size:16px"></p>
+      <div class="row"><button class="btn" id="gNext" type="button">Next</button><button class="btn ghost" id="gBack" type="button">Back to breathing</button></div>
+    </div>
+    <div id="gDone" hidden>
+      <p class="note" style="font-size:16px">Well done. Take one more slow breath. Grounding helps bring your attention back to the present when your thoughts are racing, and you can use it anywhere, even in a queue or before a test.</p>
+      <div class="row"><button class="btn" id="gBack2" type="button">Back to breathing</button></div>
+    </div>
+    <p class="note">General awareness, not medical advice. If you often feel panicky or overwhelmed, please speak to a doctor or counsellor.</p>
   </section>
 
   <section id="play" hidden>
@@ -208,7 +227,9 @@ const A = (() => {
 const PATTERNS = {
   calm: [['in', 4], ['out', 6]],
   box: [['in', 4], ['hold', 4], ['out', 4], ['hold', 4]],
-  sleep: [['in', 4], ['hold', 7], ['out', 8]]
+  sleep: [['in', 4], ['hold', 7], ['out', 8]],
+  even: [['in', 5], ['out', 5]],
+  gentle: [['in', 3], ['out', 5]]
 };
 const LABEL = { in: 'Breathe in', out: 'Breathe out', hold: 'Hold' };
 const TIPS = [
@@ -217,6 +238,11 @@ const TIPS = [
   { t: 'Say it out loud', b: 'Telling someone you trust how you feel often makes a worry lighter. You do not need to have the answer, you just need a listener.' },
   { t: 'Sleep, move, sunlight', b: 'Regular sleep, some daily movement and time outside in daylight all help your mood and your ability to cope with pressure.' },
   { t: 'Take small breaks', b: 'Stand up, stretch and look at something far away for twenty seconds every so often. Short breaks help when you have been working or studying for a long time.' },
+  { t: 'Name the feeling', b: 'Putting a word to a feeling, such as nervous, tired or overwhelmed, can take some of its power away. Try finishing the sentence "Right now I feel..." in your head or on paper.' },
+  { t: 'One thing at a time', b: 'When everything feels too much, write the tasks down and pick just one to start with. A small step done is better than a big worry carried around.' },
+  { t: 'Limit the doom scroll', b: 'Endless news and social feeds can keep your mind on alert. Set a time to check them, then put your phone down and do something with your hands or your body.' },
+  { t: 'Move it out', b: 'A brisk walk, a kick-about with friends, dancing in your room or a few stretches can burn off the tension that stress builds in the body.' },
+  { t: 'Be kind to yourself', b: 'Talk to yourself the way you would talk to a good friend having a hard time. Harsh self-talk makes stress heavier, not lighter.' },
   { t: 'Help is a strength', b: 'If stress or low mood lasts for weeks, or feels too heavy, speak to a doctor, counsellor or someone you trust. Asking for support is a sensible step, not a weakness.' }
 ];
 const $ = A.$; const cv = $('cv'), g = cv.getContext('2d'), S = 360;
@@ -276,6 +302,26 @@ $('bShare').addEventListener('click', () => window.Toybox && Toybox.share());
 document.addEventListener('visibilitychange', () => { if (document.hidden && run) { paused = true; $('bPause').textContent = 'Resume'; } });
 document.addEventListener('keydown', (e) => { if (run && (e.key === ' ' || e.key === 'p')) { e.preventDefault(); $('bPause').click(); } });
 (function () { const n = +A.store.get('aware.breathe-easy.count', 0); if (n) { const el = $('bestLine'); el.textContent = 'Sessions completed so far: ' + n; el.hidden = false; } draw(0.5, 0.3); })();
+
+/* ---------- grounding 5-4-3-2-1 ---------- */
+(function () {
+  const GS = [
+    { n: 5, w: 'see', b: 'Look around slowly and name five things you can see. A colour, a shadow, a crack in the wall, anything.' },
+    { n: 4, w: 'feel', b: 'Notice four things you can feel. Your feet on the floor, the chair under you, fabric on your skin, the air on your face.' },
+    { n: 3, w: 'hear', b: 'Listen for three sounds. Some may be far away, like traffic or birds, and some close, like your own breathing.' },
+    { n: 2, w: 'smell', b: 'Find two things you can smell. If nothing is nearby, remember two smells you like, such as rain on dry ground or fresh bread.' },
+    { n: 1, w: 'taste', b: 'Notice one thing you can taste, or take a slow sip of water and pay attention to it.' }
+  ];
+  let gi = 0; const G = $('ground'); if (!G) return;
+  function gShow() {
+    const s = GS[gi]; $('gNum').textContent = s.n; $('gWord').textContent = 'things you can ' + s.w; if (s.n === 1) $('gWord').textContent = 'thing you can ' + s.w;
+    $('gBody').textContent = s.b; $('gStep').textContent = 'Step ' + (gi + 1) + ' of 5'; $('gNext').textContent = gi === 4 ? 'Finish' : 'Next';
+  }
+  $('bGround').addEventListener('click', () => { gi = 0; $('intro').hidden = true; G.hidden = false; $('gDone').hidden = true; $('gStepBox').hidden = false; gShow(); A.audio(); window.scrollTo(0, 0); });
+  $('gNext').addEventListener('click', () => { A.sfx.tap(); if (gi < 4) { gi++; gShow(); } else { $('gStepBox').hidden = true; $('gDone').hidden = false; A.sfx.done(); } });
+  const back = () => { G.hidden = true; $('intro').hidden = false; window.scrollTo(0, 0); };
+  $('gBack').addEventListener('click', back); $('gBack2').addEventListener('click', back);
+})();
 
 </script>
 </body>

@@ -25,7 +25,7 @@
   if (mq && mq.addEventListener) mq.addEventListener('change', applyMotion);
 
   /* ---- best scores (read by the home page) ---- */
-  var KEYS = { 'flipside': 'flipside.best', 'slice-party': 'sliceparty.best', 'phish-or-legit': 'aware.phish-or-legit.best', 'road-ready': 'aware.road-ready.best', 'first-aid-first': 'aware.first-aid-first.best', 'water-wise': 'aware.water-wise.best', 'breathe-easy': 'aware.breathe-easy.best' };
+  var KEYS = { 'flipside': 'flipside.best', 'slice-party': 'sliceparty.best', 'phish-or-legit': 'aware.phish-or-legit.best', 'road-ready': 'aware.road-ready.best', 'first-aid-first': 'aware.first-aid-first.best', 'water-wise': 'aware.water-wise.best', 'breathe-easy': 'aware.breathe-easy.best', 'fact-or-fake': 'aware.fact-or-fake.best', 'health-myths': 'aware.health-myths.best', 'share-or-keep': 'aware.share-or-keep.best', 'password-lab': 'aware.password-lab.best', 'sort-it-out': 'aware.sort-it-out.best' };
   T.best = function (slug) { var v = store.get(KEYS[slug] || ('retro.' + slug + '.best'), null); if (v === null) return null; v = +v; return isFinite(v) && v > 0 ? v : null; };
 
   /* ---- sharing ---- */

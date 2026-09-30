@@ -20,11 +20,16 @@ Each toy is a self-contained folder with its own `index.html` and `img/` folder,
 | `maze-munch/` | [Maze Munch](https://tinytoybox.me/maze-munch/) | Retro Corner: Gobble every dot in a fresh maze each level. Dodge the ghosts and grab a power pellet. |
 | `hangman/` | [Hangman](https://tinytoybox.me/hangman/) | Retro Corner: Guess the hidden word before the stick figure is finished. Animals, food, tech and Namibia. |
 | `paddle-duel/` | [Paddle Duel](https://tinytoybox.me/paddle-duel/) | Retro Corner: Classic paddle and ball against the computer. Win a heart back every five points. |
-| `phish-or-legit/` | [Phish or Legit](https://tinytoybox.me/phish-or-legit/) | Awareness: Decide if each message is a scam or real |
+| `phish-or-legit/` | [Phish or Legit](https://tinytoybox.me/phish-or-legit/) | Awareness: Cyber security space: scams, red flags, quiz and breach drill |
 | `road-ready/` | [Road Ready](https://tinytoybox.me/road-ready/) | Awareness: Ten road safety situations |
 | `first-aid-first/` | [First Aid First](https://tinytoybox.me/first-aid-first/) | Awareness: Put first aid steps in order |
 | `water-wise/` | [Water Wise](https://tinytoybox.me/water-wise/) | Awareness: Fix leaks before the tank runs dry |
 | `breathe-easy/` | [Breathe Easy](https://tinytoybox.me/breathe-easy/) | Awareness: A gentle breathing pacer with a stress tip |
+| `fact-or-fake/` | [Fact or Fake](https://tinytoybox.me/fact-or-fake/) | Awareness: Spot fake news before you share it |
+| `health-myths/` | [Health Myths](https://tinytoybox.me/health-myths/) | Awareness: Myth or fact on everyday health |
+| `share-or-keep/` | [Share or Keep](https://tinytoybox.me/share-or-keep/) | Awareness: What is safe to post online |
+| `password-lab/` | [Password Lab](https://tinytoybox.me/password-lab/) | Awareness: Test and build strong passwords |
+| `sort-it-out/` | [Sort It Out](https://tinytoybox.me/sort-it-out/) | Awareness: Put rubbish in the right bin |
 
 ## Shared pieces
 

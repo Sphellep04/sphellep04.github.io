@@ -1,13 +1,13 @@
 {
-  "name": "Phish or Legit | Toybox",
-  "short_name": "Phish or Legit",
-  "description": "A cyber security awareness space. Swipe scams or legit, hunt red flags, take the quiz, run a breach drill and learn the words.",
+  "name": "Health Myths | Toybox",
+  "short_name": "Health Myths",
+  "description": "A health awareness game. Swipe myth or fact on HIV, TB, malaria, hygiene and everyday health.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#0a1622",
-  "theme_color": "#0a1622",
+  "background_color": "#0c1c1e",
+  "theme_color": "#0c1c1e",
   "icons": [
     {
       "src": "img/icon-192.png",

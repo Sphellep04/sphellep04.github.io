@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="A misinformation awareness game. Decide if each claim, post or headline checks out or is fake.">
+<meta name="theme-color" content="#101423">
+<title>Fact or Fake</title>
+<meta property="og:type" content="website">
+<meta property="og:title" content="Fact or Fake">
+<meta property="og:description" content="A misinformation awareness game. Decide if each claim, post or headline checks out or is fake.">
+<meta property="og:image" content="https://tinytoybox.me/fact-or-fake/img/preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://tinytoybox.me/fact-or-fake/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Fact or Fake">
+<meta name="twitter:description" content="A misinformation awareness game. Decide if each claim, post or headline checks out or is fake.">
+<meta name="twitter:image" content="https://tinytoybox.me/fact-or-fake/img/preview.png">
+<link rel="icon" type="image/png" sizes="64x64" href="img/favicon-64.png">
+<link rel="apple-touch-icon" href="img/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600&family=DM+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --bg: #0a1622; --bg2: #10243a; --ink: #edf3fa; --mute: #9db2c8; --line: rgba(170, 200, 235, 0.22);
+  --card: rgba(255, 255, 255, 0.06); --acc: #ffcf4a; --acc-ink: #1a1400; --good: #4ad9a0; --bad: #ff6b7a;
+  --display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --body: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { min-height: 100%; }
+body { margin: 0; min-height: 100vh; color: var(--ink); font: 400 16px/1.55 var(--body); background: radial-gradient(800px 480px at 12% 0%, var(--glow1, rgba(255, 207, 74, 0.10)), transparent 60%), radial-gradient(700px 480px at 100% 40%, var(--glow2, rgba(74, 217, 160, 0.09)), transparent 60%), linear-gradient(180deg, var(--bg), var(--bg2)); background-color: var(--bg); padding-inline: 16px; padding-block: 0 24px; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+.wrap { max-width: 640px; margin: 0 auto; }
+.top { padding-top: 60px; }
+.kicker { margin: 0; font: 500 12px/1 var(--body); letter-spacing: 0.16em; text-transform: uppercase; color: var(--acc); }
+h1 { margin: 8px 0 0; font: 600 clamp(2.1rem, 9vw, 3.2rem)/1 var(--display); letter-spacing: -0.02em; text-wrap: balance; }
+.lede { margin: 12px 0 0; color: var(--mute); max-width: 52ch; text-wrap: pretty; }
+h2 { margin: 0; font: 600 1.5rem/1.15 var(--display); letter-spacing: -0.01em; text-wrap: balance; }
+.stats { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 0; padding: 0; list-style: none; }
+.stats li { font: 500 13px/1 var(--body); padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--mute); font-variant-numeric: tabular-nums; }
+.stats b { color: var(--ink); font-weight: 600; }
+.bar { height: 6px; margin-top: 14px; border-radius: 999px; background: rgba(255, 255, 255, 0.10); overflow: hidden; }
+.bar > i { display: block; height: 100%; width: 0; background: var(--acc); border-radius: inherit; transition: width 0.35s ease; }
+.panel { margin-top: 20px; padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 22px; border: 0; border-radius: 12px; font: 600 16px/1 var(--body); color: var(--acc-ink); background: var(--acc); cursor: pointer; }
+.btn:hover { filter: brightness(1.06); }
+.btn:active { transform: translateY(1px); }
+.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.btn.ghost:hover { border-color: var(--acc); }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.btn:focus-visible, .opt:focus-visible, .chip:focus-visible, a:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.opt { display: block; width: 100%; text-align: left; padding: 14px 16px; margin-top: 10px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink); font: 500 16px/1.4 var(--body); cursor: pointer; }
+.opt:hover:not(:disabled) { border-color: var(--acc); }
+.opt.right { border-color: var(--good); background: rgba(74, 217, 160, 0.14); }
+.opt.wrong { border-color: var(--bad); background: rgba(255, 107, 122, 0.14); }
+.opt:disabled { cursor: default; }
+.why { margin-top: 16px; padding: 14px 16px; border-left: 4px solid var(--acc); border-radius: 4px 10px 10px 4px; background: rgba(255, 255, 255, 0.05); }
+.why.good { border-left-color: var(--good); } .why.bad { border-left-color: var(--bad); }
+.why p { margin: 0; } .why p + p { margin-top: 8px; }
+.why .tag { display: block; margin-bottom: 6px; font: 600 12px/1 var(--body); letter-spacing: 0.14em; text-transform: uppercase; }
+.why.good .tag { color: var(--good); } .why.bad .tag { color: var(--bad); }
+.result { text-align: center; }
+.result .big { margin: 6px 0 0; font: 600 clamp(3rem, 14vw, 5rem)/1 var(--display); color: var(--acc); font-variant-numeric: tabular-nums; }
+.result .rank { margin: 8px 0 0; font: 600 1.3rem/1.2 var(--display); }
+.remember { margin: 18px 0 0; padding: 0; list-style: none; text-align: left; display: grid; gap: 10px; }
+.remember li { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255, 255, 255, 0.04); }
+.remember b { color: var(--acc); }
+.note { margin: 18px 0 0; font-size: 13px; color: var(--mute); }
+.credit { margin: 32px 0 0; text-align: center; font-size: 13px; color: var(--mute); }
+.credit a { color: var(--ink); }
+@keyframes pop { 0% { transform: scale(0.96); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+.pop { animation: pop 0.25s ease-out; }
+@media (prefers-reduced-motion: reduce) { .pop { animation: none; } .bar > i { transition: none; } }
+html.tb-reduced .pop { animation: none; } html.tb-reduced .bar > i { transition: none; }
+@media (max-width: 380px) { .panel { padding: 16px; } .btn { padding: 0 16px; } }
+@media (max-height: 520px) and (orientation: landscape) {
+  body.playing .top { display: none; }
+  body.playing .wrap { padding-top: 52px; }
+  .top { padding-top: 52px; }
+  .scene canvas { max-height: 46vh; width: auto; margin: 0 auto; }
+}
+
+.msgwrap { margin-top: 18px; perspective: 800px; touch-action: pan-y; }
+.msg { position: relative; padding: 16px 16px 18px; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05)); box-shadow: 0 12px 30px rgba(0,0,0,0.35); cursor: grab; user-select: none; -webkit-user-select: none; touch-action: pan-y; will-change: transform; transition: transform 0.25s ease, border-color 0.2s ease; }
+.msg.drag { transition: none; cursor: grabbing; }
+.msg.left { border-color: var(--bad); } .msg.right { border-color: var(--good); }
+.msg .meta { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mute); }
+.msg .from { margin-top: 10px; font: 600 1.05rem/1.2 var(--display); word-break: break-word; }
+.msg .sub { margin-top: 2px; font-size: 13px; color: var(--mute); word-break: break-word; }
+.msg .text { margin-top: 12px; font-size: 17px; line-height: 1.5; white-space: pre-line; word-break: break-word; }
+.msg mark { background: rgba(255, 207, 74, 0.28); color: var(--ink); border-radius: 4px; padding: 0 3px; box-shadow: 0 0 0 1px rgba(255, 207, 74, 0.55); }
+.msg .verdict { position: absolute; top: 12px; right: 14px; font: 700 13px/1 var(--body); letter-spacing: 0.14em; text-transform: uppercase; padding: 6px 10px; border-radius: 8px; opacity: 0; }
+.msg.answered .verdict { opacity: 1; }
+.msg.isL .verdict { background: var(--bad); color: #2a0006; } .msg.isR .verdict { background: var(--good); color: #002a1a; }
+.msg.answered .meta { visibility: hidden; }
+.decide .dec { flex: 1 1 140px; min-height: 56px; font-size: 17px; }
+.dec.bad { background: var(--bad); color: #2a0006; } .dec.good { background: var(--good); color: #002a1a; }
+.decide.off { display: none; }
+body.playing .lede { display: none; }
+body.playing .top { padding-top: 56px; }
+.lens { display: flex; gap: 8px; margin-top: 10px; }
+.lens button { flex: 1 1 0; min-height: 48px; padding: 8px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink); font: 600 15px/1.2 var(--body); cursor: pointer; }
+.lens button:hover { border-color: var(--acc); }
+.lens button[aria-checked="true"] { border-color: var(--acc); background: rgba(255, 255, 255, 0.12); }
+.lens button:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+.gloss { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 12px; }
+.gloss summary { cursor: pointer; font-weight: 600; color: var(--acc); }
+.gloss dl { margin: 10px 0 0; display: grid; gap: 10px; }
+.gloss dt { font-weight: 600; } .gloss dd { margin: 2px 0 0; color: var(--mute); font-size: 15px; }
+@media (max-height: 520px) and (orientation: landscape) { body.playing .top { display: none; } }
+
+:root { --bg: #101423; --bg2: #1d2440; --acc: #8fb4ff; --acc-ink: #06122e; --glow1: rgba(143, 180, 255, 0.12); --glow2: rgba(255, 107, 122, 0.07); }
+
+</style>
+<style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #101423; }</style>
+<!-- toybox-shared -->
+<link rel="manifest" href="manifest.webmanifest">
+<script src="../toybox.js"></script>
+</head>
+<body>
+<main class="wrap">
+  <header class="top">
+    <p class="kicker" id="kick"></p>
+    <h1 id="ttl"></h1>
+    <p class="lede" id="lede"></p>
+  </header>
+
+  <section id="intro" class="panel">
+    <h2>How it works</h2>
+    <p class="note" id="how" style="margin-top:8px;font-size:15px;color:var(--mute)"></p>
+    <h2 style="margin-top:20px;font-size:1.15rem">Round length</h2>
+    <div class="lens" id="lens" role="radiogroup" aria-label="Round length"></div>
+    <div class="row"><button class="btn" id="bStart" type="button">Start</button></div>
+    <p class="note" id="bestLine" hidden></p>
+    <details class="gloss" id="gloss" hidden><summary>Good words to know</summary><dl id="glossList"></dl></details>
+  </section>
+
+  <section id="play" hidden aria-live="polite">
+    <ul class="stats"><li>Card <b id="sN">1</b>/<span id="sT">12</span></li><li>Score <b id="sS">0</b></li><li>Streak <b id="sK">0</b></li></ul>
+    <div class="bar" aria-hidden="true"><i id="pBar"></i></div>
+    <div class="msgwrap"><div class="msg" id="msg" tabindex="0" aria-label="Card"></div></div>
+    <div class="row decide" id="decide">
+      <button class="btn dec bad" id="bLeft" type="button"></button>
+      <button class="btn dec good" id="bRight" type="button"></button>
+    </div>
+    <div id="why" class="why" hidden></div>
+    <div class="row" id="nextRow" hidden><button class="btn" id="bNext" type="button">Next</button></div>
+  </section>
+
+  <section id="end" class="panel result" hidden>
+    <p class="kicker">Round complete</p>
+    <p class="big" id="eScore">0</p>
+    <p class="rank" id="eRank"></p>
+    <p class="note" id="eBest"></p>
+    <ul class="remember" id="remember"></ul>
+    <p class="note" id="foot" hidden></p>
+    <div class="row" style="justify-content:center"><button class="btn" id="bAgain" type="button">Play again</button><button class="btn ghost" id="bShare" type="button">Share</button></div>
+  </section>
+
+  <p class="credit">Made by <a href="https://phellep.vercel.app">Phellep Shapopi</a></p>
+</main>
+
+<script>
+/* Awareness shell: small helpers shared by the Awareness toys */
+const A = (() => {
+  const $ = (id) => document.getElementById(id);
+  const store = { get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+  const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const reduced = () => !!(window.Toybox && Toybox.reduced);
+  const soundOn = () => !(window.Toybox) || Toybox.sound;
+  let ctx = null;
+  function audio() { if (!ctx) { try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; } } if (ctx.state === 'suspended') ctx.resume(); return ctx; }
+  function tone(f, d, type, vol, slide, delay) {
+    if (!soundOn()) return; const c = audio(); if (!c) return;
+    const t = c.currentTime + (delay || 0), o = c.createOscillator(), g = c.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(f, t); if (slide) o.frequency.linearRampToValueAtTime(Math.max(30, f + slide), t + d);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol || 0.1, t + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + d + 0.05);
+  }
+  const sfx = {
+    good() { tone(660, 0.12, 'triangle', 0.10); tone(880, 0.18, 'triangle', 0.10, 0, 0.09); },
+    bad() { tone(220, 0.22, 'sawtooth', 0.07, -90); },
+    tap() { tone(520, 0.05, 'triangle', 0.06); },
+    done() { [523, 659, 784, 1046].forEach((f, i) => tone(f, 0.22, 'triangle', 0.09, 0, i * 0.11)); }
+  };
+  function bestKey(slug) { return 'aware.' + slug + '.best'; }
+  function best(slug) { const v = +store.get(bestKey(slug), 0); return isFinite(v) ? v : 0; }
+  function saveBest(slug, n) { const old = best(slug); if (n > old) { store.set(bestKey(slug), String(n)); return true; } return false; }
+  function plays(slug) { const n = (+store.get('aware.' + slug + '.plays', 0) || 0) + 1; store.set('aware.' + slug + '.plays', String(n)); return n; }
+  return { $, store, shuffle, esc, reduced, soundOn, audio, tone, sfx, best, saveBest, plays };
+})();
+
+const CFG = {
+  slug: 'fact-or-fake', kicker: 'Awareness · Misinformation', title: 'Fact or Fake',
+  lede: 'Rumours travel faster than facts. Look at each post, photo or headline and decide whether it checks out or is fake.',
+  how: 'Swipe left for <b style="color:var(--bad)">Fake</b>, right for <b style="color:var(--good)">Checks out</b>. Look for who posted it, when, and whether anyone else reliable reports it. The examples are made up.',
+  leftLabel: 'Fake', rightLabel: 'Checks out', leftWord: 'Fake', rightWord: 'Checks out', keyL: 'f', keyR: 'c', rounds: [6, 12], leftShare: 0.5,
+  ranks: [[0.92, 'Fact checker'], [0.75, 'Careful reader'], [0.5, 'Learning to pause'], [0, 'Check before you share']],
+  remember: [['Check the source.', 'Who posted it? Is it a known, verified account or site, or something new with few followers?'], ['Check the date.', 'Old stories and photos are often shared again as if they just happened.'], ['See who else reports it.', 'Real news usually appears in more than one trustworthy place.'], ['Pause before you share.', 'Fear, anger and "forward to everyone" are signs a message wants to spread, not to inform.']],
+  gloss: [['Misinformation', 'False information shared without meaning to harm, often by people who believe it.'], ['Disinformation', 'False information spread on purpose to mislead.'], ['Deepfake', 'A video or voice made or changed by software to look and sound real.'], ['Reverse image search', 'A tool that shows where else a picture has appeared, so you can check when and where it is from.']]
+};
+const DECK = [
+  { ch: 'WhatsApp forward', from: 'Forwarded many times', text: 'URGENT!!! Forward this to 10 people or your phone will stop working tomorrow. Network operators have confirmed it.', a: 'L', flags: ['URGENT!!!', 'Forward this to 10 people', 'have confirmed it'], why: 'Threats, capital letters and "forward to everyone" are hallmarks of a chain hoax. It names no operator and gives no source, and networks do not work this way.' },
+  { ch: 'Facebook', from: 'Namibia Cash Relief', sub: 'Page created last week', text: 'The government will pay N$5,000 to every citizen who shares this post before Friday. Comment "YES" and click the link to register.', a: 'L', flags: ['N$5,000 to every citizen', 'before Friday', 'click the link to register'], why: 'A brand new page, a huge payout and a share-to-win deadline point to a scam. Real government support is announced on official channels.' },
+  { ch: 'Photo', from: 'Shared by many people', text: 'A photo of flooded streets is shared as "Windhoek yesterday". A reverse image search shows the same photo posted in 2015 from another country.', a: 'L', flags: ['reverse image search', 'posted in 2015 from another country'], why: 'Old or foreign photos are often reused during real events. A quick reverse image search can show where a picture first appeared.' },
+  { ch: 'Post', from: 'Natural Health Secrets', text: 'Doctors hate this! A spoonful of this powder cures diabetes in 3 days. Stop taking your medicine now.', a: 'L', flags: ['cures diabetes in 3 days', 'Stop taking your medicine'], why: 'No powder cures diabetes in days, and stopping prescribed medicine can be dangerous. Health claims need evidence from health services or trusted medical sources.' },
+  { ch: 'Screenshot', from: 'A headline image', sub: 'No link, no date, the site name has a spelling mistake', text: 'BREAKING: Minister resigns tonight! Nobody else is reporting this yet.', a: 'L', flags: ['No link, no date', 'Nobody else is reporting this'], why: 'A screenshot can be edited by anyone. Big news is reported by several outlets and usually comes with a link and a date.' },
+  { ch: 'Voice note', from: 'Forwarded from a friend', text: 'My cousin works at the hospital and they are hiding a new disease. Do not go to the clinics this week. Please pass it on.', a: 'L', flags: ['My cousin works at the hospital', 'Please pass it on'], why: 'A vague inside source who cannot be named is a warning sign. Rumours like this can stop sick people from getting care. Check with the health ministry or the clinic directly.' },
+  { ch: 'Video', from: 'A famous singer', sub: 'Shared on TikTok', text: 'The singer is seen recommending a new app that will make you rich. The lips look slightly off and the voice sounds robotic.', a: 'L', flags: ['lips look slightly off', 'voice sounds robotic'], why: 'This may be a deepfake. Look for odd lip movements or voices, and check the singer\'s own verified pages for the real message.' },
+  { ch: 'Article', from: 'Breaking news', sub: 'Shared today', text: 'Schools closed tomorrow after a serious incident! The article looks recent, but the date at the top is from three years ago.', a: 'L', flags: ['date at the top is from three years ago'], why: 'Old stories are often shared again as if they are new. Always check the date before you react or share.' },
+  { ch: 'Facebook', from: 'Ministry_Of_Health_Official', sub: '40 followers, account made last week, no verification tick', text: 'We are giving cash to every household. Send your name, ID number and phone number in the comments to receive it.', a: 'L', flags: ['40 followers, account made last week', 'Send your name, ID number'], why: 'Copycat accounts pretend to be official bodies. The real page is verified, links to the real website and never asks for your ID in public comments.' },
+  { ch: 'WhatsApp forward', from: 'Forwarded many times', text: 'Do not drink Brand X juice! It has poisoned 12 children. Forward to protect your family!', a: 'L', flags: ['poisoned 12 children', 'Forward to protect your family'], why: 'No news outlet, no health authority, no names. Scary claims with no source are made to spread. A real recall is published by the maker and by health authorities.' },
+  { ch: 'Post', from: 'MoneyMagic Tips', text: 'This new app pays N$500 per day just for watching videos. Thousands are already earning. Download now!', a: 'L', flags: ['N$500 per day just for watching videos', 'Download now'], why: 'Promises of easy money are a classic trick. Search for independent reviews before you download an app or share your details.' },
+
+  { ch: 'Facebook', from: 'Ministry of Health', sub: 'Verified page with a long history of posts', text: 'A vaccination campaign starts next Monday. The post lists the clinics and dates and links to a page on the ministry\'s own website that says the same.', a: 'R', flags: [], why: 'It comes from a verified page, has specific details and the same information appears on the official website. That is what a trustworthy post looks like.' },
+  { ch: 'News', from: 'Three news outlets', text: 'Three different outlets report the same road closure with the same times and diversions. The roads authority page posted a map.', a: 'R', flags: [], why: 'Independent reports agreeing on the details, plus an official source, is strong evidence.' },
+  { ch: 'Weather', from: 'National Weather Service', sub: 'Official website and app', text: 'A warning of heavy rain on Thursday for the north. The notice has a time issued, affected areas and safety advice, and local radio repeats it.', a: 'R', flags: [], why: 'It has a clear source, time and place, and radio confirms it. Weather warnings from the official service are worth taking seriously.' },
+  { ch: 'University', from: 'Student Affairs', sub: 'Verified page and student portal', text: 'The exam timetable has changed. The full timetable is on the student portal, and the same notice appears on the verified page.', a: 'R', flags: [], why: 'The information is in two official places you can check yourself. That is the safest way to confirm.' },
+  { ch: 'Article', from: 'A university study', text: 'A researcher\'s post about water saving links to the full study in a university journal. The numbers in the post match the study.', a: 'R', flags: [], why: 'It links to the primary source and the claims match it. Checking that the numbers match is a great habit.' },
+  { ch: 'Newspaper', from: 'A local newspaper', text: 'An article from today names the reporter, quotes named officials and links to the official statement.', a: 'R', flags: [], why: 'A named reporter, a current date, named sources and a link to the statement all make it easy to check.' },
+  { ch: 'Fact check', from: 'A fact-checking website', text: 'It explains that a viral photo is from an event five years ago and shows the original photo, its date and the photographer\'s name.', a: 'R', flags: [], why: 'Fact checkers show their evidence so you can check it too. This is a good place to end a debate about a rumour.' },
+  { ch: 'School', from: 'The principal', text: 'A message in the class group says school is closed on Friday. The same notice is on the school\'s website and the official parents\' group.', a: 'R', flags: [], why: 'The source is in charge of the information and it is repeated in the school\'s own official places.' },
+  { ch: 'Instagram', from: 'A lodge you follow', text: 'A photo of a rainbow over a waterhole, posted with the location and date. Other visitors have posted similar photos the same day.', a: 'R', flags: [], why: 'Context, date and other photos from the same place make this easy to believe. Not every post is a lie.' },
+  { ch: 'Video', from: 'A known broadcaster', text: 'A news video shows a reporter on location. The date and place are shown, and there is a link to the full report on the broadcaster\'s site.', a: 'R', flags: [], why: 'A known outlet, a reporter on location and a link to the full story all add trust.' },
+  { ch: 'Notice', from: 'Local municipality', sub: 'Official page', text: 'Water will be off in two suburbs on Saturday from 08:00 to 14:00 for repairs. Tankers will be at two marked points.', a: 'R', flags: [], why: 'A clear time, place and plan from the body responsible. Municipalities announce these on their own pages.' }
+];
+
+/* Generic swipe deck. Needs CFG and DECK from the toy's own file. */
+let deck = [], i = 0, score = 0, streak = 0, answered = false, cur = null, ROUND = CFG.rounds[CFG.rounds.length - 1];
+const msg = A.$('msg'), $ = A.$;
+const MAXLEN = CFG.rounds[CFG.rounds.length - 1];
+$('kick').textContent = CFG.kicker; $('ttl').textContent = CFG.title; $('lede').textContent = CFG.lede; $('how').innerHTML = CFG.how;
+$('bLeft').innerHTML = '&larr; ' + A.esc(CFG.leftLabel); $('bRight').innerHTML = A.esc(CFG.rightLabel) + ' &rarr;';
+$('bLeft').setAttribute('aria-keyshortcuts', 'ArrowLeft'); $('bRight').setAttribute('aria-keyshortcuts', 'ArrowRight');
+$('remember').innerHTML = CFG.remember.map((r) => '<li><b>' + A.esc(r[0]) + '</b> ' + A.esc(r[1]) + '</li>').join('');
+if (CFG.foot) { $('foot').innerHTML = CFG.foot; $('foot').hidden = false; }
+if (CFG.gloss && CFG.gloss.length) { $('glossList').innerHTML = CFG.gloss.map((g) => '<dt>' + A.esc(g[0]) + '</dt><dd>' + A.esc(g[1]) + '</dd>').join(''); $('gloss').hidden = false; }
+let chosen = +A.store.get('aware.' + CFG.slug + '.len', MAXLEN); if (CFG.rounds.indexOf(chosen) < 0) chosen = MAXLEN;
+function drawLens() { $('lens').innerHTML = CFG.rounds.map((n) => '<button type="button" role="radio" data-n="' + n + '" aria-checked="' + (n === chosen) + '">' + n + ' cards' + (n === MAXLEN ? ' (counts for best)' : '') + '</button>').join(''); $('lens').querySelectorAll('button').forEach((b) => b.addEventListener('click', () => { chosen = +b.dataset.n; A.store.set('aware.' + CFG.slug + '.len', String(chosen)); drawLens(); })); }
+drawLens();
+
+function hi(text, flags) { let out = A.esc(text); for (const f of flags || []) { const e = A.esc(f); out = out.split(e).join('<mark>' + e + '</mark>'); } return out; }
+function show() {
+  cur = deck[i]; answered = false;
+  msg.className = 'msg pop'; msg.style.transform = '';
+  msg.innerHTML = '<div class="meta"><span>' + A.esc(cur.ch) + '</span><span>Card ' + (i + 1) + '</span></div><div class="from">' + A.esc(cur.from) + '</div>' + (cur.sub ? '<div class="sub">' + A.esc(cur.sub) + '</div>' : '') + '<div class="text">' + A.esc(cur.text) + '</div><span class="verdict"></span>';
+  $('why').hidden = true; $('nextRow').hidden = true; $('decide').classList.remove('off');
+  $('sN').textContent = i + 1; $('sT').textContent = ROUND; $('sS').textContent = score; $('sK').textContent = streak; $('pBar').style.width = (i / ROUND * 100) + '%';
+  msg.focus({ preventScroll: true });
+}
+function answer(sayLeft) {
+  if (answered) return; answered = true;
+  const ok = sayLeft === (cur.a === 'L');
+  if (ok) { score++; streak++; A.sfx.good(); } else { streak = 0; A.sfx.bad(); }
+  msg.classList.add('answered', cur.a === 'L' ? 'isL' : 'isR'); msg.style.transform = ''; msg.classList.remove('left', 'right');
+  msg.querySelector('.verdict').textContent = cur.a === 'L' ? CFG.leftWord : CFG.rightWord;
+  msg.querySelector('.text').innerHTML = hi(cur.text, cur.flags);
+  const w = $('why'); w.className = 'why pop ' + (ok ? 'good' : 'bad');
+  w.innerHTML = '<span class="tag">' + (ok ? 'Correct' : 'Not this time') + '</span><p>' + A.esc(cur.why) + '</p>' + (cur.flags && cur.flags.length ? '<p style="color:var(--mute);font-size:14px">Key parts are highlighted on the card.</p>' : '');
+  w.hidden = false; $('decide').classList.add('off'); $('nextRow').hidden = false;
+  $('bNext').textContent = i + 1 >= ROUND ? 'See my result' : 'Next card';
+  $('sS').textContent = score; $('sK').textContent = streak; $('pBar').style.width = ((i + 1) / ROUND * 100) + '%';
+  $('bNext').focus({ preventScroll: true });
+}
+function next() { if (!answered) return; i++; if (i >= ROUND) return finish(); show(); window.scrollTo({ top: 0, behavior: A.reduced() ? 'auto' : 'smooth' }); }
+function finish() {
+  document.body.classList.remove('playing'); $('play').hidden = true; $('end').hidden = false;
+  const full = ROUND === MAXLEN, isBest = full && A.saveBest(CFG.slug, score), n = A.plays(CFG.slug);
+  $('eScore').textContent = score + '/' + ROUND;
+  const pct = score / ROUND; let rank = CFG.ranks[CFG.ranks.length - 1][1]; for (const r of CFG.ranks) if (pct >= r[0]) { rank = r[1]; break; }
+  $('eRank').textContent = rank;
+  $('eBest').textContent = full ? ((isBest && n > 1 ? 'New best. ' : '') + 'Your best is ' + A.best(CFG.slug) + '/' + MAXLEN + '.') : 'Short rounds do not count towards your best. Try the full round.';
+  if (window.Toybox) Toybox.setResult(CFG.title, score + '/' + ROUND);
+  A.sfx.done(); window.scrollTo(0, 0);
+}
+function start() {
+  ROUND = chosen; const L = A.shuffle(DECK.filter((c) => c.a === 'L')), R = A.shuffle(DECK.filter((c) => c.a === 'R'));
+  const nl = Math.min(L.length, Math.round(ROUND * (CFG.leftShare || 0.5))), nr = Math.min(R.length, ROUND - nl);
+  deck = A.shuffle(L.slice(0, nl).concat(R.slice(0, nr))); ROUND = deck.length; i = 0; score = 0; streak = 0;
+  document.body.classList.add('playing'); $('intro').hidden = true; $('end').hidden = true; $('play').hidden = false; show(); A.audio();
+}
+$('bStart').addEventListener('click', start); $('bAgain').addEventListener('click', () => { $('end').hidden = true; $('intro').hidden = false; window.scrollTo(0, 0); refreshBest(); });
+$('bLeft').addEventListener('click', () => answer(true)); $('bRight').addEventListener('click', () => answer(false)); $('bNext').addEventListener('click', next);
+$('bShare').addEventListener('click', () => window.Toybox && Toybox.share());
+document.addEventListener('keydown', (e) => {
+  if ($('play').hidden) return; const k = e.key.toLowerCase();
+  if (e.key === 'ArrowLeft' || k === CFG.keyL) answer(true); else if (e.key === 'ArrowRight' || k === CFG.keyR) answer(false);
+  else if ((e.key === 'Enter' || e.key === ' ') && answered && document.activeElement !== $('bNext')) { e.preventDefault(); next(); }
+});
+let sx = null, dx = 0;
+msg.addEventListener('pointerdown', (e) => { if (answered) return; sx = e.clientX; dx = 0; msg.classList.add('drag'); try { msg.setPointerCapture(e.pointerId); } catch (x) {} });
+msg.addEventListener('pointermove', (e) => { if (sx === null) return; dx = e.clientX - sx; msg.style.transform = 'translateX(' + dx + 'px) rotate(' + dx / 25 + 'deg)'; msg.classList.toggle('left', dx < -30); msg.classList.toggle('right', dx > 30); });
+function endDrag() { if (sx === null) return; sx = null; msg.classList.remove('drag'); if (dx < -80) answer(true); else if (dx > 80) answer(false); else { msg.style.transform = ''; msg.classList.remove('left', 'right'); } dx = 0; }
+msg.addEventListener('pointerup', endDrag); msg.addEventListener('pointercancel', endDrag);
+function refreshBest() { const b = A.best(CFG.slug); if (b) { const el = $('bestLine'); el.textContent = 'Your best so far: ' + b + '/' + MAXLEN; el.hidden = false; } }
+refreshBest();
+window.__sw = { info: () => ({ i, score, streak, cur, ROUND, answered }), answer };
+
+</script>
+</body>
+</html>

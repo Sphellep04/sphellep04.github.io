@@ -1,13 +1,13 @@
 {
-  "name": "Phish or Legit | Toybox",
-  "short_name": "Phish or Legit",
-  "description": "A cyber security awareness space. Swipe scams or legit, hunt red flags, take the quiz, run a breach drill and learn the words.",
+  "name": "Sort It Out | Toybox",
+  "short_name": "Sort It Out",
+  "description": "A recycling awareness game. Drop each item in the right bin before the pile grows.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#0a1622",
-  "theme_color": "#0a1622",
+  "background_color": "#0e1a12",
+  "theme_color": "#0e1a12",
   "icons": [
     {
       "src": "img/icon-192.png",

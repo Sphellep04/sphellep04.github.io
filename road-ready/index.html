@@ -92,6 +92,19 @@ body.playing .lede { display: none; }
 body.playing .top { padding-top: 56px; }
 .opt .k { display: inline-block; min-width: 1.6em; color: var(--acc); font-weight: 700; }
 
+.xpl h3 { margin: 0 0 6px; font-size: 18px; }
+.xl { display: block; margin-top: 12px; font-size: 15px; }
+#xSpeed { width: 100%; margin-top: 8px; accent-color: var(--acc); }
+.btn.sm { padding: 0 14px; font-size: 14px; min-height: 40px; }
+[data-surf][aria-pressed="true"] { background: var(--acc); color: var(--acc-ink); border-color: var(--acc); }
+.xbar { display: flex; height: 22px; margin: 14px 0 8px; border-radius: 8px; overflow: hidden; background: rgba(255,255,255,0.08); }
+.xbar i { display: block; height: 100%; transition: width .25s; }
+#xBarR { background: #4aa3ff; } #xBarB { background: var(--acc); }
+.dotr, .dotb { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; }
+.dotr { background: #4aa3ff; } .dotb { background: var(--acc); }
+.xtot { font-size: 18px; margin: 6px 0; }
+body.playing #explorer { display: none; }
+
 </style>
 <style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #12151d; }</style>
 <!-- toybox-shared -->
@@ -108,9 +121,23 @@ body.playing .top { padding-top: 56px; }
 
   <section id="intro" class="panel">
     <h2>How it works</h2>
-    <p class="note" style="margin-top:8px;font-size:15px">Each round is ten situations picked from a bigger set. Choose an answer, then read why it is safest. There is no timer, so take your time.</p>
+    <p class="note" style="margin-top:8px;font-size:15px">Each round is ten situations picked from a bigger set of twenty. Choose an answer, then read why it is safest. There is no timer, so take your time.</p>
     <div class="row"><button class="btn" id="bStart" type="button">Start</button></div>
     <p class="note" id="bestLine" hidden></p>
+  </section>
+
+  <section id="explorer" class="panel">
+    <div class="xpl">
+      <h3>Stopping distance explorer</h3>
+      <p class="note" style="font-size:14px">Slide the speed and pick a surface. These are estimates: they use a 1.5 second reaction time and typical tyre grip, so real distances vary with your car, tyres and brakes.</p>
+      <label class="xl" for="xSpeed">Speed: <b id="xKmh">60</b> km/h</label>
+      <input id="xSpeed" type="range" min="20" max="120" step="10" value="60">
+      <div class="row" style="margin-top:10px"><button class="btn ghost sm" type="button" data-surf="dry" aria-pressed="true">Dry tar</button><button class="btn ghost sm" type="button" data-surf="wet" aria-pressed="false">Wet tar</button><button class="btn ghost sm" type="button" data-surf="gravel" aria-pressed="false">Gravel</button></div>
+      <div class="xbar" aria-hidden="true"><i id="xBarR"></i><i id="xBarB"></i></div>
+      <p class="note" style="font-size:14px"><span class="dotr"></span>Reaction about <b id="xReact">0</b> m &nbsp; <span class="dotb"></span>Braking about <b id="xBrake">0</b> m</p>
+      <p class="xtot">Total stopping distance: about <b id="xTot">0</b> m</p>
+      <p class="note" id="xNote" style="font-size:14px"></p>
+    </div>
   </section>
 
   <section id="play" hidden aria-live="polite">
@@ -186,7 +213,13 @@ const QS = [
   { scene: 'tail', q: 'A minibus is tailgating you on the highway and flashing its lights.', o: ['Brake suddenly to teach them a lesson', 'Stay calm, hold a steady speed and let them pass when it is safe', 'Speed up to get away from them'], a: 1, why: 'Reacting angrily makes a crash more likely. Keep to your lane, do not brake suddenly and let them go by when it is safe. You will not win by racing.' },
   { scene: 'tyre', q: 'You are about to set off on a 400 km journey on a Friday afternoon.', o: ['Just go, the car is fine', 'Check the tyres including the spare, fuel and water, and plan rest stops', 'Only check that there is enough fuel'], a: 1, why: 'A blown tyre at speed is dangerous, and the long empty stretches are far from help. Ten minutes checking the tyres, spare, fuel and water before you leave can prevent a serious problem.' },
   { scene: 'braai', q: 'You had two beers at a braai and you feel fine. You are about to drive home.', o: ['Drive, you feel fine', 'Do not drive: get a lift, use a sober driver or stay over', 'Drive home very slowly on back roads'], a: 1, why: 'Alcohol slows your reactions and judgement well before you feel drunk. The safest amount before driving is none. Plan your ride home before the first drink.' },
-  { scene: 'seat', q: 'You are driving with a small child who is too little for an adult seatbelt.', o: ['Hold the child on your lap', 'Use a child seat that fits their size and is fitted properly', 'Belt the adult and child in together'], a: 1, why: 'In a crash you cannot hold a child in your arms. A child seat suited to their size, fitted correctly, holds them safely. Adult belts alone do not fit small bodies.' }
+  { scene: 'seat', q: 'You are driving with a small child who is too little for an adult seatbelt.', o: ['Hold the child on your lap', 'Use a child seat that fits their size and is fitted properly', 'Belt the adult and child in together'], a: 1, why: 'In a crash you cannot hold a child in your arms. A child seat suited to their size, fitted correctly, holds them safely. Adult belts alone do not fit small bodies.' },
+  { scene: 'crossing', q: 'You are approaching a roundabout. A car is already on it, coming from your right.', o: ['Enter quickly so they have to slow down', 'Slow down, give way to traffic already on the roundabout and enter when there is a safe gap', 'Stop dead on the roundabout entry and wait for a signal'], a: 1, why: 'Traffic already on the roundabout has priority. Slowing early lets you judge the gap and keeps everyone moving safely.' },
+  { scene: 'tail', q: 'You want to turn left at a junction. A motorbike is close beside you on your left.', o: ['Turn, bikes should stay back', 'Check mirrors and the blind spot, let the rider pass and then turn', 'Hoot and turn at the same time'], a: 1, why: 'Motorbikes and cyclists are easy to miss in a blind spot. A quick shoulder check and a little patience prevents a very common type of crash.' },
+  { scene: 'school', q: 'A minibus taxi stops and passengers begin crossing in front of it. You cannot see past the taxi.', o: ['Pass quickly on the outside', 'Slow right down or stop and wait until you can see the road clearly', 'Hoot and drive through'], a: 1, why: 'People often step out from in front of a stopped vehicle into your path. Waiting until you can see clearly gives you time to react.' },
+  { scene: 'belt', q: 'You are a passenger and the driver is speeding and overtaking dangerously. You feel unsafe.', o: ['Say nothing, it is rude to speak up', 'Speak up calmly, ask them to slow down and ask to be dropped off if they will not', 'Close your eyes and hope for the best'], a: 1, why: 'Passengers have a voice too. Asking politely but firmly can change the driver\'s behaviour, and it is fine to get out if you feel unsafe.' },
+  { scene: 'rain', q: 'You drive through a low-lying road and see water flowing across it. You cannot tell how deep it is.', o: ['Drive through fast so you do not stall', 'Do not enter. Turn around or wait, because you cannot judge the depth or the current', 'Follow the car in front, it looks fine'], a: 1, why: 'Even shallow moving water can float a car and hide damage to the road. Turning back is always safer than testing it.' },
+  { scene: 'walker', q: 'You are on a bicycle at dusk with no lights or reflectors on it.', o: ['Ride fast to get home before dark', 'Use lights and reflective gear, or push the bike on the verge if you have none', 'Ride in the middle of the road so people see you'], a: 1, why: 'Drivers see cyclists late at dusk. Lights and reflective items make you visible from much further away.' }
 ];
 const ROUND = 10;
 let deck = [], i = 0, score = 0, answered = false, cur = null, raf = 0, t0 = 0;
@@ -288,6 +321,23 @@ A.$('bShare').addEventListener('click', () => window.Toybox && Toybox.share());
 document.addEventListener('keydown', (e) => { if (A.$('play').hidden) return; const n = { a: 0, b: 1, c: 2, 1: 0, 2: 1, 3: 2 }[e.key.toLowerCase()]; if (n !== undefined && !answered) { const b = A.$('opts').children[n]; if (b) b.click(); } else if (answered && (e.key === 'Enter') && document.activeElement !== A.$('bNext')) next(); });
 document.addEventListener('visibilitychange', () => { if (document.hidden) cancelAnimationFrame(raf); else if (!A.$('play').hidden && cur) drawScene(); });
 (function () { const b = A.best('road-ready'); if (b) { const el = A.$('bestLine'); el.textContent = 'Your best so far: ' + b + '/' + ROUND; el.hidden = false; } })();
+
+/* ---------- stopping distance explorer ---------- */
+(function () {
+  const sp = A.$('xSpeed'); if (!sp) return;
+  const MU = { dry: 0.7, wet: 0.4, gravel: 0.35 };
+  let surf = 'dry';
+  function calc() {
+    const kmh = +sp.value, v = kmh / 3.6, react = v * 1.5, brake = v * v / (2 * MU[surf] * 9.81), tot = react + brake, cap = 160;
+    A.$('xKmh').textContent = kmh;
+    A.$('xReact').textContent = Math.round(react); A.$('xBrake').textContent = Math.round(brake); A.$('xTot').textContent = Math.round(tot);
+    A.$('xBarR').style.width = Math.min(100, react / cap * 100) + '%'; A.$('xBarB').style.width = Math.min(100 - Math.min(100, react / cap * 100), brake / cap * 100) + '%';
+    A.$('xNote').textContent = 'That is about ' + Math.max(1, Math.round(tot / 4.5)) + ' car lengths. At 60 km/h on a dry road it is roughly ' + Math.round(60 / 3.6 * 1.5 + Math.pow(60 / 3.6, 2) / (2 * 0.7 * 9.81)) + ' m.';
+  }
+  sp.addEventListener('input', calc);
+  document.querySelectorAll('[data-surf]').forEach((b) => b.addEventListener('click', () => { surf = b.dataset.surf; document.querySelectorAll('[data-surf]').forEach((x) => x.setAttribute('aria-pressed', x === b)); calc(); }));
+  calc();
+})();
 
 </script>
 </body>

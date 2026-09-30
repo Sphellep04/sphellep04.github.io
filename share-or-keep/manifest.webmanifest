@@ -1,13 +1,13 @@
 {
-  "name": "Phish or Legit | Toybox",
-  "short_name": "Phish or Legit",
-  "description": "A cyber security awareness space. Swipe scams or legit, hunt red flags, take the quiz, run a breach drill and learn the words.",
+  "name": "Share or Keep | Toybox",
+  "short_name": "Share or Keep",
+  "description": "A privacy awareness game. Decide what is safe to post online and what to keep to yourself.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#0a1622",
-  "theme_color": "#0a1622",
+  "background_color": "#161226",
+  "theme_color": "#161226",
   "icons": [
     {
       "src": "img/icon-192.png",

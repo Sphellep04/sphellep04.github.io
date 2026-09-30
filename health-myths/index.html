@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="A health awareness game. Swipe myth or fact on HIV, TB, malaria, hygiene and everyday health.">
+<meta name="theme-color" content="#0c1c1e">
+<title>Health Myths</title>
+<meta property="og:type" content="website">
+<meta property="og:title" content="Health Myths">
+<meta property="og:description" content="A health awareness game. Swipe myth or fact on HIV, TB, malaria, hygiene and everyday health.">
+<meta property="og:image" content="https://tinytoybox.me/health-myths/img/preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://tinytoybox.me/health-myths/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Health Myths">
+<meta name="twitter:description" content="A health awareness game. Swipe myth or fact on HIV, TB, malaria, hygiene and everyday health.">
+<meta name="twitter:image" content="https://tinytoybox.me/health-myths/img/preview.png">
+<link rel="icon" type="image/png" sizes="64x64" href="img/favicon-64.png">
+<link rel="apple-touch-icon" href="img/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600&family=DM+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --bg: #0a1622; --bg2: #10243a; --ink: #edf3fa; --mute: #9db2c8; --line: rgba(170, 200, 235, 0.22);
+  --card: rgba(255, 255, 255, 0.06); --acc: #ffcf4a; --acc-ink: #1a1400; --good: #4ad9a0; --bad: #ff6b7a;
+  --display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --body: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { min-height: 100%; }
+body { margin: 0; min-height: 100vh; color: var(--ink); font: 400 16px/1.55 var(--body); background: radial-gradient(800px 480px at 12% 0%, var(--glow1, rgba(255, 207, 74, 0.10)), transparent 60%), radial-gradient(700px 480px at 100% 40%, var(--glow2, rgba(74, 217, 160, 0.09)), transparent 60%), linear-gradient(180deg, var(--bg), var(--bg2)); background-color: var(--bg); padding-inline: 16px; padding-block: 0 24px; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+.wrap { max-width: 640px; margin: 0 auto; }
+.top { padding-top: 60px; }
+.kicker { margin: 0; font: 500 12px/1 var(--body); letter-spacing: 0.16em; text-transform: uppercase; color: var(--acc); }
+h1 { margin: 8px 0 0; font: 600 clamp(2.1rem, 9vw, 3.2rem)/1 var(--display); letter-spacing: -0.02em; text-wrap: balance; }
+.lede { margin: 12px 0 0; color: var(--mute); max-width: 52ch; text-wrap: pretty; }
+h2 { margin: 0; font: 600 1.5rem/1.15 var(--display); letter-spacing: -0.01em; text-wrap: balance; }
+.stats { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 0; padding: 0; list-style: none; }
+.stats li { font: 500 13px/1 var(--body); padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--mute); font-variant-numeric: tabular-nums; }
+.stats b { color: var(--ink); font-weight: 600; }
+.bar { height: 6px; margin-top: 14px; border-radius: 999px; background: rgba(255, 255, 255, 0.10); overflow: hidden; }
+.bar > i { display: block; height: 100%; width: 0; background: var(--acc); border-radius: inherit; transition: width 0.35s ease; }
+.panel { margin-top: 20px; padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 22px; border: 0; border-radius: 12px; font: 600 16px/1 var(--body); color: var(--acc-ink); background: var(--acc); cursor: pointer; }
+.btn:hover { filter: brightness(1.06); }
+.btn:active { transform: translateY(1px); }
+.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.btn.ghost:hover { border-color: var(--acc); }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.btn:focus-visible, .opt:focus-visible, .chip:focus-visible, a:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.opt { display: block; width: 100%; text-align: left; padding: 14px 16px; margin-top: 10px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink); font: 500 16px/1.4 var(--body); cursor: pointer; }
+.opt:hover:not(:disabled) { border-color: var(--acc); }
+.opt.right { border-color: var(--good); background: rgba(74, 217, 160, 0.14); }
+.opt.wrong { border-color: var(--bad); background: rgba(255, 107, 122, 0.14); }
+.opt:disabled { cursor: default; }
+.why { margin-top: 16px; padding: 14px 16px; border-left: 4px solid var(--acc); border-radius: 4px 10px 10px 4px; background: rgba(255, 255, 255, 0.05); }
+.why.good { border-left-color: var(--good); } .why.bad { border-left-color: var(--bad); }
+.why p { margin: 0; } .why p + p { margin-top: 8px; }
+.why .tag { display: block; margin-bottom: 6px; font: 600 12px/1 var(--body); letter-spacing: 0.14em; text-transform: uppercase; }
+.why.good .tag { color: var(--good); } .why.bad .tag { color: var(--bad); }
+.result { text-align: center; }
+.result .big { margin: 6px 0 0; font: 600 clamp(3rem, 14vw, 5rem)/1 var(--display); color: var(--acc); font-variant-numeric: tabular-nums; }
+.result .rank { margin: 8px 0 0; font: 600 1.3rem/1.2 var(--display); }
+.remember { margin: 18px 0 0; padding: 0; list-style: none; text-align: left; display: grid; gap: 10px; }
+.remember li { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255, 255, 255, 0.04); }
+.remember b { color: var(--acc); }
+.note { margin: 18px 0 0; font-size: 13px; color: var(--mute); }
+.credit { margin: 32px 0 0; text-align: center; font-size: 13px; color: var(--mute); }
+.credit a { color: var(--ink); }
+@keyframes pop { 0% { transform: scale(0.96); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+.pop { animation: pop 0.25s ease-out; }
+@media (prefers-reduced-motion: reduce) { .pop { animation: none; } .bar > i { transition: none; } }
+html.tb-reduced .pop { animation: none; } html.tb-reduced .bar > i { transition: none; }
+@media (max-width: 380px) { .panel { padding: 16px; } .btn { padding: 0 16px; } }
+@media (max-height: 520px) and (orientation: landscape) {
+  body.playing .top { display: none; }
+  body.playing .wrap { padding-top: 52px; }
+  .top { padding-top: 52px; }
+  .scene canvas { max-height: 46vh; width: auto; margin: 0 auto; }
+}
+
+.msgwrap { margin-top: 18px; perspective: 800px; touch-action: pan-y; }
+.msg { position: relative; padding: 16px 16px 18px; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05)); box-shadow: 0 12px 30px rgba(0,0,0,0.35); cursor: grab; user-select: none; -webkit-user-select: none; touch-action: pan-y; will-change: transform; transition: transform 0.25s ease, border-color 0.2s ease; }
+.msg.drag { transition: none; cursor: grabbing; }
+.msg.left { border-color: var(--bad); } .msg.right { border-color: var(--good); }
+.msg .meta { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mute); }
+.msg .from { margin-top: 10px; font: 600 1.05rem/1.2 var(--display); word-break: break-word; }
+.msg .sub { margin-top: 2px; font-size: 13px; color: var(--mute); word-break: break-word; }
+.msg .text { margin-top: 12px; font-size: 17px; line-height: 1.5; white-space: pre-line; word-break: break-word; }
+.msg mark { background: rgba(255, 207, 74, 0.28); color: var(--ink); border-radius: 4px; padding: 0 3px; box-shadow: 0 0 0 1px rgba(255, 207, 74, 0.55); }
+.msg .verdict { position: absolute; top: 12px; right: 14px; font: 700 13px/1 var(--body); letter-spacing: 0.14em; text-transform: uppercase; padding: 6px 10px; border-radius: 8px; opacity: 0; }
+.msg.answered .verdict { opacity: 1; }
+.msg.isL .verdict { background: var(--bad); color: #2a0006; } .msg.isR .verdict { background: var(--good); color: #002a1a; }
+.msg.answered .meta { visibility: hidden; }
+.decide .dec { flex: 1 1 140px; min-height: 56px; font-size: 17px; }
+.dec.bad { background: var(--bad); color: #2a0006; } .dec.good { background: var(--good); color: #002a1a; }
+.decide.off { display: none; }
+body.playing .lede { display: none; }
+body.playing .top { padding-top: 56px; }
+.lens { display: flex; gap: 8px; margin-top: 10px; }
+.lens button { flex: 1 1 0; min-height: 48px; padding: 8px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink); font: 600 15px/1.2 var(--body); cursor: pointer; }
+.lens button:hover { border-color: var(--acc); }
+.lens button[aria-checked="true"] { border-color: var(--acc); background: rgba(255, 255, 255, 0.12); }
+.lens button:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+.gloss { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 12px; }
+.gloss summary { cursor: pointer; font-weight: 600; color: var(--acc); }
+.gloss dl { margin: 10px 0 0; display: grid; gap: 10px; }
+.gloss dt { font-weight: 600; } .gloss dd { margin: 2px 0 0; color: var(--mute); font-size: 15px; }
+@media (max-height: 520px) and (orientation: landscape) { body.playing .top { display: none; } }
+
+:root { --bg: #0c1c1e; --bg2: #123a3a; --acc: #7ff0d4; --acc-ink: #03231f; --glow1: rgba(127, 240, 212, 0.12); --glow2: rgba(255, 138, 91, 0.07); }
+
+</style>
+<style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #0c1c1e; }</style>
+<!-- toybox-shared -->
+<link rel="manifest" href="manifest.webmanifest">
+<script src="../toybox.js"></script>
+</head>
+<body>
+<main class="wrap">
+  <header class="top">
+    <p class="kicker" id="kick"></p>
+    <h1 id="ttl"></h1>
+    <p class="lede" id="lede"></p>
+  </header>
+
+  <section id="intro" class="panel">
+    <h2>How it works</h2>
+    <p class="note" id="how" style="margin-top:8px;font-size:15px;color:var(--mute)"></p>
+    <h2 style="margin-top:20px;font-size:1.15rem">Round length</h2>
+    <div class="lens" id="lens" role="radiogroup" aria-label="Round length"></div>
+    <div class="row"><button class="btn" id="bStart" type="button">Start</button></div>
+    <p class="note" id="bestLine" hidden></p>
+    <details class="gloss" id="gloss" hidden><summary>Good words to know</summary><dl id="glossList"></dl></details>
+  </section>
+
+  <section id="play" hidden aria-live="polite">
+    <ul class="stats"><li>Card <b id="sN">1</b>/<span id="sT">12</span></li><li>Score <b id="sS">0</b></li><li>Streak <b id="sK">0</b></li></ul>
+    <div class="bar" aria-hidden="true"><i id="pBar"></i></div>
+    <div class="msgwrap"><div class="msg" id="msg" tabindex="0" aria-label="Card"></div></div>
+    <div class="row decide" id="decide">
+      <button class="btn dec bad" id="bLeft" type="button"></button>
+      <button class="btn dec good" id="bRight" type="button"></button>
+    </div>
+    <div id="why" class="why" hidden></div>
+    <div class="row" id="nextRow" hidden><button class="btn" id="bNext" type="button">Next</button></div>
+  </section>
+
+  <section id="end" class="panel result" hidden>
+    <p class="kicker">Round complete</p>
+    <p class="big" id="eScore">0</p>
+    <p class="rank" id="eRank"></p>
+    <p class="note" id="eBest"></p>
+    <ul class="remember" id="remember"></ul>
+    <p class="note" id="foot" hidden></p>
+    <div class="row" style="justify-content:center"><button class="btn" id="bAgain" type="button">Play again</button><button class="btn ghost" id="bShare" type="button">Share</button></div>
+  </section>
+
+  <p class="credit">Made by <a href="https://phellep.vercel.app">Phellep Shapopi</a></p>
+</main>
+
+<script>
+/* Awareness shell: small helpers shared by the Awareness toys */
+const A = (() => {
+  const $ = (id) => document.getElementById(id);
+  const store = { get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+  const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const reduced = () => !!(window.Toybox && Toybox.reduced);
+  const soundOn = () => !(window.Toybox) || Toybox.sound;
+  let ctx = null;
+  function audio() { if (!ctx) { try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; } } if (ctx.state === 'suspended') ctx.resume(); return ctx; }
+  function tone(f, d, type, vol, slide, delay) {
+    if (!soundOn()) return; const c = audio(); if (!c) return;
+    const t = c.currentTime + (delay || 0), o = c.createOscillator(), g = c.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(f, t); if (slide) o.frequency.linearRampToValueAtTime(Math.max(30, f + slide), t + d);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol || 0.1, t + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + d + 0.05);
+  }
+  const sfx = {
+    good() { tone(660, 0.12, 'triangle', 0.10); tone(880, 0.18, 'triangle', 0.10, 0, 0.09); },
+    bad() { tone(220, 0.22, 'sawtooth', 0.07, -90); },
+    tap() { tone(520, 0.05, 'triangle', 0.06); },
+    done() { [523, 659, 784, 1046].forEach((f, i) => tone(f, 0.22, 'triangle', 0.09, 0, i * 0.11)); }
+  };
+  function bestKey(slug) { return 'aware.' + slug + '.best'; }
+  function best(slug) { const v = +store.get(bestKey(slug), 0); return isFinite(v) ? v : 0; }
+  function saveBest(slug, n) { const old = best(slug); if (n > old) { store.set(bestKey(slug), String(n)); return true; } return false; }
+  function plays(slug) { const n = (+store.get('aware.' + slug + '.plays', 0) || 0) + 1; store.set('aware.' + slug + '.plays', String(n)); return n; }
+  return { $, store, shuffle, esc, reduced, soundOn, audio, tone, sfx, best, saveBest, plays };
+})();
+
+const CFG = {
+  slug: 'health-myths', kicker: 'Awareness · Health', title: 'Health Myths',
+  lede: 'Is it a myth or a fact? A quick swipe game on HIV, TB, malaria, hygiene and looking after yourself.',
+  how: 'Swipe left for <b style="color:var(--bad)">Myth</b>, right for <b style="color:var(--good)">Fact</b>. After each card you will see the short, clear reason.',
+  leftLabel: 'Myth', rightLabel: 'Fact', leftWord: 'Myth', rightWord: 'Fact', keyL: 'm', keyR: 'f', rounds: [6, 12], leftShare: 0.5,
+  ranks: [[0.92, 'Health champion'], [0.75, 'Well informed'], [0.5, 'On your way'], [0, 'Time to learn more']],
+  remember: [['Get tested.', 'Regular testing for HIV and other conditions helps you get treatment early. Visit your nearest clinic.'], ['Finish treatment.', 'Take medicines exactly as prescribed, including TB and HIV treatment, even when you feel better.'], ['Protect yourself.', 'Wash hands, use mosquito nets where needed, protect your skin from the sun and keep up to date with vaccines.'], ['Ask a health worker.', 'A nurse or doctor can answer questions in private. Rumours travel fast, good advice comes from trained people.']],
+  foot: 'This is general information based on public health guidance. It does not replace advice from a doctor or nurse.',
+  gloss: [['HIV', 'A virus that weakens the immune system. With treatment people can live long, healthy lives.'], ['ART', 'Antiretroviral treatment, the daily medicine that controls HIV.'], ['TB', 'Tuberculosis, a lung infection that spreads through the air and can be cured with a full course of treatment.'], ['Undetectable', 'When HIV treatment keeps the amount of virus in the blood too low to measure. People with an undetectable viral load cannot pass HIV on through sex.']]
+};
+const DECK = [
+  { ch: 'HIV', from: 'Myth or fact?', text: 'You can get HIV by hugging, shaking hands or sharing a cup with someone who has it.', a: 'L', flags: [], why: 'HIV is not spread through everyday contact. It is passed on through certain body fluids, for example through unprotected sex, sharing needles, from mother to baby or through unsafe blood.' },
+  { ch: 'HIV', from: 'Myth or fact?', text: 'You can tell someone has HIV just by looking at them.', a: 'L', flags: [], why: 'Most people with HIV look and feel healthy. The only way to know is a test.' },
+  { ch: 'HIV', from: 'Myth or fact?', text: 'Traditional herbs or prayer can replace HIV medicine.', a: 'L', flags: [], why: 'Only antiretroviral treatment keeps HIV under control. Herbs cannot replace it, and some can interfere with the medicine. Talk to your clinic before adding anything.' },
+  { ch: 'TB', from: 'Myth or fact?', text: 'TB spreads by sharing plates and cups.', a: 'L', flags: [], why: 'TB spreads through the air when someone with active TB in their lungs coughs or sneezes. Good ventilation and treatment for the person who is ill help stop it.' },
+  { ch: 'TB', from: 'Myth or fact?', text: 'You can stop TB tablets as soon as you start to feel better.', a: 'L', flags: [], why: 'You must finish the full course. Stopping early lets the germs survive, the illness can come back and it can become much harder to treat.' },
+  { ch: 'Colds', from: 'Myth or fact?', text: 'Antibiotics cure colds and flu.', a: 'L', flags: [], why: 'Colds and flu are caused by viruses, and antibiotics only work on bacteria. Using them when they are not needed helps germs become resistant.' },
+  { ch: 'Malaria', from: 'Myth or fact?', text: 'Malaria comes from drinking dirty water.', a: 'L', flags: [], why: 'Malaria is spread by the bite of infected mosquitoes, not by water you drink. Nets, repellent and covering up at dusk help.' },
+  { ch: 'Sun', from: 'Myth or fact?', text: 'You only need sunscreen on hot, sunny days.', a: 'L', flags: [], why: 'UV rays can be strong even when it is cloudy or cool. In sunny places, shade, a hat and sunscreen are useful all year.' },
+  { ch: 'Snakes', from: 'Myth or fact?', text: 'If a snake bites you, you should cut the wound and suck out the venom.', a: 'L', flags: [], why: 'Cutting or sucking makes things worse. Keep the person calm and still and get to a hospital as quickly as possible.' },
+  { ch: 'Body', from: 'Myth or fact?', text: 'Only old people get high blood pressure or diabetes.', a: 'L', flags: [], why: 'These conditions can affect younger adults too, and often have no obvious symptoms. Regular check-ups can catch them early.' },
+  { ch: 'Mind', from: 'Myth or fact?', text: 'If you feel very sad or worried for weeks, it means you are weak.', a: 'L', flags: [], why: 'Mental health conditions are common health problems, not weakness. Talking to someone you trust or a health worker can help.' },
+
+  { ch: 'HIV', from: 'Myth or fact?', text: 'A person on HIV treatment who has an undetectable viral load cannot pass HIV on through sex.', a: 'R', flags: [], why: 'When treatment keeps the virus too low to detect, HIV cannot be passed on through sex. This is why taking medicine every day matters so much.' },
+  { ch: 'HIV', from: 'Myth or fact?', text: 'Regular HIV testing helps you know your status, and starting treatment early keeps you healthy.', a: 'R', flags: [], why: 'Early treatment means a longer, healthier life. Testing is quick and can be done at your local clinic.' },
+  { ch: 'Hygiene', from: 'Myth or fact?', text: 'Washing your hands with soap and clean water helps prevent many infections, like diarrhoea and flu.', a: 'R', flags: [], why: 'Handwashing after the toilet and before eating or preparing food is one of the cheapest and most effective ways to stay well.' },
+  { ch: 'TB', from: 'Myth or fact?', text: 'TB can be cured when you take all your treatment for the full time.', a: 'R', flags: [], why: 'Most TB can be cured with the right medicines taken correctly. Follow your clinic\'s plan and attend every appointment.' },
+  { ch: 'Malaria', from: 'Myth or fact?', text: 'Sleeping under a treated mosquito net helps protect you from malaria.', a: 'R', flags: [], why: 'Nets keep mosquitoes away while they are most active at night, especially with insecticide on them.' },
+  { ch: 'Malaria', from: 'Myth or fact?', text: 'Standing water around a home can become a breeding place for mosquitoes.', a: 'R', flags: [], why: 'Emptying buckets, tyres and containers that collect water removes places mosquitoes need to breed.' },
+  { ch: 'Vaccines', from: 'Myth or fact?', text: 'Childhood vaccines protect children and help protect others from serious diseases.', a: 'R', flags: [], why: 'Vaccines train the body to fight disease. When enough people are vaccinated, the whole community is safer.' },
+  { ch: 'Water', from: 'Myth or fact?', text: 'In hot weather you should drink water often, not wait until you are very thirsty.', a: 'R', flags: [], why: 'Thirst comes after your body already needs fluid. Sip water regularly when it is hot, or when you are active.' },
+  { ch: 'Sun', from: 'Myth or fact?', text: 'Shade, a hat and sunscreen lower your risk of sunburn and skin damage.', a: 'R', flags: [], why: 'Repeated sunburn raises the risk of skin cancer later in life. Cover up during the strongest sun in the middle of the day.' },
+  { ch: 'Food', from: 'Myth or fact?', text: 'Eating more vegetables and fruit and less sugar and salt is good for your long-term health.', a: 'R', flags: [], why: 'A balanced diet helps protect your heart, weight and blood sugar. Small changes add up.' },
+  { ch: 'Mind', from: 'Myth or fact?', text: 'Talking to someone you trust, or a health worker, can help when you feel very low or worried for a long time.', a: 'R', flags: [], why: 'Sharing a problem lightens it, and health workers can offer support and treatment. You do not have to cope alone.' }
+];
+
+/* Generic swipe deck. Needs CFG and DECK from the toy's own file. */
+let deck = [], i = 0, score = 0, streak = 0, answered = false, cur = null, ROUND = CFG.rounds[CFG.rounds.length - 1];
+const msg = A.$('msg'), $ = A.$;
+const MAXLEN = CFG.rounds[CFG.rounds.length - 1];
+$('kick').textContent = CFG.kicker; $('ttl').textContent = CFG.title; $('lede').textContent = CFG.lede; $('how').innerHTML = CFG.how;
+$('bLeft').innerHTML = '&larr; ' + A.esc(CFG.leftLabel); $('bRight').innerHTML = A.esc(CFG.rightLabel) + ' &rarr;';
+$('bLeft').setAttribute('aria-keyshortcuts', 'ArrowLeft'); $('bRight').setAttribute('aria-keyshortcuts', 'ArrowRight');
+$('remember').innerHTML = CFG.remember.map((r) => '<li><b>' + A.esc(r[0]) + '</b> ' + A.esc(r[1]) + '</li>').join('');
+if (CFG.foot) { $('foot').innerHTML = CFG.foot; $('foot').hidden = false; }
+if (CFG.gloss && CFG.gloss.length) { $('glossList').innerHTML = CFG.gloss.map((g) => '<dt>' + A.esc(g[0]) + '</dt><dd>' + A.esc(g[1]) + '</dd>').join(''); $('gloss').hidden = false; }
+let chosen = +A.store.get('aware.' + CFG.slug + '.len', MAXLEN); if (CFG.rounds.indexOf(chosen) < 0) chosen = MAXLEN;
+function drawLens() { $('lens').innerHTML = CFG.rounds.map((n) => '<button type="button" role="radio" data-n="' + n + '" aria-checked="' + (n === chosen) + '">' + n + ' cards' + (n === MAXLEN ? ' (counts for best)' : '') + '</button>').join(''); $('lens').querySelectorAll('button').forEach((b) => b.addEventListener('click', () => { chosen = +b.dataset.n; A.store.set('aware.' + CFG.slug + '.len', String(chosen)); drawLens(); })); }
+drawLens();
+
+function hi(text, flags) { let out = A.esc(text); for (const f of flags || []) { const e = A.esc(f); out = out.split(e).join('<mark>' + e + '</mark>'); } return out; }
+function show() {
+  cur = deck[i]; answered = false;
+  msg.className = 'msg pop'; msg.style.transform = '';
+  msg.innerHTML = '<div class="meta"><span>' + A.esc(cur.ch) + '</span><span>Card ' + (i + 1) + '</span></div><div class="from">' + A.esc(cur.from) + '</div>' + (cur.sub ? '<div class="sub">' + A.esc(cur.sub) + '</div>' : '') + '<div class="text">' + A.esc(cur.text) + '</div><span class="verdict"></span>';
+  $('why').hidden = true; $('nextRow').hidden = true; $('decide').classList.remove('off');
+  $('sN').textContent = i + 1; $('sT').textContent = ROUND; $('sS').textContent = score; $('sK').textContent = streak; $('pBar').style.width = (i / ROUND * 100) + '%';
+  msg.focus({ preventScroll: true });
+}
+function answer(sayLeft) {
+  if (answered) return; answered = true;
+  const ok = sayLeft === (cur.a === 'L');
+  if (ok) { score++; streak++; A.sfx.good(); } else { streak = 0; A.sfx.bad(); }
+  msg.classList.add('answered', cur.a === 'L' ? 'isL' : 'isR'); msg.style.transform = ''; msg.classList.remove('left', 'right');
+  msg.querySelector('.verdict').textContent = cur.a === 'L' ? CFG.leftWord : CFG.rightWord;
+  msg.querySelector('.text').innerHTML = hi(cur.text, cur.flags);
+  const w = $('why'); w.className = 'why pop ' + (ok ? 'good' : 'bad');
+  w.innerHTML = '<span class="tag">' + (ok ? 'Correct' : 'Not this time') + '</span><p>' + A.esc(cur.why) + '</p>' + (cur.flags && cur.flags.length ? '<p style="color:var(--mute);font-size:14px">Key parts are highlighted on the card.</p>' : '');
+  w.hidden = false; $('decide').classList.add('off'); $('nextRow').hidden = false;
+  $('bNext').textContent = i + 1 >= ROUND ? 'See my result' : 'Next card';
+  $('sS').textContent = score; $('sK').textContent = streak; $('pBar').style.width = ((i + 1) / ROUND * 100) + '%';
+  $('bNext').focus({ preventScroll: true });
+}
+function next() { if (!answered) return; i++; if (i >= ROUND) return finish(); show(); window.scrollTo({ top: 0, behavior: A.reduced() ? 'auto' : 'smooth' }); }
+function finish() {
+  document.body.classList.remove('playing'); $('play').hidden = true; $('end').hidden = false;
+  const full = ROUND === MAXLEN, isBest = full && A.saveBest(CFG.slug, score), n = A.plays(CFG.slug);
+  $('eScore').textContent = score + '/' + ROUND;
+  const pct = score / ROUND; let rank = CFG.ranks[CFG.ranks.length - 1][1]; for (const r of CFG.ranks) if (pct >= r[0]) { rank = r[1]; break; }
+  $('eRank').textContent = rank;
+  $('eBest').textContent = full ? ((isBest && n > 1 ? 'New best. ' : '') + 'Your best is ' + A.best(CFG.slug) + '/' + MAXLEN + '.') : 'Short rounds do not count towards your best. Try the full round.';
+  if (window.Toybox) Toybox.setResult(CFG.title, score + '/' + ROUND);
+  A.sfx.done(); window.scrollTo(0, 0);
+}
+function start() {
+  ROUND = chosen; const L = A.shuffle(DECK.filter((c) => c.a === 'L')), R = A.shuffle(DECK.filter((c) => c.a === 'R'));
+  const nl = Math.min(L.length, Math.round(ROUND * (CFG.leftShare || 0.5))), nr = Math.min(R.length, ROUND - nl);
+  deck = A.shuffle(L.slice(0, nl).concat(R.slice(0, nr))); ROUND = deck.length; i = 0; score = 0; streak = 0;
+  document.body.classList.add('playing'); $('intro').hidden = true; $('end').hidden = true; $('play').hidden = false; show(); A.audio();
+}
+$('bStart').addEventListener('click', start); $('bAgain').addEventListener('click', () => { $('end').hidden = true; $('intro').hidden = false; window.scrollTo(0, 0); refreshBest(); });
+$('bLeft').addEventListener('click', () => answer(true)); $('bRight').addEventListener('click', () => answer(false)); $('bNext').addEventListener('click', next);
+$('bShare').addEventListener('click', () => window.Toybox && Toybox.share());
+document.addEventListener('keydown', (e) => {
+  if ($('play').hidden) return; const k = e.key.toLowerCase();
+  if (e.key === 'ArrowLeft' || k === CFG.keyL) answer(true); else if (e.key === 'ArrowRight' || k === CFG.keyR) answer(false);
+  else if ((e.key === 'Enter' || e.key === ' ') && answered && document.activeElement !== $('bNext')) { e.preventDefault(); next(); }
+});
+let sx = null, dx = 0;
+msg.addEventListener('pointerdown', (e) => { if (answered) return; sx = e.clientX; dx = 0; msg.classList.add('drag'); try { msg.setPointerCapture(e.pointerId); } catch (x) {} });
+msg.addEventListener('pointermove', (e) => { if (sx === null) return; dx = e.clientX - sx; msg.style.transform = 'translateX(' + dx + 'px) rotate(' + dx / 25 + 'deg)'; msg.classList.toggle('left', dx < -30); msg.classList.toggle('right', dx > 30); });
+function endDrag() { if (sx === null) return; sx = null; msg.classList.remove('drag'); if (dx < -80) answer(true); else if (dx > 80) answer(false); else { msg.style.transform = ''; msg.classList.remove('left', 'right'); } dx = 0; }
+msg.addEventListener('pointerup', endDrag); msg.addEventListener('pointercancel', endDrag);
+function refreshBest() { const b = A.best(CFG.slug); if (b) { const el = $('bestLine'); el.textContent = 'Your best so far: ' + b + '/' + MAXLEN; el.hidden = false; } }
+refreshBest();
+window.__sw = { info: () => ({ i, score, streak, cur, ROUND, answered }), answer };
+
+</script>
+</body>
+</html>

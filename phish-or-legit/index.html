@@ -3,19 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="An online scam awareness game. Read twelve messages and decide if each is a scam or the real thing.">
+<meta name="description" content="A cyber security awareness space. Swipe scams or legit, hunt red flags, take the quiz, run a breach drill and learn the words.">
 <meta name="theme-color" content="#0a1622">
 <title>Phish or Legit</title>
 <meta property="og:type" content="website">
 <meta property="og:title" content="Phish or Legit">
-<meta property="og:description" content="An online scam awareness game. Read twelve messages and decide if each is a scam or the real thing.">
+<meta property="og:description" content="A cyber security awareness space. Swipe scams or legit, hunt red flags, take the quiz, run a breach drill and learn the words.">
 <meta property="og:image" content="https://tinytoybox.me/phish-or-legit/img/preview.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://tinytoybox.me/phish-or-legit/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Phish or Legit">
-<meta name="twitter:description" content="An online scam awareness game. Read twelve messages and decide if each is a scam or the real thing.">
+<meta name="twitter:description" content="A cyber security awareness space. Swipe scams or legit, hunt red flags, take the quiz, run a breach drill and learn the words.">
 <meta name="twitter:image" content="https://tinytoybox.me/phish-or-legit/img/preview.png">
 <link rel="icon" type="image/png" sizes="64x64" href="img/favicon-64.png">
 <link rel="apple-touch-icon" href="img/favicon-180.png">
@@ -85,7 +85,6 @@ html.tb-reduced .pop { animation: none; } html.tb-reduced .bar > i { transition:
   .scene canvas { max-height: 46vh; width: auto; margin: 0 auto; }
 }
 
-:root { --bg: #0a1622; --bg2: #0f2a3d; --acc: #ffcf4a; --glow1: rgba(255, 207, 74, 0.10); --glow2: rgba(255, 107, 122, 0.08); }
 .msgwrap { margin-top: 18px; perspective: 800px; touch-action: pan-y; }
 .msg { position: relative; padding: 16px 16px 18px; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05)); box-shadow: 0 12px 30px rgba(0,0,0,0.35); cursor: grab; user-select: none; -webkit-user-select: none; touch-action: pan-y; will-change: transform; transition: transform 0.25s ease, border-color 0.2s ease; }
 .msg.drag { transition: none; cursor: grabbing; }
@@ -97,14 +96,83 @@ html.tb-reduced .pop { animation: none; } html.tb-reduced .bar > i { transition:
 .msg mark { background: rgba(255, 207, 74, 0.28); color: var(--ink); border-radius: 4px; padding: 0 3px; box-shadow: 0 0 0 1px rgba(255, 207, 74, 0.55); }
 .msg .verdict { position: absolute; top: 12px; right: 14px; font: 700 13px/1 var(--body); letter-spacing: 0.14em; text-transform: uppercase; padding: 6px 10px; border-radius: 8px; opacity: 0; }
 .msg.answered .verdict { opacity: 1; }
-.msg.isScam .verdict { background: var(--bad); color: #2a0006; } .msg.isLegit .verdict { background: var(--good); color: #002a1a; }
+.msg.isL .verdict { background: var(--bad); color: #2a0006; } .msg.isR .verdict { background: var(--good); color: #002a1a; }
 .msg.answered .meta { visibility: hidden; }
 .decide .dec { flex: 1 1 140px; min-height: 56px; font-size: 17px; }
 .dec.bad { background: var(--bad); color: #2a0006; } .dec.good { background: var(--good); color: #002a1a; }
 .decide.off { display: none; }
-
 body.playing .lede { display: none; }
 body.playing .top { padding-top: 56px; }
+.lens { display: flex; gap: 8px; margin-top: 10px; }
+.lens button { flex: 1 1 0; min-height: 48px; padding: 8px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink); font: 600 15px/1.2 var(--body); cursor: pointer; }
+.lens button:hover { border-color: var(--acc); }
+.lens button[aria-checked="true"] { border-color: var(--acc); background: rgba(255, 255, 255, 0.12); }
+.lens button:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+.gloss { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 12px; }
+.gloss summary { cursor: pointer; font-weight: 600; color: var(--acc); }
+.gloss dl { margin: 10px 0 0; display: grid; gap: 10px; }
+.gloss dt { font-weight: 600; } .gloss dd { margin: 2px 0 0; color: var(--mute); font-size: 15px; }
+@media (max-height: 520px) and (orientation: landscape) { body.playing .top { display: none; } }
+
+:root { --bg: #0a1622; --bg2: #0f2a3d; --acc: #ffcf4a; --glow1: rgba(255, 207, 74, 0.10); --glow2: rgba(255, 107, 122, 0.08); }
+
+.tabs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-top: 18px; padding: 4px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); overflow-x: auto; }
+.tabs button { flex: 1 1 0; min-width: 0; min-height: 42px; padding: 0 2px; border: 0; border-radius: 10px; background: transparent; color: var(--mute); font: 600 14px/1 var(--body); cursor: pointer; white-space: nowrap; text-align: center; }
+.tabs button[aria-selected="true"] { background: var(--acc); color: var(--acc-ink); }
+.tabs button:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+body.playing .tabs { display: none; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.chips button { min-height: 40px; padding: 6px 12px; border: 1.5px solid var(--line); border-radius: 999px; background: var(--card); color: var(--ink); font: 600 14px/1.2 var(--body); cursor: pointer; }
+.chips button small { color: var(--mute); font-weight: 500; margin-left: 4px; }
+.chips button[aria-checked="true"] { border-color: var(--acc); background: rgba(255, 255, 255, 0.14); }
+.chips button:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+.btn.sm { min-height: 40px; padding: 0 14px; font-size: 14px; }
+.mini { margin: 18px 0 8px; font: 600 12px/1 var(--body); letter-spacing: 0.14em; text-transform: uppercase; color: var(--mute); }
+/* hunt */
+.msg.hunt { cursor: default; user-select: none; }
+.msg.hunt .toks { margin-top: 12px; font-size: 17px; line-height: 2; }
+.tok { display: inline; padding: 3px 2px; -webkit-box-decoration-break: clone; box-decoration-break: clone; margin: 0; border: 0; border-radius: 6px; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.tok:hover { background: rgba(255, 255, 255, 0.10); }
+.tok.on { background: rgba(255, 207, 74, 0.28); box-shadow: 0 0 0 1px rgba(255, 207, 74, 0.7); }
+.tok.hit { background: rgba(74, 217, 160, 0.25); box-shadow: 0 0 0 1px var(--good); }
+.tok.false { background: rgba(255, 107, 122, 0.2); box-shadow: 0 0 0 1px var(--bad); text-decoration: line-through; }
+.tok.miss { background: rgba(255, 207, 74, 0.10); outline: 2px dashed var(--acc); outline-offset: 1px; }
+.tok:focus-visible { outline: 3px solid var(--acc); }
+html .msg.hunt .tok[tabindex="-1"] { cursor: default; }
+.lgd { font-size: 13px; color: var(--mute); margin-top: 8px; }
+.why ul { margin: 8px 0 0; padding-left: 18px; } .why li { margin-top: 4px; }
+/* drill */
+.slots { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; counter-reset: s; }
+.slots li { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border: 1px solid var(--acc); border-radius: 12px; background: rgba(255, 207, 74, 0.10); }
+.slots li::before { counter-increment: s; content: counter(s); flex: 0 0 26px; height: 26px; border-radius: 50%; background: var(--acc); color: var(--acc-ink); font: 700 14px/26px var(--body); text-align: center; }
+.slots li.empty { border-style: dashed; border-color: var(--line); background: transparent; color: var(--mute); }
+.slots li.empty::before { background: transparent; border: 1px solid var(--line); color: var(--mute); line-height: 24px; }
+.pool { display: grid; gap: 8px; }
+.tile { text-align: left; padding: 13px 14px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink); font: 500 16px/1.4 var(--body); cursor: pointer; }
+.tile:hover { border-color: var(--acc); }
+.tile:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+.tile.no { border-color: var(--bad); background: rgba(255, 107, 122, 0.16); animation: shk 0.3s; }
+.tile.hint { border-color: var(--acc); box-shadow: 0 0 0 3px rgba(255, 207, 74, 0.35); }
+@keyframes shk { 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+@media (prefers-reduced-motion: reduce) { .tile.no { animation: none; } }
+html.tb-reduced .tile.no { animation: none; }
+.stars { letter-spacing: 0.15em; color: var(--acc); }
+/* learn */
+.ring { display: flex; align-items: baseline; gap: 10px; margin-top: 14px; }
+.ring b { font: 600 2.6rem/1 var(--display); } .ring span { color: var(--mute); }
+.checks { margin: 14px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.checks label { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); cursor: pointer; }
+.checks input { flex: 0 0 22px; width: 22px; height: 22px; margin-top: 2px; accent-color: var(--acc); }
+.checks label.done { border-color: var(--good); background: rgba(74, 217, 160, 0.10); }
+.checks small { display: block; color: var(--mute); font-size: 14px; margin-top: 2px; }
+.search { width: 100%; margin-top: 12px; min-height: 46px; padding: 0 14px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink); font: 500 16px/1 var(--body); }
+.search:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+.terms { margin: 12px 0 0; display: grid; gap: 10px; }
+.terms dt { font-weight: 600; } .terms dd { margin: 2px 0 0; color: var(--mute); font-size: 15px; }
+.missed { margin-top: 14px; text-align: left; }
+.missed h3 { margin: 0 0 6px; font: 600 1rem/1.2 var(--display); }
+.missed li { margin-top: 8px; font-size: 15px; color: var(--mute); }
+.missed b { color: var(--ink); }
 
 </style>
 <style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #0a1622; }</style>
@@ -115,25 +183,38 @@ body.playing .top { padding-top: 56px; }
 <body>
 <main class="wrap">
   <header class="top">
-    <p class="kicker">Awareness · Online scams</p>
-    <h1>Phish or Legit</h1>
-    <p class="lede">Twelve messages, one decision each. Is it a scam or the real thing? Swipe the card, use the buttons, or press the arrow keys.</p>
+    <p class="kicker" id="kick"></p>
+    <h1 id="ttl"></h1>
+    <p class="lede" id="lede"></p>
   </header>
 
+  <div class="tabs" id="tabs" role="tablist" aria-label="Cyber security space">
+    <button type="button" role="tab" data-tab="swipe" aria-selected="true">Swipe</button>
+    <button type="button" role="tab" data-tab="hunt" aria-selected="false">Flags</button>
+    <button type="button" role="tab" data-tab="quiz" aria-selected="false">Quiz</button>
+    <button type="button" role="tab" data-tab="drill" aria-selected="false">Drill</button>
+    <button type="button" role="tab" data-tab="learn" aria-selected="false">Learn</button>
+  </div>
+
+  <div class="pane" id="p-swipe">
   <section id="intro" class="panel">
     <h2>How it works</h2>
-    <p class="note" style="margin-top:8px;font-size:15px;color:var(--mute)">Swipe left for <b style="color:var(--bad)">Scam</b>, right for <b style="color:var(--good)">Legit</b>. After each card you will see the warning signs and why. All the banks, phone companies and shops here are made up.</p>
+    <p class="note" id="how" style="margin-top:8px;font-size:15px;color:var(--mute)"></p>
+    <div id="topicWrap" hidden><h2 style="margin-top:20px;font-size:1.15rem">Topic</h2><div class="chips" id="topics" role="radiogroup" aria-label="Topic"></div></div>
+    <h2 style="margin-top:20px;font-size:1.15rem">Round length</h2>
+    <div class="lens" id="lens" role="radiogroup" aria-label="Round length"></div>
     <div class="row"><button class="btn" id="bStart" type="button">Start</button></div>
     <p class="note" id="bestLine" hidden></p>
+    
   </section>
 
   <section id="play" hidden aria-live="polite">
     <ul class="stats"><li>Card <b id="sN">1</b>/<span id="sT">12</span></li><li>Score <b id="sS">0</b></li><li>Streak <b id="sK">0</b></li></ul>
     <div class="bar" aria-hidden="true"><i id="pBar"></i></div>
-    <div class="msgwrap"><div class="msg" id="msg" tabindex="0" aria-label="Message card"></div></div>
+    <div class="msgwrap"><div class="msg" id="msg" tabindex="0" aria-label="Card"></div></div>
     <div class="row decide" id="decide">
-      <button class="btn dec bad" id="bScam" type="button">&larr; Scam</button>
-      <button class="btn dec good" id="bLegit" type="button">Legit &rarr;</button>
+      <button class="btn dec bad" id="bLeft" type="button"></button>
+      <button class="btn dec good" id="bRight" type="button"></button>
     </div>
     <div id="why" class="why" hidden></div>
     <div class="row" id="nextRow" hidden><button class="btn" id="bNext" type="button">Next</button></div>
@@ -144,14 +225,129 @@ body.playing .top { padding-top: 56px; }
     <p class="big" id="eScore">0</p>
     <p class="rank" id="eRank"></p>
     <p class="note" id="eBest"></p>
-    <ul class="remember">
-      <li><b>Pause.</b> Rushing you is the scammer's main trick. Real organisations can wait ten minutes.</li>
-      <li><b>Check.</b> Contact the company through the app, website or number you already trust, never the link or number in the message.</li>
-      <li><b>Guard your codes.</b> Nobody real needs your PIN, password or one-time code.</li>
-      <li><b>Tell someone.</b> Report it to your bank or network provider and warn friends and family.</li>
-    </ul>
+    <ul class="remember" id="remember"></ul>
+    <p class="note" id="foot" hidden></p>
     <div class="row" style="justify-content:center"><button class="btn" id="bAgain" type="button">Play again</button><button class="btn ghost" id="bShare" type="button">Share</button></div>
+    <p class="note" style="text-align:center">Try another part of the space: <a href="#" data-go="hunt">Flags</a>, <a href="#" data-go="quiz">Quiz</a>, <a href="#" data-go="drill">Drill</a>.</p>
   </section>
+
+  </div>
+
+  <div class="pane" id="p-hunt" hidden>
+    <section id="hIntro" class="panel">
+      <h2>Red flag hunt</h2>
+      <p class="note" style="margin-top:8px;font-size:15px;color:var(--mute)">You get a whole message. Tap the words and phrases that look suspicious, then press <b>Check</b>. Real warning signs score a point, wrong taps take one away. Some messages are perfectly fine: for those press <b>This looks fine</b>.</p>
+      <div class="row"><button class="btn" id="hStart" type="button">Start</button></div>
+      <p class="note" id="hBest" hidden></p>
+    </section>
+    <section id="hPlay" hidden aria-live="polite">
+      <ul class="stats"><li>Message <b id="hN">1</b>/<span id="hT">5</span></li><li>Points <b id="hS">0</b></li></ul>
+      <div class="bar" aria-hidden="true"><i id="hBar"></i></div>
+      <div class="msgwrap"><div class="msg hunt" id="hMsg"></div></div>
+      <div class="row" id="hAct"><button class="btn" id="hCheck" type="button">Check</button><button class="btn ghost" id="hFine" type="button">This looks fine</button></div>
+      <div id="hWhy" class="why" hidden></div>
+      <div class="row" id="hNextRow" hidden><button class="btn" id="hNext" type="button">Next message</button></div>
+    </section>
+    <section id="hEnd" class="panel result" hidden>
+      <p class="kicker">Hunt complete</p>
+      <p class="big" id="hScore">0</p>
+      <p class="rank" id="hRank"></p>
+      <p class="note" id="hEBest"></p>
+      <ul class="remember">
+        <li><b>Urgency and fear.</b> Deadlines, threats and countdowns are there to stop you thinking.</li>
+        <li><b>Money and secrets.</b> Fees up front, vouchers, codes and "tell no one" are strong warnings.</li>
+        <li><b>The link or number.</b> If it is not one you already trust, do not use it.</li>
+      </ul>
+      <div class="row" style="justify-content:center"><button class="btn" id="hAgain" type="button">Play again</button><button class="btn ghost" data-share type="button">Share</button></div>
+    </section>
+  </div>
+
+  <div class="pane" id="p-quiz" hidden>
+    <section id="qIntro" class="panel">
+      <h2>Cyber quiz</h2>
+      <p class="note" style="margin-top:8px;font-size:15px;color:var(--mute)">Ten questions picked from a bigger set on passwords, accounts, updates, Wi-Fi, malware, privacy and more. Choose an answer, then read why.</p>
+      <div class="row"><button class="btn" id="qStart" type="button">Start</button></div>
+      <p class="note" id="qBest" hidden></p>
+    </section>
+    <section id="qPlay" hidden aria-live="polite">
+      <ul class="stats"><li>Question <b id="qN">1</b>/<span id="qT">10</span></li><li>Score <b id="qS">0</b></li><li id="qTopic"></li></ul>
+      <div class="bar" aria-hidden="true"><i id="qBar"></i></div>
+      <h2 id="qText" style="margin-top:18px"></h2>
+      <div id="qOpts"></div>
+      <div id="qWhy" class="why" hidden></div>
+      <div class="row" id="qNextRow" hidden><button class="btn" id="qNext" type="button">Next question</button></div>
+    </section>
+    <section id="qEnd" class="panel result" hidden>
+      <p class="kicker">Quiz complete</p>
+      <p class="big" id="qScore">0</p>
+      <p class="rank" id="qRank"></p>
+      <p class="note" id="qEBest"></p>
+      <div id="qMissed"></div>
+      <div class="row" style="justify-content:center"><button class="btn" id="qAgain" type="button">Play again</button><button class="btn ghost" data-share type="button">Share</button></div>
+    </section>
+  </div>
+
+  <div class="pane" id="p-drill" hidden>
+    <section id="dIntro" class="panel">
+      <h2>Breach drill</h2>
+      <p class="note" style="margin-top:8px;font-size:15px;color:var(--mute)">Something has gone wrong. Tap the steps in the order you would take them. Three stars per scenario: wrong taps and hints each cost a star. Five scenarios per round, picked from eight.</p>
+      <div class="row"><button class="btn" id="dStart" type="button">Start</button></div>
+      <p class="note" id="dBest" hidden></p>
+    </section>
+    <section id="dPlay" hidden aria-live="polite">
+      <ul class="stats"><li>Scenario <b id="dN">1</b>/<span id="dT">5</span></li><li>Stars <b id="dS">0</b></li><li>This one <b id="dC">3</b> left</li></ul>
+      <div class="bar" aria-hidden="true"><i id="dBar"></i></div>
+      <h2 id="dTitle" style="margin-top:18px"></h2>
+      <p id="dText" class="lede" style="margin-top:6px"></p>
+      <p class="mini">Your order</p>
+      <ol id="dSlots" class="slots"></ol>
+      <p class="mini" id="dPoolLabel">Tap the next step</p>
+      <div id="dPool" class="pool"></div>
+      <div class="row" id="dHintRow"><button class="btn ghost" id="dHint" type="button">Hint (costs a star)</button></div>
+      <div id="dWhy" class="why" hidden></div>
+      <div class="row" id="dNextRow" hidden><button class="btn" id="dNext" type="button">Next scenario</button></div>
+    </section>
+    <section id="dEnd" class="panel result" hidden>
+      <p class="kicker">Drill complete</p>
+      <p class="big" id="dScore">0</p>
+      <p class="rank" id="dRank"></p>
+      <p class="note" id="dEBest"></p>
+      <ul class="remember">
+        <li><b>Act fast.</b> The first hour matters most after a password, code or payment mistake.</li>
+        <li><b>Use your own numbers.</b> Call the bank or provider on the number on your card or in their app.</li>
+        <li><b>It is not your fault.</b> Scammers are skilled. Reporting quickly helps you and others.</li>
+      </ul>
+      <div class="row" style="justify-content:center"><button class="btn" id="dAgain" type="button">Play again</button><button class="btn ghost" data-share type="button">Share</button></div>
+    </section>
+  </div>
+
+  <div class="pane" id="p-learn" hidden>
+    <section class="panel">
+      <h2>10-minute security check-up</h2>
+      <p class="note" style="margin-top:8px;font-size:15px;color:var(--mute)">Tick what is true for you. It stays on this device only. Untick to see tips for what is left.</p>
+      <div class="ring"><b id="cuNum">0</b><span>of <span id="cuTot">14</span> habits</span></div>
+      <div class="bar" aria-hidden="true"><i id="cuBar"></i></div>
+      <p class="rank" id="cuRank" style="margin-top:12px"></p>
+      <ul class="checks" id="cuList"></ul>
+      <div class="row"><button class="btn ghost sm" id="cuReset" type="button">Clear ticks</button></div>
+    </section>
+    <section class="panel">
+      <h2>Words to know</h2>
+      <input class="search" id="tSearch" type="search" placeholder="Search words, for example SIM swap" aria-label="Search words">
+      <dl class="terms" id="tList"></dl>
+      <p class="note" id="tNone" hidden>No matching word. Try another spelling.</p>
+    </section>
+    <section class="panel">
+      <h2>If something goes wrong</h2>
+      <ul class="remember">
+        <li><b>Money.</b> Call your bank or mobile money provider straight away using the number on your card or in their app.</li>
+        <li><b>SIM or phone.</b> Contact your mobile provider from another phone and block the SIM.</li>
+        <li><b>Accounts.</b> Change the password from a safe device and turn on two-factor authentication.</li>
+        <li><b>Report.</b> Keep screenshots and tell the police. Reporting scams helps protect others.</li>
+      </ul>
+      <p class="note">This is general awareness, not professional advice. Every bank and provider has its own process, so check with them.</p>
+    </section>
+  </div>
 
   <p class="credit">Made by <a href="https://phellep.vercel.app">Phellep Shapopi</a></p>
 </main>
@@ -187,95 +383,543 @@ const A = (() => {
   return { $, store, shuffle, esc, reduced, soundOn, audio, tone, sfx, best, saveBest, plays };
 })();
 
+const CFG = {
+  slug: 'phish-or-legit', kicker: 'Awareness · Cyber security', title: 'Phish or Legit',
+  lede: 'A cyber security practice space. Spot scams, hunt for red flags, test your knowledge and practise what to do when something goes wrong.',
+  how: 'Swipe left for <b style="color:var(--bad)">Scam</b>, right for <b style="color:var(--good)">Legit</b>. After each card you will see the warning signs and the reason. All the banks, phone companies and shops here are made up.',
+  leftLabel: 'Scam', rightLabel: 'Legit', leftWord: 'Scam', rightWord: 'Legit', keyL: 's', keyR: 'l', rounds: [6, 12, 20], count: 12, topics: [['all', 'Mix of everything'], ['email', 'Email'], ['chat', 'SMS and chat'], ['calls', 'Calls'], ['social', 'Social media'], ['money', 'Money and wallets'], ['jobs', 'Jobs and love'], ['work', 'At work'], ['device', 'Devices and Wi-Fi']], leftShare: 0.5,
+  ranks: [[0.92, 'Scam radar switched on'], [0.75, 'Sharp eyed'], [0.5, 'Getting there'], [0, 'Slow down and check']],
+  remember: [['Pause.', 'Rushing you is the scammer\'s main trick. Real organisations can wait ten minutes.'], ['Check.', 'Contact the company through the app, website or number you already trust, never the link or number in the message.'], ['Guard your codes.', 'Nobody real needs your PIN, password or one-time code.'], ['Tell someone.', 'Report it to your bank or network provider and warn friends and family.']],
+  gloss: [['Phishing', 'A fake message that tries to trick you into giving away details or clicking a bad link.'], ['Smishing', 'Phishing by SMS or WhatsApp.'], ['Vishing', 'Phishing by phone call, often pretending to be your bank.'], ['Quishing', 'Fake QR codes that lead to a bad website.'], ['Spoofing', 'Faking a name, number or address so a message looks like it came from someone you trust.'], ['OTP', 'A one-time code sent to you. It proves you are you, so never share it.']]
+};
 const DECK = [
-  { ch: 'SMS', from: 'SavannaBank', text: 'URGENT: Your account has been LIMITED. Verify within 2 hours or it will be closed: savanna-bank-verify.co/login', scam: true, flags: ['URGENT', 'within 2 hours', 'savanna-bank-verify.co/login'], why: 'Banks do not threaten to close your account by SMS, and they do not send you to a website with a made-up address. Scammers copy the bank name and add a countdown so you click before you think.' },
-  { ch: 'WhatsApp', from: 'Unknown number', sub: 'Profile photo copied from your daughter', text: 'Hi Mum, I dropped my phone in water and this is my new number. Please send N$3,500 to this account today, I will explain later.', scam: true, flags: ['this is my new number', 'send N$3,500', 'I will explain later'], why: 'A new number, a sad story and a request for money is a classic impersonation scam. Ring the number you already have, or ask a question only your child could answer, before sending anything.' },
-  { ch: 'Email', from: 'Oryx Mobile Prizes', sub: 'prizes@oryx-lucky-draw.win', text: 'Congratulations! You won a brand new phone in our lucky draw. To claim it, pay a N$150 delivery fee to the account below.', scam: true, flags: ['You won', 'pay a N$150 delivery fee'], why: 'You cannot win a draw you never entered, and real prizes never ask you to pay first. The odd address ending in .win is another clue.' },
-  { ch: 'Email', from: 'IT Helpdesk', sub: 'helpdesk@company-support.help', text: 'Your password expires today. Click here to keep your access. If the link does not work, reply with your current password and we will renew it.', scam: true, flags: ['expires today', 'reply with your current password'], why: 'No genuine IT team ever asks you to send your password. The deadline is there to make you rush.' },
-  { ch: 'SMS', from: 'KalaharPost', text: 'We could not deliver your parcel. Pay a N$12 redelivery fee to reschedule: kalaharpost-redeliver.top/pay', scam: true, flags: ['N$12 redelivery fee', 'kalaharpost-redeliver.top/pay'], why: 'A small fee looks harmless, but the goal is your card details. If you are expecting a parcel, open the courier\'s own app or type their website yourself.' },
-  { ch: 'WhatsApp', from: 'Talent Hub', sub: 'Added you to a group', text: 'Job offer! Earn N$800 per day liking videos from home. No experience needed. Send N$200 registration to start today.', scam: true, flags: ['N$800 per day', 'Send N$200 registration'], why: 'If you have to pay to get a job, it is not a job. Very high pay for very easy work is the bait in many advance fee scams.' },
-  { ch: 'SMS', from: 'OryxMobile', text: 'Your SIM will be blocked today. Call 081 555 0199 now to update your ID details.', scam: true, flags: ['blocked today', 'Call 081 555 0199', 'update your ID details'], why: 'Pressure plus a number they choose. Scammers hope you call and read out your ID details. Use the number on your provider\'s official website or in their app.' },
-  { ch: 'Email', from: 'Accounts', sub: 'accounts@invoice-desk.info', text: 'Attached is your overdue invoice for N$48,900. Open invoice.zip and pay today to avoid penalties.', scam: true, flags: ['invoice.zip', 'pay today to avoid penalties'], why: 'An unexpected invoice in a zip file can carry malware. If you do not know the sender, do not open the attachment. Check with the company directly.' },
-  { ch: 'Instagram DM', from: 'Naledi', sub: 'A friend, but the message feels off', text: 'Is this you in this video?? lol https://vid-watch.link/x', scam: true, flags: ['Is this you in this video??', 'vid-watch.link/x'], why: 'Hijacked accounts message everyone in their contacts with bait links. Ask your friend on another app or in person before you tap anything.' },
-  { ch: 'Email', from: 'Dune Power', sub: 'billing@dunepower-pay.top', text: 'Your electricity will be cut at 17:00 today unless you pay N$2,300 to this personal mobile money number: 081 555 0142.', scam: true, flags: ['cut at 17:00 today', 'personal mobile money number'], why: 'Utilities do not ask you to pay into a personal wallet. Threatening a cut-off within hours is meant to stop you checking.' },
-  { ch: 'SMS', from: 'Relief Fund', text: 'Congratulations! Your ID has been selected for a government relief grant. Send your ID number and bank PIN to receive it.', scam: true, flags: ['selected for a government relief grant', 'bank PIN'], why: 'Nobody legitimate will ever ask for your bank PIN. Grants are not paid by asking you to text your details to a stranger.' },
-  { ch: 'Email', from: 'Managing Director', sub: 'md.office@gmail-mail.co', text: 'I am in a meeting and cannot talk. Please buy N$5,000 of shop vouchers and send me the codes now. Keep this between us.', scam: true, flags: ['buy N$5,000 of shop vouchers', 'send me the codes', 'Keep this between us'], why: 'This is boss fraud. The name is real but the address is not, and secrecy plus vouchers is the giveaway. Confirm by phoning your boss on a number you already know.' },
-  { ch: 'Email', from: 'StreamBox', sub: 'billing@streambox-help.support', text: 'Your account is on hold. Update your payment method now to avoid losing your profiles and watch list: streambox-billing.support', scam: true, flags: ['on hold', 'streambox-billing.support'], why: 'The link goes to a look-alike site made to collect your card number. Open the real app yourself and check your account there.' },
-  { ch: 'WhatsApp', from: 'Wealth Circle', sub: 'Group invite from a stranger', text: 'Turn N$1,000 into N$5,000 in 7 days. Guaranteed. Only 3 spots left, join now!', scam: true, flags: ['N$1,000 into N$5,000 in 7 days', 'Guaranteed', 'Only 3 spots left'], why: 'Guaranteed big returns and a shrinking number of spots are the signature of pyramid and investment scams. No honest investment can promise that.' },
-  { ch: 'Email', from: 'Account Security', sub: 'no-reply@secure-my-login.click', text: 'Security alert: a new sign-in was detected from another country. If this was not you, click here now to secure your account.', scam: true, flags: ['click here now', 'secure-my-login.click'], why: 'Real security alerts tell you to open the official app or website yourself. A button that goes to an unfamiliar address is the trap.' },
+  { ch: 'SMS', from: 'SavannaBank', text: 'URGENT: Your account has been LIMITED. Verify within 2 hours or it will be closed: savanna-bank-verify.co/login', a: 'L', flags: ['URGENT', 'within 2 hours', 'savanna-bank-verify.co/login'], why: 'Banks do not threaten to close your account by SMS, and they do not send you to a website with a made-up address. Scammers copy the bank name and add a countdown so you click before you think.' },
+  { ch: 'WhatsApp', from: 'Unknown number', sub: 'Profile photo copied from your daughter', text: 'Hi Mum, I dropped my phone in water and this is my new number. Please send N$3,500 to this account today, I will explain later.', a: 'L', flags: ['this is my new number', 'send N$3,500', 'I will explain later'], why: 'A new number, a sad story and a request for money is a classic impersonation scam. Ring the number you already have, or ask a question only your child could answer, before sending anything.' },
+  { ch: 'Email', from: 'Oryx Mobile Prizes', sub: 'prizes@oryx-lucky-draw.win', text: 'Congratulations! You won a brand new phone in our lucky draw. To claim it, pay a N$150 delivery fee to the account below.', a: 'L', flags: ['You won', 'pay a N$150 delivery fee'], why: 'You cannot win a draw you never entered, and real prizes never ask you to pay first. The odd address ending in .win is another clue.' },
+  { ch: 'Email', from: 'IT Helpdesk', sub: 'helpdesk@company-support.help', text: 'Your password expires today. Click here to keep your access. If the link does not work, reply with your current password and we will renew it.', a: 'L', flags: ['expires today', 'reply with your current password'], why: 'No genuine IT team ever asks you to send your password. The deadline is there to make you rush.' },
+  { ch: 'SMS', from: 'KalaharPost', text: 'We could not deliver your parcel. Pay a N$12 redelivery fee to reschedule: kalaharpost-redeliver.top/pay', a: 'L', flags: ['N$12 redelivery fee', 'kalaharpost-redeliver.top/pay'], why: 'A small fee looks harmless, but the goal is your card details. If you are expecting a parcel, open the courier\'s own app or type their website yourself.' },
+  { ch: 'WhatsApp', from: 'Talent Hub', sub: 'Added you to a group', text: 'Job offer! Earn N$800 per day liking videos from home. No experience needed. Send N$200 registration to start today.', a: 'L', flags: ['N$800 per day', 'Send N$200 registration'], why: 'If you have to pay to get a job, it is not a job. Very high pay for very easy work is the bait in many advance fee scams.' },
+  { ch: 'SMS', from: 'OryxMobile', text: 'Your SIM will be blocked today. Call 081 555 0199 now to update your ID details.', a: 'L', flags: ['blocked today', 'Call 081 555 0199', 'update your ID details'], why: 'Pressure plus a number they choose. Scammers hope you call and read out your ID details. Use the number on your provider\'s official website or in their app.' },
+  { ch: 'Email', from: 'Accounts', sub: 'accounts@invoice-desk.info', text: 'Attached is your overdue invoice for N$48,900. Open invoice.zip and pay today to avoid penalties.', a: 'L', flags: ['invoice.zip', 'pay today to avoid penalties'], why: 'An unexpected invoice in a zip file can carry malware. If you do not know the sender, do not open the attachment. Check with the company directly.' },
+  { ch: 'Instagram DM', from: 'Naledi', sub: 'A friend, but the message feels off', text: 'Is this you in this video?? lol https://vid-watch.link/x', a: 'L', flags: ['Is this you in this video??', 'vid-watch.link/x'], why: 'Hijacked accounts message everyone in their contacts with bait links. Ask your friend on another app or in person before you tap anything.' },
+  { ch: 'Email', from: 'Dune Power', sub: 'billing@dunepower-pay.top', text: 'Your electricity will be cut at 17:00 today unless you pay N$2,300 to this personal mobile money number: 081 555 0142.', a: 'L', flags: ['cut at 17:00 today', 'personal mobile money number'], why: 'Utilities do not ask you to pay into a personal wallet. Threatening a cut-off within hours is meant to stop you checking.' },
+  { ch: 'SMS', from: 'Relief Fund', text: 'Congratulations! Your ID has been selected for a government relief grant. Send your ID number and bank PIN to receive it.', a: 'L', flags: ['selected for a government relief grant', 'bank PIN'], why: 'Nobody legitimate will ever ask for your bank PIN. Grants are not paid by asking you to text your details to a stranger.' },
+  { ch: 'Email', from: 'Managing Director', sub: 'md.office@gmail-mail.co', text: 'I am in a meeting and cannot talk. Please buy N$5,000 of shop vouchers and send me the codes now. Keep this between us.', a: 'L', flags: ['buy N$5,000 of shop vouchers', 'send me the codes', 'Keep this between us'], why: 'This is boss fraud. The name is real but the address is not, and secrecy plus vouchers is the giveaway. Confirm by phoning your boss on a number you already know.' },
+  { ch: 'Email', from: 'StreamBox', sub: 'billing@streambox-help.support', text: 'Your account is on hold. Update your payment method now to avoid losing your profiles and watch list: streambox-billing.support', a: 'L', flags: ['on hold', 'streambox-billing.support'], why: 'The link goes to a look-alike site made to collect your card number. Open the real app yourself and check your account there.' },
+  { ch: 'WhatsApp', from: 'Wealth Circle', sub: 'Group invite from a stranger', text: 'Turn N$1,000 into N$5,000 in 7 days. Guaranteed. Only 3 spots left, join now!', a: 'L', flags: ['N$1,000 into N$5,000 in 7 days', 'Guaranteed', 'Only 3 spots left'], why: 'Guaranteed big returns and a shrinking number of spots are the signature of pyramid and investment scams. No honest investment can promise that.' },
+  { ch: 'Email', from: 'Account Security', sub: 'no-reply@secure-my-login.click', text: 'Security alert: a new sign-in was detected from another country. If this was not you, click here now to secure your account.', a: 'L', flags: ['click here now'], why: 'Real security alerts tell you to open the official app or website yourself. A button that goes to an unfamiliar address is the trap.' },
 
-  { ch: 'SMS', from: 'SavannaBank', text: 'Your one-time code is 482913. Never share this code with anyone, even the bank. If you did not request it, call the number on the back of your card.', scam: false, flags: [], why: 'This is the kind you get right after you log in or pay online. There is no link, no pressure and it warns you not to share the code. Only trust it if you just asked for it. If you did not, treat it as a warning that someone else is trying your account.' },
-  { ch: 'Email', from: 'BookNook', sub: 'orders@booknook.na', text: 'Thanks for your order. It should arrive by Friday. You can follow it any time in your BookNook account.', scam: false, flags: [], why: 'You know you bought something, it asks for nothing and it does not rush you. It points you to your own account rather than a link. Even so, open the site yourself rather than trusting any link.' },
-  { ch: 'SMS', from: 'SavannaBank', text: 'N$250.00 was spent at Corner Cafe on card ending 4417. Not you? Freeze your card in the app or call the number on the back of your card.', scam: false, flags: [], why: 'It is only information. It sends you to the app or the number printed on your own card, not to a link. That is exactly how a real alert should behave.' },
-  { ch: 'WhatsApp', from: 'Tuli', sub: 'A saved contact with a long chat history', text: 'Hey! Still on for the braai at mine on Saturday? Bring drinks if you can 🙂', scam: false, flags: [], why: 'It comes from a saved contact you talk to often and asks for nothing risky: no money, no link, no code. Everyday chat is fine.' },
-  { ch: 'Email', from: 'People and Culture', sub: 'From your normal HR address', text: 'Reminder: the leave policy has been updated. You can read it on the staff portal you normally use. No action is needed today.', scam: false, flags: [], why: 'No link, no deadline and it points to a portal you already know. If you are ever unsure, open the portal yourself instead of using anything in the email.' },
-  { ch: 'SMS', from: 'OryxMobile', text: 'You have used 80% of your data bundle. You can buy more in the Oryx app whenever you like.', scam: false, flags: [], why: 'It is a plain notice that sends you to the official app and does not rush you or ask for details. Compare that with the fake "SIM blocked" message.' },
-  { ch: 'Email', from: 'Student Services', sub: 'From the university\'s usual address', text: 'Your timetable for next term is now available. Log in to the student portal the way you normally do to see it.', scam: false, flags: [], why: 'It tells you to log in the way you always do, not through a link, and nothing about it is urgent. That is the safe pattern.' },
-  { ch: 'Email', from: 'BookNook', sub: 'accounts@booknook.na', text: 'You asked to reset your password. If this was you, use the button below within 30 minutes. If not, ignore this email and your password will stay the same.', scam: false, flags: [], why: 'This one is fine only because you just clicked "forgot password". It sets a fair time limit and tells you what to do if it was not you. If you had not asked, do not click; change your password in the app instead.' },
-  { ch: 'SMS', from: 'Sunrise Clinic', text: 'Reminder: your appointment is tomorrow at 09:30. Reply C to cancel. Please arrive 10 minutes early.', scam: false, flags: [], why: 'You booked this appointment and the message asks for nothing sensitive, no payment and no link. If you did not book one, ignore it or ring the clinic on a number you look up yourself.' }
+  { ch: 'SMS', from: 'SavannaBank', text: 'Your one-time code is 482913. Never share this code with anyone, even the bank. If you did not request it, call the number on the back of your card.', a: 'R', flags: [], why: 'This is the kind you get right after you log in or pay online. There is no link, no pressure and it warns you not to share the code. Only trust it if you just asked for it. If you did not, treat it as a warning that someone else is trying your account.' },
+  { ch: 'Email', from: 'BookNook', sub: 'orders@booknook.na', text: 'Thanks for your order. It should arrive by Friday. You can follow it any time in your BookNook account.', a: 'R', flags: [], why: 'You know you bought something, it asks for nothing and it does not rush you. It points you to your own account rather than a link. Even so, open the site yourself rather than trusting any link.' },
+  { ch: 'SMS', from: 'SavannaBank', text: 'N$250.00 was spent at Corner Cafe on card ending 4417. Not you? Freeze your card in the app or call the number on the back of your card.', a: 'R', flags: [], why: 'It is only information. It sends you to the app or the number printed on your own card, not to a link. That is exactly how a real alert should behave.' },
+  { ch: 'WhatsApp', from: 'Tuli', sub: 'A saved contact with a long chat history', text: 'Hey! Still on for the braai at mine on Saturday? Bring drinks if you can 🙂', a: 'R', flags: [], why: 'It comes from a saved contact you talk to often and asks for nothing risky: no money, no link, no code. Everyday chat is fine.' },
+  { ch: 'Email', from: 'People and Culture', sub: 'From your normal HR address', text: 'Reminder: the leave policy has been updated. You can read it on the staff portal you normally use. No action is needed today.', a: 'R', flags: [], why: 'No link, no deadline and it points to a portal you already know. If you are ever unsure, open the portal yourself instead of using anything in the email.' },
+  { ch: 'SMS', from: 'OryxMobile', text: 'You have used 80% of your data bundle. You can buy more in the Oryx app whenever you like.', a: 'R', flags: [], why: 'It is a plain notice that sends you to the official app and does not rush you or ask for details. Compare that with the fake "SIM blocked" message.' },
+  { ch: 'Email', from: 'Student Services', sub: 'From the university\'s usual address', text: 'Your timetable for next term is now available. Log in to the student portal the way you normally do to see it.', a: 'R', flags: [], why: 'It tells you to log in the way you always do, not through a link, and nothing about it is urgent. That is the safe pattern.' },
+  { ch: 'Email', from: 'BookNook', sub: 'accounts@booknook.na', text: 'You asked to reset your password. If this was you, use the button below within 30 minutes. If not, ignore this email and your password will stay the same.', a: 'R', flags: [], why: 'This one is fine only because you just clicked "forgot password". It sets a fair time limit and tells you what to do if it was not you. If you had not asked, do not click; change your password in the app instead.' },
+  { ch: 'SMS', from: 'Sunrise Clinic', text: 'Reminder: your appointment is tomorrow at 09:30. Reply C to cancel. Please arrive 10 minutes early.', a: 'R', flags: [], why: 'You booked this appointment and the message asks for nothing sensitive, no payment and no link. If you did not book one, ignore it or ring the clinic on a number you look up yourself.' },
+  { ch: 'QR code', from: 'Parking meter sticker', sub: 'Looks pasted over the original sign', text: 'SCAN TO PAY N$10 - quick and cashless! (The sticker sits slightly crooked on top of the meter\'s printed notice.)', a: 'L', flags: ['SCAN TO PAY', 'sits slightly crooked on top'], why: 'Criminals stick their own QR codes over real ones. Look for stickers on top of signs, and pay through the official app or at the machine instead of a code you found on a wall.' },
+  { ch: 'WhatsApp', from: 'Unknown number', sub: 'Profile picture of a smiling doctor in uniform', text: 'Hello dear, I am a doctor working overseas and I already feel close to you. I want to visit, but I need N$4,000 for a travel permit. I will pay you back double.', a: 'L', flags: ['already feel close to you', 'need N$4,000', 'pay you back double'], why: 'Fast affection followed by a request for money is a romance scam. Never send money to someone you have not met in person, however kind they seem.' },
+  { ch: 'SMS', from: 'FastCash Loans', text: 'Loan approved! Get N$20,000 today with no credit check. Pay N$500 insurance first to release your money.', a: 'L', flags: ['no credit check', 'Pay N$500 insurance first'], why: 'Real lenders take fees out of the loan, and they check who you are. Paying a fee first to "release" a loan is a sign of an advance fee scam.' },
+  { ch: 'Phone call', from: 'A caller who says he is from the bank fraud team', text: 'We can see fraud on your account. Please read us the code we have just sent to your phone so we can move your money to a safe account.', a: 'L', flags: ['read us the code', 'move your money to a safe account'], why: 'The code is what lets the criminal in. A real bank never asks you to read out a one-time code or move your money. Hang up and call the number on the back of your card.' },
+  { ch: 'Email', from: 'Graduate Programme', sub: 'careers@oryx-jobs-desk.info', text: 'Congratulations, you are shortlisted for an internship at Oryx Mobile! Please send a copy of your ID and N$300 for your interview kit.', a: 'L', flags: ['send a copy of your ID', 'N$300 for your interview kit'], why: 'Genuine employers never charge for interviews. A copy of your ID plus a small fee gives the scammer both your identity and your money.' },
+  { ch: 'Facebook', from: 'Free Airtime Giveaway', sub: 'Page created last week', text: 'Like, share and comment with your phone number AND your airtime PIN to receive N$100 free airtime!', a: 'L', flags: ['phone number AND your airtime PIN'], why: 'Nobody needs your PIN to give you airtime. Fake giveaway pages are usually new, with few real followers, and collect your details.' },
+  { ch: 'Telegram', from: 'CryptoDoubler', sub: 'Added to a channel you did not join', text: 'Send 0.1 coin to this wallet and receive 0.2 coin back automatically in 10 minutes. Limited time only!', a: 'L', flags: ['receive 0.2 coin back automatically', 'Limited time only'], why: 'Nothing doubles your money automatically. Once you send crypto it cannot be taken back, which is why scammers love it.' },
+  { ch: 'Email', from: 'Tax Office', sub: 'refunds@tax-refund-claim.info', text: 'You are owed a refund of N$3,215. Claim it within 24 hours at tax-refund-claim.info or it will be cancelled.', a: 'L', flags: ['within 24 hours', 'tax-refund-claim.info'], why: 'Tax offices contact you through official channels, and they do not give you 24 hours to click a link. Log in to the official site yourself if you think you are owed money.' },
+  { ch: 'WhatsApp', from: 'Buyer on a Buy and Sell group', text: 'I will pay you more than the price! To confirm the payment, just send me the code you get by SMS from your bank.', a: 'L', flags: ['send me the code you get by SMS'], why: 'A code from your bank is for you only. Buyers pay you, they never need a code. Someone who asks for it wants to get into your account.' },
+  { ch: 'Pop-up', from: 'Your browser', sub: 'A page that will not close', text: 'WARNING: Your phone has 5 viruses! Your photos will be deleted. Call 081 555 0110 or install CleanFast now.', a: 'L', flags: ['5 viruses', 'Call 081 555 0110'], why: 'Websites cannot scan your phone like this. It is a scare tactic. Close the tab, and never install an app or call a number from a pop-up.' },
+  { ch: 'Wi-Fi', from: 'Cafe_Free_WiFi_2', sub: 'An open network with a sign-in page', text: 'Free fast Wi-Fi! Enter your email address AND your email password to connect.', a: 'L', flags: ['email password'], why: 'A Wi-Fi hotspot never needs your email password. Copycat networks named like the cafe\'s are a common trick. Ask staff for the real network name.' },
+  { ch: 'WhatsApp', from: 'Someone from your contacts', sub: 'A friend of a friend', text: 'Hi, I sent my WhatsApp code to your number by mistake, can you please send it to me? I am locked out.', a: 'L', flags: ['sent my WhatsApp code to your number by mistake', 'send it to me'], why: 'The scammer is trying to log into your friend\'s account, or is using their number to hijack yours. Never share a verification code, even with someone you know.' },
+
+  { ch: 'SMS', from: 'DunePower', text: 'Planned maintenance in your area on Saturday from 09:00 to 13:00. No action is needed. Details are on our website and app.', a: 'R', flags: [], why: 'It is only an information notice. No link, no payment, and it points to official places you can check yourself.' },
+  { ch: 'SMS', from: 'KalaharPost', text: 'Your parcel is ready for collection at the Kalahari Post counter. Please bring your ID and reference KP-2048. No online payment is needed.', a: 'R', flags: [], why: 'It matches a parcel you are expecting, tells you to go to the counter with your ID and does not ask for any online payment. Compare that with the fake "redelivery fee" message.' },
+  { ch: 'Email', from: 'BookNook', sub: 'security@booknook.na', text: 'Your BookNook password was changed today at 10:14. If this was you, no action is needed. If not, open the app and choose "Secure my account".', a: 'R', flags: [], why: 'This is fine when you know you just changed it. It tells you to use the app, not a link. If you had not changed it, go to the app straight away.' },
+  { ch: 'WhatsApp', from: 'Aunty Selma', sub: 'A saved contact you chat with weekly', text: 'Can you send me the photos from Saturday when you have a chance? No rush at all.', a: 'R', flags: [], why: 'Familiar person, normal chat, nothing urgent, no money or codes. Not everything is a scam.' },
+  { ch: 'Email', from: 'Student Finance', sub: 'From the university\'s usual address', text: 'Payment received: N$2,450 for registration. Your receipt is available in the student portal.', a: 'R', flags: [], why: 'You know you made this payment, it points to the portal you already use, and it does not ask for anything further.' },
+  { ch: 'App alert', from: 'SavannaBank app', text: 'Approve sign-in? You tried to sign in from a Windows PC at 08:02. Tap Approve only if this was you.', a: 'R', flags: [], why: 'This is genuine only if you were just signing in yourself. The safe rule: approve only what you started. If you did not, tap Deny and change your password.' },
+  { ch: 'Email', from: 'People and Culture', sub: 'From your normal HR address', text: 'Your payslip for this month is now available on the staff portal. Please log in the way you normally do.', a: 'R', flags: [], why: 'A routine notice pointing to a portal you already know, without links, deadlines or payment requests.' }
+
 ];
-const ROUND = 12;
-let deck = [], i = 0, score = 0, streak = 0, answered = false, cur = null;
-const msg = A.$('msg');
 
-function hi(text, flags) { let out = A.esc(text); for (const f of flags) { const e = A.esc(f); out = out.split(e).join('<mark>' + e + '</mark>'); } return out; }
+DECK.push(
+  /* ---------- money and mobile wallets ---------- */
+  { t: 'money', ch: 'SMS', from: 'KuduPay', text: 'You have received N$1,200 by mistake. Please send it back to 081 555 0177 urgently. The sender will report you if it is not returned today.', a: 'L', flags: ['received N$1,200 by mistake', 'send it back to 081 555 0177', 'report you if it is not returned today'], why: 'The fake "sent by mistake" trick uses a fake confirmation message. Check your real balance in the wallet app. If no money arrived, there is nothing to return. If it did, ask your provider to reverse it rather than sending it yourself.' },
+  { t: 'money', ch: 'SMS', from: 'KuduPay', text: 'KuduPay: You sent N$300.00 to Sara M. on 12 May at 14:32. Ref 88213. Not you? Open the KuduPay app or dial the number printed on your wallet card.', a: 'R', flags: [], why: 'It confirms something you did, gives a reference and tells you to use the app or the number on your card. There is no link and no pressure.' },
+  { t: 'money', ch: 'Phone call', from: 'Unknown number', sub: 'A calm voice says they are from the bank fraud team', text: 'We have stopped a suspicious payment on your account. To cancel it, I will send you a code and you must read it out to me.', a: 'L', flags: ['suspicious payment', 'send you a code and you must read it out'], why: 'The code that arrives is what approves the payment or a new login. A real fraud team never asks you to read a code out. Hang up and call the number on the back of your card.' },
+  { t: 'money', ch: 'SMS', from: 'SavannaBank', text: 'Your new card is ready for collection at your branch. Please bring your ID. You can also choose home delivery in the SavannaBank app.', a: 'R', flags: [], why: 'It has no link, does not ask for personal details and points you to the app you already use. Collecting a card with your ID at the branch is normal.' },
+  { t: 'money', ch: 'WhatsApp', from: 'Unknown number', text: 'Hello, I accidentally paid the wrong account for a taxi. Please can you send me back N$450? Here is my proof of payment: [screenshot]', a: 'L', flags: ['accidentally paid the wrong account', 'proof of payment: [screenshot]'], why: 'Screenshots are easy to fake. Only your own banking or wallet app shows what really reached your account.' },
+  { t: 'money', ch: 'Email', from: 'Baobab Insurance', sub: 'claims@baobab-insurance-refunds.top', text: 'You are owed a premium refund of N$4,780. Confirm your card number and expiry date to receive the money today.', a: 'L', flags: ['owed a premium refund of N$4,780', 'Confirm your card number and expiry date'], why: 'Refunds are paid into an account the company already has. You never need to give your card number to receive money.' },
+  { t: 'money', ch: 'Email', from: 'Baobab Insurance', sub: 'noreply@baobab.na', text: 'Your policy renews on 1 July. Your debit order of N$320 will go off as usual. You can review your cover in the Baobab app or at any branch.', a: 'R', flags: [], why: 'It is a routine notice about something you already have. It does not ask for details or rush you and it points to the app and the branch.' },
+  { t: 'money', ch: 'SMS', from: 'Revenue Agency', text: 'Final notice: you owe N$3,650 in unpaid tax. Pay now with a bank card at revenue-agency-pay.info to avoid arrest.', a: 'L', flags: ['Final notice', 'avoid arrest', 'revenue-agency-pay.info'], why: 'Threats of arrest by SMS are pure pressure. Tax authorities write to you in a formal way and use their official website. Never pay through a link in a text.' },
+  { t: 'money', ch: 'Marketplace chat', from: 'Buyer "Kevin"', sub: 'Wants your listed phone', text: 'I will pay full price now. I am sending a payment link for you to confirm the deposit. Please open it and enter your card details to receive the money.', a: 'L', flags: ['payment link', 'enter your card details to receive the money'], why: 'You never enter card details to receive money. This is the classic fake buyer trick, and the link steals your card. Insist on cash on collection or a payment you can see in your own bank app.' },
+  { t: 'money', ch: 'Email', from: 'Marula Marketplace', sub: 'no-reply@marula.na', text: 'Someone is interested in your listing "Blue bicycle". Reply to them in the Marula app so your chat stays protected.', a: 'R', flags: [], why: 'It keeps the conversation inside the platform, has no links asking for details and does not ask for payment. Staying in the app is the safe way to trade.' },
+  { t: 'money', ch: 'SMS', from: 'Loan Now', text: 'Pre-approved loan of N$15,000 with no credit check. Pay a N$300 admin fee first to release the funds.', a: 'L', flags: ['no credit check', 'Pay a N$300 admin fee first'], why: 'Real lenders take fees out of the loan or charge later and they check who you are. Paying in advance to get a loan is a well-known scam.' },
+  { t: 'money', ch: 'SMS', from: 'SavannaBank', text: 'Your card ending 4417 was used online for N$1,999.00 at TechMart. If you did not do this, block your card in the app now.', a: 'R', flags: [], why: 'It tells you what happened and sends you to the app to act. If you did not make the purchase, act in the app or by calling the number on your card, not through a message.' },
+  { t: 'money', ch: 'Email', from: 'Sales Department', sub: 'sales@your-supplier.co', text: 'Please note our bank details have changed. Use the new account below for this month\'s payment of N$62,000.', a: 'L', flags: ['our bank details have changed', 'new account below'], why: 'Changed bank details are a common way to redirect a payment to a criminal. Ring the supplier on a number you already have before paying anything.' },
+  { t: 'money', ch: 'Crypto ad', from: 'Sponsored post', text: 'Elon-approved trading bot. Deposit N$2,000 and earn N$500 every day with zero risk. Celebrity endorsed!', a: 'L', flags: ['Elon-approved', 'earn N$500 every day with zero risk', 'Celebrity endorsed'], why: 'Fake celebrity endorsements and no-risk profits are how these scams look convincing. Any investment can lose money.' },
+
+  /* ---------- jobs and love ---------- */
+  { t: 'jobs', ch: 'Email', from: 'Global Careers', sub: 'hr@global-careers-abroad.top', text: 'You are shortlisted for a job overseas with free accommodation. To start, pay N$2,500 for your work permit and medical check to our agent.', a: 'L', flags: ['shortlisted', 'pay N$2,500 for your work permit'], why: 'You did not apply and they want money first. Genuine employers do not charge for permits, and fake overseas jobs are also used for human trafficking. Check the company through official channels.' },
+  { t: 'jobs', ch: 'Email', from: 'Talent Team', sub: 'careers@baobab.na', text: 'Thank you for applying for the Junior Accountant role. Interviews take place next week. We will confirm your slot by email and phone.', a: 'R', flags: [], why: 'You applied, so this is expected. It asks for no money or personal documents and gives a normal timeline.' },
+  { t: 'jobs', ch: 'WhatsApp', from: 'Recruiter Sam', sub: 'Unknown number', text: 'Hi! We saw your CV online. Work from home, N$1,500 per day. We will send you a cheque, you keep N$1,000 and forward the rest to our supplier.', a: 'L', flags: ['N$1,500 per day', 'send you a cheque, you keep N$1,000 and forward the rest'], why: 'The cheque bounces days later and you lose the money you sent on. Moving money for a stranger can also make you part of a crime.' },
+  { t: 'jobs', ch: 'Dating app', from: 'Daniel, 34', sub: 'Matched three days ago, says he is an engineer abroad', text: 'I feel like we have known each other for years. My contract payment is stuck and I need N$8,000 for customs so I can fly to meet you.', a: 'L', flags: ['I feel like we have known each other for years', 'I need N$8,000 for customs'], why: 'Love scams build feelings quickly, then invent an emergency needing money. Never send money to someone you have not met in person.' },
+  { t: 'jobs', ch: 'Dating app', from: 'Amelia, 27', sub: 'Matched last week', text: 'I would love to have a video call this weekend so we can see each other properly. Saturday afternoon works for me. What time suits you?', a: 'R', flags: [], why: 'Asking for a live video call is a healthy sign, because scammers usually dodge them. Nothing here asks for money or secrets.' },
+  { t: 'jobs', ch: 'Email', from: 'Scholarship Board', sub: 'award@intl-scholars.win', text: 'You have been awarded a full scholarship abroad. Send a scan of your passport, ID and bank card to secure your place within 24 hours.', a: 'L', flags: ['Send a scan of your passport, ID and bank card', 'within 24 hours'], why: 'They want everything needed to steal your identity. A real scholarship comes after you apply and never needs your bank card.' },
+  { t: 'jobs', ch: 'SMS', from: 'Job Alerts', text: 'Earn N$300 for each task by rating shops online. Register at task-rate-pay.co and deposit N$500 to unlock higher-paying tasks.', a: 'L', flags: ['deposit N$500 to unlock higher-paying tasks'], why: 'Task scams pay a little at first to win your trust, then ask for bigger deposits which you never get back.' },
+
+  /* ---------- work ---------- */
+  { t: 'work', ch: 'Email', from: 'HR Department', sub: 'hr@company-benefits.click', text: 'Everyone must update their payroll details today. Sign in with your work email and password on the portal below or your salary may be delayed.', a: 'L', flags: ['Sign in with your work email and password', 'salary may be delayed'], why: 'Threats to your pay are used to make you enter your work password on a fake page. Use the intranet you normally use.' },
+  { t: 'work', ch: 'Email', from: 'IT Service Desk', sub: 'servicedesk@yourcompany.na', text: 'Scheduled maintenance on Saturday from 22:00 to 23:00. Email will be offline. No action is needed from you.', a: 'R', flags: [], why: 'It gives a clear time, asks you to do nothing and uses the company address. Notices like this are normal.' },
+  { t: 'work', ch: 'Email', from: 'Finance', sub: 'cfo.office@yourcompany.co', text: 'Urgent wire transfer needed for a confidential acquisition. Do not discuss this with anyone. I will send the details in the next mail.', a: 'L', flags: ['Urgent wire transfer', 'confidential acquisition', 'Do not discuss this with anyone'], why: 'Secrecy and urgency are typical of business email compromise. The address is also slightly different from your real company domain. Check with the person using another channel.' },
+  { t: 'work', ch: 'Email', from: 'Document Share', sub: 'noreply@shared-docs-view.link', text: 'Thabo shared "Salary Review 2026.pdf" with you. Sign in with your email account to view.', a: 'L', flags: ['Sign in with your email account to view'], why: 'A tempting file name and a fake sign-in page are used to steal your login. Ask the sender whether they really sent it before you open it.' },
+  { t: 'work', ch: 'Teams chat', from: 'Colleague Nomsa', sub: 'A colleague you talk to regularly', text: 'Are you free to review the draft for tomorrow? I saved it in our shared folder. Ping me if you cannot find it.', a: 'R', flags: [], why: 'It comes from someone you know, refers to normal work and asks for no password or payment. Look for the file in your usual shared folder, not from a link.' },
+  { t: 'work', ch: 'Email', from: 'Software Vendor', sub: 'sales@office-suite-renew.support', text: 'Your licence has expired and your files will be locked in 24 hours. Download the renewal tool and run it now.', a: 'L', flags: ['files will be locked in 24 hours', 'Download the renewal tool and run it now'], why: 'Running a tool from a scare email can install malware. Renew software through the vendor\'s official site or your IT team.' },
+  { t: 'work', ch: 'Email', from: 'Payroll', sub: 'payroll@yourcompany.na', text: 'Your payslip for May is now available. Sign in to the staff portal as normal to view it.', a: 'R', flags: [], why: 'There is no attachment, no link to a strange site and no pressure. Going to the staff portal yourself is the safest way.' },
+
+  /* ---------- social media ---------- */
+  { t: 'social', ch: 'Facebook', from: 'Page: Fuel Price Giveaway', text: 'We are giving away free fuel vouchers to celebrate 100k followers. Like, share, comment and click the link to enter and get your voucher.', a: 'L', flags: ['free fuel vouchers', 'click the link to enter'], why: 'Giveaway pages harvest likes, shares and your details. Check whether the page is verified and whether the company announced the promotion on its own site.' },
+  { t: 'social', ch: 'Instagram DM', from: 'Brand Ambassador', sub: 'A new account with few posts', text: 'We want you as a brand ambassador! Pay N$500 for the starter kit and earn commission when you recruit others.', a: 'L', flags: ['Pay N$500 for the starter kit', 'recruit others'], why: 'Paying up front and earning by recruiting others is the shape of a pyramid scheme. Real brands pay you, not the other way round.' },
+  { t: 'social', ch: 'X post', from: '@BreakingUpdatesNow', sub: 'Account created this month', text: 'BREAKING: All schools will close for two weeks starting tomorrow! Share before they delete this!', a: 'L', flags: ['BREAKING', 'Share before they delete this'], why: 'Panic and a "share now" order are used to spread false news. Look for the news in official announcements or trusted media before you share.' },
+  { t: 'social', ch: 'Facebook', from: 'City Council', sub: 'Verified page you follow', text: 'Water supply will be interrupted in the Northern suburbs on Thursday from 08:00 to 14:00. Please store water in advance.', a: 'R', flags: [], why: 'It comes from a verified page you follow, gives specific details and asks for nothing. Confirming it on the council\'s website is easy.' },
+  { t: 'social', ch: 'Instagram DM', from: 'Instagram Support', sub: 'Blue tick look-alike', text: 'Your account violates copyright rules and will be deleted in 12 hours. Appeal now at insta-appeal-help.com with your login details.', a: 'L', flags: ['deleted in 12 hours', 'insta-appeal-help.com'], why: 'Platforms do not ask for your password in a DM. The fake blue tick is copied. Report the message and use the app settings for any real notice.' },
+  { t: 'social', ch: 'Facebook', from: 'Group admin', sub: 'Your community group', text: 'Reminder: no selling in the group without admin approval. Please read the pinned post for the rules.', a: 'R', flags: [], why: 'It is a routine rule reminder pointing to a pinned post in the group, with nothing to click and nothing to pay.' },
+  { t: 'social', ch: 'TikTok comment', from: 'user928374', text: 'I made N$20,000 in one week from this app! Message my agent on WhatsApp and he will show you how.', a: 'L', flags: ['N$20,000 in one week', 'Message my agent on WhatsApp'], why: 'Comments like this are often bots or paid promoters. Moving you to a private chat lets scammers pressure you away from public view.' },
+  { t: 'social', ch: 'Instagram DM', from: 'Lindiwe', sub: 'A friend, message from her usual account', text: 'Hey, can you vote for my cousin in a school contest? Tap the link, then log in with Instagram to vote.', a: 'L', flags: ['Tap the link, then log in with Instagram to vote'], why: 'A vote link that asks you to log in with your account is a common way to steal it. Ask your friend outside the app if she really sent it.' },
+
+  /* ---------- calls ---------- */
+  { t: 'calls', ch: 'Phone call', from: 'Number withheld', text: 'This is Microsoft support. Your computer has a virus. Please install the remote access app so that we can fix it for you.', a: 'L', flags: ['Your computer has a virus', 'install the remote access app'], why: 'Tech companies do not phone you out of the blue. Remote access lets the caller see everything, install malware and even reach your bank.' },
+  { t: 'calls', ch: 'Phone call', from: '+264 xx xxx 0100', sub: 'Your GP\'s number, saved in your phone', text: 'Hello, this is the clinic reminding you about your appointment tomorrow at 10:00. Reply YES to confirm or call us to change it.', a: 'R', flags: [], why: 'It is a saved number, you have an appointment and the request is simple and safe. If unsure, call the clinic on the number you already have.' },
+  { t: 'calls', ch: 'Phone call', from: 'Unknown number', text: 'Mum, it is me, I have been arrested and I need bail money right now. Please do not tell dad. A lawyer will call you with the details.', a: 'L', flags: ['I have been arrested and I need bail money right now', 'do not tell dad'], why: 'Voice cloning and fear make this scam convincing. Hang up and call your child, or another relative, on a number you know. A family safe word helps.' },
+  { t: 'calls', ch: 'Phone call', from: 'Unknown number', text: 'We are calling from your courier. We have a parcel for you but there is a customs charge. Press 1 to pay by card over the phone.', a: 'L', flags: ['customs charge', 'Press 1 to pay by card over the phone'], why: 'Automated calls like this collect card numbers. Track your parcel in the courier\'s own app or website.' },
+  { t: 'calls', ch: 'Phone call', from: 'OryxMobile', sub: 'Number shown as OryxMobile', text: 'Your SIM card is being replaced at another store. If this was not you, press 2 to stop it.', a: 'R', flags: [], why: 'It warns about something happening on your account. Do not use any number given to you. Contact your provider through their app or shop to check. A real SIM swap alert is also a sign to act quickly.' },
+  { t: 'calls', ch: 'Voice note', from: 'Uncle Joe', sub: 'His voice, but from a new number', text: 'It is me, my phone broke. Please send N$2,000 to this wallet number for my medicine. I will pay you back on Friday.', a: 'L', flags: ['my phone broke', 'send N$2,000 to this wallet number'], why: 'Voices can be copied from social media videos. Call your relative on their old number or ask someone close to them.' },
+  { t: 'calls', ch: 'Phone call', from: 'Police officer', text: 'You are linked to a serious fraud case. Do not tell anyone. Move your savings to a safe account until we finish our investigation.', a: 'L', flags: ['Do not tell anyone', 'Move your savings to a safe account'], why: 'The police never ask you to move money to a "safe account". This is fear plus secrecy. Hang up and contact the police station yourself.' },
+
+  /* ---------- devices, Wi-Fi and updates ---------- */
+  { t: 'device', ch: 'Wi-Fi', from: 'Free_Airport_WiFi', sub: 'An open network with no password', text: 'Welcome! To connect, sign in with your Facebook or email password on the next page.', a: 'L', flags: ['sign in with your Facebook or email password'], why: 'A fake hotspot can collect any password you enter. Ask staff for the exact network name, and never enter important logins on public Wi-Fi.' },
+  { t: 'device', ch: 'Pop-up', from: 'Your browser', text: 'WARNING: 3 viruses found! Call 081 555 0155 immediately or your files will be deleted.', a: 'L', flags: ['3 viruses found', 'Call 081 555 0155 immediately'], why: 'A website cannot scan your device. This fake alarm is meant to make you call a scammer. Close the tab and run your real security tool.' },
+  { t: 'device', ch: 'Phone update', from: 'Settings', sub: 'Inside your phone\'s own settings menu', text: 'A new system update is ready. Install tonight while charging. Update includes security fixes.', a: 'R', flags: [], why: 'It comes from your phone\'s settings and not from a message or link. Installing updates promptly is one of the best safety habits.' },
+  { t: 'device', ch: 'App store', from: 'Unknown developer', sub: 'A free app outside the official store', text: 'Get the full version of a paid app for free. Download the APK from this link and allow all permissions.', a: 'L', flags: ['Download the APK from this link', 'allow all permissions'], why: 'Cracked apps from outside the official store are a favourite way to hide malware that spies on your phone.' },
+  { t: 'device', ch: 'USB drive', from: 'Found in a car park', text: 'A USB stick labelled "Salaries 2026 - private" is lying near your office entrance.', a: 'L', flags: ['Salaries 2026 - private'], why: 'Attackers leave tempting USB sticks for curious people. Plugging one in can run malware. Hand it to your IT team instead.' },
+  { t: 'device', ch: 'QR code', from: 'Sticker on a parking meter', text: 'Scan to pay for parking. The sticker looks slightly newer than the sign it is stuck on.', a: 'L', flags: ['Scan to pay for parking', 'newer than the sign'], why: 'Fake QR stickers can send you to a copy of a payment page. Use the official parking app or pay at the machine.' },
+  { t: 'device', ch: 'Bank app', from: 'SavannaBank app', sub: 'Push notification from the official app', text: 'New sign-in on a Samsung phone in Windhoek. Was this you? Tap to review inside the app.', a: 'R', flags: [], why: 'It comes from the official app, gives details and asks you to review inside the app. If it was not you, change your password and contact the bank.' },
+  { t: 'device', ch: 'Router', from: 'Home router', sub: 'Admin page of your own router', text: 'Firmware update available. Change the default admin password after updating.', a: 'R', flags: [], why: 'It appears in your own router settings and recommends good security practice. The default admin password is the first thing attackers try.' },
+  { t: 'device', ch: 'Email', from: 'Cloud Storage', sub: 'no-reply@cloud-storage-alerts.top', text: 'Your storage is 99% full. Upgrade now to avoid losing your photos. Click here to add a payment card.', a: 'L', flags: ['99% full', 'Click here to add a payment card'], why: 'Fear of losing photos pushes you to a fake payment page. Check storage inside the real app.' },
+  { t: 'device', ch: 'Email', from: 'Security Team', sub: 'security@streambox.com', text: 'Your StreamBox password was changed. If this was you, no action is needed. If not, reset it from the app\'s settings.', a: 'R', flags: [], why: 'It confirms a change and lets you act through the app, with no link demanding a login.' },
+  { t: 'device', ch: 'SMS', from: 'Unknown number', text: 'Your Wi-Fi password has been shared with a guest. Tap here to manage who is connected: wifi-guard.click', a: 'L', flags: ['Tap here to manage who is connected', 'wifi-guard.click'], why: 'Unknown links that talk about your network are used to spread malware. Use your router\'s own page.' },
+  { t: 'email', ch: 'Email', from: 'Mailbox Team', sub: 'admin@mail-quota-alert.help', text: 'Your mailbox is full and you will stop receiving mail. Click "Keep my account" and log in to free up space.', a: 'L', flags: ['you will stop receiving mail', 'Keep my account'], why: 'A fake mailbox warning steals your email password. Your real mail provider shows storage status inside your account.' },
+  { t: 'email', ch: 'Email', from: 'Online Store', sub: 'receipts@namshop.na', text: 'Receipt for your order #48213: 1 x Water bottle, N$95.00. Track it from Orders in your NamShop account.', a: 'R', flags: [], why: 'You know you ordered it, there is no pressure and it points you to your own account. If you do not remember ordering, do not click; sign in to the site directly to check.' },
+  { t: 'email', ch: 'Email', from: 'Mr. Johnson', sub: 'barrister.johnson@lawyer-mail.co', text: 'A distant relative died and left you N$4.2 million. To release the funds I need your full name, address and bank details.', a: 'L', flags: ['left you N$4.2 million', 'your full name, address and bank details'], why: 'This is a very old advance fee scam. You cannot inherit from someone you never knew because a stranger emailed you.' },
+  { t: 'chat', ch: 'WhatsApp', from: 'Unknown number', text: 'Hi, sorry wrong number. But you seem nice, how is your day going?', a: 'L', flags: ['sorry wrong number', 'you seem nice'], why: 'A "wrong number" opener starts a friendly chat that later turns to investments or romance. It is safest not to engage and to block.' },
+  { t: 'chat', ch: 'WhatsApp', from: 'Mum', sub: 'Saved contact, long chat history', text: 'Do not forget to take a jacket, it will be cold tonight. Love you.', a: 'R', flags: [], why: 'It is a normal message from a saved contact and asks for nothing.' },
+  { t: 'chat', ch: 'WhatsApp', from: 'Your contact', sub: 'Their account was hacked', text: 'Hi, I sent you a verification code by mistake. Can you send it back to me quickly?', a: 'L', flags: ['sent you a verification code by mistake', 'send it back to me'], why: 'The code is from your own account being logged in on another phone. Sending it lets them take over your WhatsApp. Never share it.' },
+  { t: 'chat', ch: 'SMS', from: 'Etosha Telecom', text: 'You have used 90% of your data bundle this month. Buy more in the Etosha app or by dialling *123#.', a: 'R', flags: [], why: 'The information is useful and points to the official app or a short code. There is no link or pressure.' }
+);
+
+DECK.push(
+  { t: 'social', ch: 'Instagram DM', from: 'Naledi', sub: 'A close friend, long chat history', text: 'Loved your photos from the weekend! Are we still meeting at the market on Saturday morning?', a: 'R', flags: [], why: 'It comes from a friend you talk to often, refers to real plans and asks for nothing. No links, no money, no codes.' },
+  { t: 'social', ch: 'Facebook', from: 'Marula Marketplace', sub: 'Official verified page', text: 'Tip of the week: meet buyers in a public place and never share your one-time codes with anyone.', a: 'R', flags: [], why: 'A safety tip from a verified page, with nothing to click and nothing to pay.' },
+  { t: 'social', ch: 'Instagram', from: 'Instagram', sub: 'Notification inside the app', text: 'Someone logged in from a new device. If it was you, tap Yes. If not, tap No, it was not me and we will help you secure the account.', a: 'R', flags: [], why: 'It appears inside the real app and helps you protect the account without asking for your password.' },
+  { t: 'calls', ch: 'Phone call', from: 'Your bank\'s saved number', sub: 'You called them first', text: 'Thank you for calling. To confirm who you are, I will ask a few questions, but I will never ask for your full PIN or one-time code.', a: 'R', flags: [], why: 'You started the call using a number you trust, and the agent says clearly what they will not ask for. That is how a real call behaves.' },
+  { t: 'calls', ch: 'Phone call', from: 'Delivery driver', sub: 'You are expecting a parcel today', text: 'Hi, I am outside your gate with your parcel. Are you home to sign for it?', a: 'R', flags: [], why: 'You are expecting a delivery, the request is simple and no payment, code or link is involved.' },
+  { t: 'jobs', ch: 'Email', from: 'Recruiter', sub: 'talent@baobab.na', text: 'Thanks for your interest. We would like to invite you to an interview at our Windhoek office on Tuesday at 10:00. Please bring your ID and CV. There is no fee at any stage of our process.', a: 'R', flags: [], why: 'It names a real time and place, says clearly there is no fee and asks only for what you would normally bring.' },
+  { t: 'jobs', ch: 'LinkedIn', from: 'Careers, Baobab Insurance', sub: 'Verified company page', text: 'We are hiring a Customer Support Agent. Apply through the careers page on our website. We never ask for payment from applicants.', a: 'R', flags: [], why: 'It sends you to the company\'s own website and says outright that applicants never pay.' },
+  { t: 'work', ch: 'Email', from: 'IT Service Desk', sub: 'servicedesk@yourcompany.na', text: 'Reminder: please complete the annual security awareness course by Friday. You will find it in the learning portal you normally use.', a: 'R', flags: [], why: 'It points to a system you already use and does not ask you to sign in through a link.' },
+  { t: 'work', ch: 'Email', from: 'Manager Pieter', sub: 'A colleague you talk to often', text: 'Could you send me the meeting notes when you have a moment? No rush, tomorrow morning is fine.', a: 'R', flags: [], why: 'A normal request from a known colleague, with no pressure and nothing unusual to open or pay.' },
+  { t: 'device', ch: 'SMS', from: 'Etosha Telecom', text: 'Your monthly bill of N$399 is ready. View it in the Etosha app or pay by debit order as usual.', a: 'R', flags: [], why: 'It points to the app and mentions your usual payment method. There is no link and no threat.' }
+);
+DECK.forEach((c) => { if (!c.t) c.t = ({ Email: 'email', SMS: 'chat', WhatsApp: 'chat', Telegram: 'chat', 'Phone call': 'calls', 'Instagram DM': 'social', Facebook: 'social', 'QR code': 'device', 'App alert': 'device' })[c.ch] || 'email'; });
+
+/* Generic swipe deck. Needs CFG and DECK from the toy's own file. */
+let deck = [], i = 0, score = 0, streak = 0, answered = false, cur = null, ROUND = CFG.count || CFG.rounds[CFG.rounds.length - 1];
+const msg = A.$('msg'), $ = A.$;
+const MAXLEN = CFG.count || CFG.rounds[CFG.rounds.length - 1];
+$('kick').textContent = CFG.kicker; $('ttl').textContent = CFG.title; $('lede').textContent = CFG.lede; $('how').innerHTML = CFG.how;
+$('bLeft').innerHTML = '&larr; ' + A.esc(CFG.leftLabel); $('bRight').innerHTML = A.esc(CFG.rightLabel) + ' &rarr;';
+$('bLeft').setAttribute('aria-keyshortcuts', 'ArrowLeft'); $('bRight').setAttribute('aria-keyshortcuts', 'ArrowRight');
+$('remember').innerHTML = CFG.remember.map((r) => '<li><b>' + A.esc(r[0]) + '</b> ' + A.esc(r[1]) + '</li>').join('');
+if (CFG.foot) { $('foot').innerHTML = CFG.foot; $('foot').hidden = false; }
+if (CFG.gloss && CFG.gloss.length && $('glossList')) { $('glossList').innerHTML = CFG.gloss.map((g) => '<dt>' + A.esc(g[0]) + '</dt><dd>' + A.esc(g[1]) + '</dd>').join(''); $('gloss').hidden = false; }
+let chosen = +A.store.get('aware.' + CFG.slug + '.len', MAXLEN); if (CFG.rounds.indexOf(chosen) < 0) chosen = MAXLEN;
+function drawLens() { $('lens').innerHTML = CFG.rounds.map((n) => '<button type="button" role="radio" data-n="' + n + '" aria-checked="' + (n === chosen) + '">' + n + ' cards' + (n === MAXLEN ? ' (counts for best)' : '') + '</button>').join(''); $('lens').querySelectorAll('button').forEach((b) => b.addEventListener('click', () => { chosen = +b.dataset.n; A.store.set('aware.' + CFG.slug + '.len', String(chosen)); drawLens(); })); }
+drawLens();
+let topic = 'all';
+if (CFG.topics && $('topics')) {
+  const cnt = (k) => DECK.filter((c) => k === 'all' || c.t === k).length;
+  topic = A.store.get('aware.' + CFG.slug + '.topic', 'all'); if (!CFG.topics.some((t) => t[0] === topic)) topic = 'all';
+  const drawTopics = () => { $('topics').innerHTML = CFG.topics.map((t) => '<button type="button" role="radio" data-k="' + t[0] + '" aria-checked="' + (t[0] === topic) + '">' + A.esc(t[1]) + ' <small>' + cnt(t[0]) + '</small></button>').join(''); $('topics').querySelectorAll('button').forEach((b) => b.addEventListener('click', () => { topic = b.dataset.k; A.store.set('aware.' + CFG.slug + '.topic', topic); drawTopics(); })); };
+  drawTopics(); $('topicWrap').hidden = false;
+}
+
+function hi(text, flags) { let out = A.esc(text); for (const f of flags || []) { const e = A.esc(f); out = out.split(e).join('<mark>' + e + '</mark>'); } return out; }
 function show() {
   cur = deck[i]; answered = false;
   msg.className = 'msg pop'; msg.style.transform = '';
-  msg.innerHTML = '<div class="meta"><span>' + A.esc(cur.ch) + '</span><span>Message ' + (i + 1) + '</span></div><div class="from">' + A.esc(cur.from) + '</div>' + (cur.sub ? '<div class="sub">' + A.esc(cur.sub) + '</div>' : '') + '<div class="text">' + A.esc(cur.text) + '</div><span class="verdict"></span>';
-  A.$('why').hidden = true; A.$('nextRow').hidden = true; A.$('decide').classList.remove('off');
-  A.$('sN').textContent = i + 1; A.$('sS').textContent = score; A.$('sK').textContent = streak; A.$('pBar').style.width = (i / ROUND * 100) + '%';
+  msg.innerHTML = '<div class="meta"><span>' + A.esc(cur.ch) + '</span><span>Card ' + (i + 1) + '</span></div><div class="from">' + A.esc(cur.from) + '</div>' + (cur.sub ? '<div class="sub">' + A.esc(cur.sub) + '</div>' : '') + '<div class="text">' + A.esc(cur.text) + '</div><span class="verdict"></span>';
+  $('why').hidden = true; $('nextRow').hidden = true; $('decide').classList.remove('off');
+  $('sN').textContent = i + 1; $('sT').textContent = ROUND; $('sS').textContent = score; $('sK').textContent = streak; $('pBar').style.width = (i / ROUND * 100) + '%';
   msg.focus({ preventScroll: true });
 }
-function answer(sayScam) {
+function answer(sayLeft) {
   if (answered) return; answered = true;
-  const ok = sayScam === cur.scam;
+  const ok = sayLeft === (cur.a === 'L');
   if (ok) { score++; streak++; A.sfx.good(); } else { streak = 0; A.sfx.bad(); }
-  msg.classList.add('answered', cur.scam ? 'isScam' : 'isLegit'); msg.style.transform = '';
-  msg.classList.remove('left', 'right');
-  msg.querySelector('.verdict').textContent = cur.scam ? 'Scam' : 'Legit';
+  msg.classList.add('answered', cur.a === 'L' ? 'isL' : 'isR'); msg.style.transform = ''; msg.classList.remove('left', 'right');
+  msg.querySelector('.verdict').textContent = cur.a === 'L' ? CFG.leftWord : CFG.rightWord;
   msg.querySelector('.text').innerHTML = hi(cur.text, cur.flags);
-  const w = A.$('why'); w.className = 'why pop ' + (ok ? 'good' : 'bad');
-  w.innerHTML = '<span class="tag">' + (ok ? 'Correct' : 'Not this time') + '</span><p>' + A.esc(cur.why) + '</p>' + (cur.flags.length ? '<p style="color:var(--mute);font-size:14px">Warning signs are highlighted on the card.</p>' : '');
-  w.hidden = false; A.$('decide').classList.add('off'); A.$('nextRow').hidden = false;
-  A.$('bNext').textContent = i + 1 >= ROUND ? 'See my result' : 'Next message';
-  A.$('sS').textContent = score; A.$('sK').textContent = streak; A.$('pBar').style.width = ((i + 1) / ROUND * 100) + '%';
-  A.$('bNext').focus({ preventScroll: true });
+  const w = $('why'); w.className = 'why pop ' + (ok ? 'good' : 'bad');
+  w.innerHTML = '<span class="tag">' + (ok ? 'Correct' : 'Not this time') + '</span><p>' + A.esc(cur.why) + '</p>' + (cur.flags && cur.flags.length ? '<p style="color:var(--mute);font-size:14px">Key parts are highlighted on the card.</p>' : '');
+  w.hidden = false; $('decide').classList.add('off'); $('nextRow').hidden = false;
+  $('bNext').textContent = i + 1 >= ROUND ? 'See my result' : 'Next card';
+  $('sS').textContent = score; $('sK').textContent = streak; $('pBar').style.width = ((i + 1) / ROUND * 100) + '%';
+  $('bNext').focus({ preventScroll: true });
 }
 function next() { if (!answered) return; i++; if (i >= ROUND) return finish(); show(); window.scrollTo({ top: 0, behavior: A.reduced() ? 'auto' : 'smooth' }); }
 function finish() {
-  document.body.classList.remove('playing'); A.$('play').hidden = true; A.$('end').hidden = false;
-  const isBest = A.saveBest('phish-or-legit', score), n = A.plays('phish-or-legit');
-  A.$('eScore').textContent = score + '/' + ROUND;
-  A.$('eRank').textContent = score >= 11 ? 'Scam radar switched on' : score >= 9 ? 'Sharp eyed' : score >= 6 ? 'Getting there' : 'Slow down and check';
-  A.$('eBest').textContent = (isBest && n > 1 ? 'New best. ' : '') + 'Your best is ' + A.best('phish-or-legit') + '/' + ROUND + '.';
-  if (window.Toybox) Toybox.setResult('Phish or Legit', score + '/' + ROUND);
+  document.body.classList.remove('playing'); $('play').hidden = true; $('end').hidden = false;
+  const full = ROUND === MAXLEN && topic === 'all', isBest = full && A.saveBest(CFG.slug, score), n = A.plays(CFG.slug);
+  $('eScore').textContent = score + '/' + ROUND;
+  const pct = score / ROUND; let rank = CFG.ranks[CFG.ranks.length - 1][1]; for (const r of CFG.ranks) if (pct >= r[0]) { rank = r[1]; break; }
+  $('eRank').textContent = rank;
+  $('eBest').textContent = full ? ((isBest && n > 1 ? 'New best. ' : '') + 'Your best is ' + A.best(CFG.slug) + '/' + MAXLEN + '.') : 'Short and single-topic rounds do not count towards your best. Try the full mixed round.';
+  if (window.Toybox) Toybox.setResult(CFG.title, score + '/' + ROUND);
   A.sfx.done(); window.scrollTo(0, 0);
 }
 function start() {
-  const s = A.shuffle(DECK.filter((c) => c.scam)).slice(0, 6), l = A.shuffle(DECK.filter((c) => !c.scam)).slice(0, 6);
-  deck = A.shuffle(s.concat(l)); i = 0; score = 0; streak = 0;
-  document.body.classList.add('playing'); A.$('intro').hidden = true; A.$('end').hidden = true; A.$('play').hidden = false; show(); A.audio();
+  ROUND = chosen; const pool = DECK.filter((c) => topic === 'all' || c.t === topic), L = A.shuffle(pool.filter((c) => c.a === 'L')), R = A.shuffle(pool.filter((c) => c.a === 'R'));
+  let nl = Math.min(L.length, Math.round(ROUND * (CFG.leftShare || 0.5))), nr = Math.min(R.length, ROUND - nl);
+  if (nl + nr < ROUND) nl = Math.min(L.length, ROUND - nr);
+  deck = A.shuffle(L.slice(0, nl).concat(R.slice(0, nr))); ROUND = deck.length; i = 0; score = 0; streak = 0;
+  document.body.classList.add('playing'); $('intro').hidden = true; $('end').hidden = true; $('play').hidden = false; show(); A.audio();
 }
-A.$('bStart').addEventListener('click', start);
-A.$('bAgain').addEventListener('click', start);
-A.$('bScam').addEventListener('click', () => answer(true));
-A.$('bLegit').addEventListener('click', () => answer(false));
-A.$('bNext').addEventListener('click', next);
-A.$('bShare').addEventListener('click', () => window.Toybox && Toybox.share());
+$('bStart').addEventListener('click', start); $('bAgain').addEventListener('click', () => { $('end').hidden = true; $('intro').hidden = false; window.scrollTo(0, 0); refreshBest(); });
+$('bLeft').addEventListener('click', () => answer(true)); $('bRight').addEventListener('click', () => answer(false)); $('bNext').addEventListener('click', next);
+$('bShare').addEventListener('click', () => window.Toybox && Toybox.share());
 document.addEventListener('keydown', (e) => {
-  if (A.$('play').hidden) return;
-  if (e.key === 'ArrowLeft' || e.key === 's' || e.key === 'S') answer(true);
-  else if (e.key === 'ArrowRight' || e.key === 'l' || e.key === 'L') answer(false);
-  else if ((e.key === 'Enter' || e.key === ' ') && answered && document.activeElement !== A.$('bNext')) { e.preventDefault(); next(); }
+  if ($('play').hidden) return; const k = e.key.toLowerCase();
+  if (e.key === 'ArrowLeft' || k === CFG.keyL) answer(true); else if (e.key === 'ArrowRight' || k === CFG.keyR) answer(false);
+  else if ((e.key === 'Enter' || e.key === ' ') && answered && document.activeElement !== $('bNext')) { e.preventDefault(); next(); }
 });
-/* swipe the card */
 let sx = null, dx = 0;
 msg.addEventListener('pointerdown', (e) => { if (answered) return; sx = e.clientX; dx = 0; msg.classList.add('drag'); try { msg.setPointerCapture(e.pointerId); } catch (x) {} });
 msg.addEventListener('pointermove', (e) => { if (sx === null) return; dx = e.clientX - sx; msg.style.transform = 'translateX(' + dx + 'px) rotate(' + dx / 25 + 'deg)'; msg.classList.toggle('left', dx < -30); msg.classList.toggle('right', dx > 30); });
 function endDrag() { if (sx === null) return; sx = null; msg.classList.remove('drag'); if (dx < -80) answer(true); else if (dx > 80) answer(false); else { msg.style.transform = ''; msg.classList.remove('left', 'right'); } dx = 0; }
 msg.addEventListener('pointerup', endDrag); msg.addEventListener('pointercancel', endDrag);
-(function () { const b = A.best('phish-or-legit'); if (b) { const el = A.$('bestLine'); el.textContent = 'Your best so far: ' + b + '/' + ROUND; el.hidden = false; } })();
+function refreshBest() { const b = A.best(CFG.slug); if (b) { const el = $('bestLine'); el.textContent = 'Your best so far: ' + b + '/' + MAXLEN; el.hidden = false; } }
+refreshBest();
+window.__sw = { info: () => ({ i, score, streak, cur, ROUND, answered }), answer };
+
+/* ---------- Red flag hunt. {{phrase|why}} marks a real warning sign. ---------- */
+const HUNT = [
+  { ch: 'SMS', from: 'SavannaBank', text: 'Dear customer, {{your account has been suspended|Banks do not suspend accounts by SMS. This is meant to scare you.}}. {{Verify within 1 hour|A short deadline stops you from checking.}} at {{savanna-secure-login.top|The web address is not the bank\'s real site. Look at the ending of the address, not just the name.}} or {{lose access permanently|Threats of losing everything are a pressure trick.}}.' },
+  { ch: 'Email', from: 'accounts@streambox-help.support', text: 'Hello user, we could not {{process your last payment|A vague reason with no details, such as an order or date.}}. Your account will end today. {{Click here to update your card|A button that takes you to a page you did not choose.}} and {{reply with the 3 digits on the back of your card|Nobody real asks for your security code by reply.}}.' },
+  { ch: 'WhatsApp', from: 'Unknown number', text: 'Hi Dad, I have {{a new phone and number|Change of number is the classic story for impersonation.}}. I need to pay a course fee today but my app is not working. Can you {{send N$4,500 to this account|Money to an account you do not know.}}? I will {{explain later|Avoiding questions is a warning sign.}}.' },
+  { ch: 'Email', from: 'Delivery Team', text: 'Your parcel is waiting. There is a {{small fee of N$15|Small fees look harmless but collect your card details.}} to release it. Please {{pay now at parcel-fee-pay.click|A made-up website that does not belong to the courier.}}. If you do not respond in {{24 hours it will be returned|A fake deadline.}}.' },
+  { ch: 'Email', from: 'CEO Office', text: 'I am in a meeting and cannot take calls. I need you to {{buy 5 shop vouchers of N$1,000 each|Vouchers are hard to trace, which is why criminals like them.}} and {{send me the codes here|Codes are the same as cash.}}. {{Keep this between us|Secrecy stops others from spotting the fraud.}} for now.' },
+  { ch: 'SMS', from: 'Relief Board', text: 'Congratulations! You have been {{randomly selected|You never entered anything.}} for a N$5,000 grant. Reply with your {{ID number and bank PIN|Nobody legitimate ever needs your PIN.}} to receive the money {{before midnight|Countdown pressure.}}.' },
+  { ch: 'Email', from: 'Microsoft Account Team', text: 'We detected a {{sign-in from an unknown location|Vague alarm with no device or time.}}. To keep your account safe, {{sign in here|The link goes to a fake login page.}} with your password. If you do not do this in {{12 hours your mailbox will be deleted|Made-up consequence.}}.' },
+  { ch: 'WhatsApp', from: 'Talent Hub', text: 'Work from home and earn {{N$1,200 per day|Very high pay for very little work.}} by liking videos. {{No experience needed|Real jobs usually need something.}}. To start, {{pay a N$150 registration fee|If you pay to get a job, it is a scam.}} to the number below.' },
+  { ch: 'Email', from: 'Invoice Desk', text: 'Please see the attached {{invoice.zip|Zip files from strangers can hide malware.}} for your overdue payment. {{Open it and pay today|Rushing you to open an attachment.}} to avoid {{legal action|Threats keep you from thinking clearly.}}.' },
+  { ch: 'Phone call transcript', from: 'Caller: bank fraud team', text: 'This is the fraud team. We saw a suspicious payment. To cancel it I will send a code and {{you must read it out to me|A real bank never asks for it. The code approves the payment.}}. Please {{do not hang up|They do not want you to call the bank back.}} or the payment will go through. Also {{install this app so I can help you|Remote access apps give them control.}}.' },
+  { ch: 'Dating app', from: 'Daniel, 34', text: 'I feel so close to you already. I am a {{engineer working on an oil rig abroad|A far-away job is the perfect excuse to never meet.}}. My card is blocked and I need {{N$6,000 for flight tickets|The money request.}} to come and see you. {{Please tell no one|Isolation stops friends from warning you.}}.' },
+  { ch: 'Email', from: 'Baobab Insurance', text: 'You are owed a {{premium refund of N$4,780|A surprise refund.}}. To receive it, please {{confirm your full card number and expiry date|You never need to give card details to receive money.}} at the link. This offer {{expires today|Fake urgency.}}.' },
+  { ch: 'SMS', from: 'SavannaBank', text: 'N$250.00 was spent at Corner Cafe on your card ending 4417. Not you? Freeze your card in the app or call the number on the back of your card.', ok: true },
+  { ch: 'Email', from: 'BookNook', text: 'Thanks for your order #48213. It should arrive by Friday. You can follow it any time in your BookNook account.', ok: true },
+  { ch: 'SMS', from: 'Etosha Telecom', text: 'You have used 90% of your data bundle. Buy more in the Etosha app or dial *123#.', ok: true },
+  { ch: 'WhatsApp', from: 'Unknown number', text: 'Hi, I am your new neighbour and I saw your ad. {{Please open this link to see my proof of payment|Fake proof pages steal logins or deliver malware.}}. It is {{urgent because the bank closes soon|A made-up rush.}}.' }
+];
+
+/* ---------- Cyber quiz ---------- */
+const QUIZ = [
+  { t: 'Passwords', q: 'Which password is the strongest choice?', o: ['Windhoek2026!', 'Four or five unrelated words strung together, such as "lamp river maroon chalk"', 'P@ssw0rd'], a: 1, why: 'Length beats clever symbols. A passphrase of unrelated words is long, easy to remember and very hard to guess. Common words with symbol swaps are the first thing guessing tools try.' },
+  { t: 'Passwords', q: 'You use the same password on many websites. What is the main risk?', o: ['Websites will slow down', 'If one site leaks it, criminals try it on your other accounts', 'Nothing, passwords are unique per site anyway'], a: 1, why: 'This is called credential stuffing. A leak from a small forum can unlock your email or bank if you reuse the password.' },
+  { t: 'Passwords', q: 'What is the best way to keep many strong, different passwords?', o: ['Write them all on a sticky note on the screen', 'Use a reputable password manager', 'Use your birthday with a different ending each time'], a: 1, why: 'A password manager creates and stores unique passwords, so you only remember one strong passphrase. Predictable patterns are easy for attackers to guess.' },
+  { t: 'Passwords', q: 'How often should you change a strong, unique password?', o: ['Every week', 'Only when you have reason to think it has been exposed, or a site tells you', 'Never, even after a breach'], a: 1, why: 'Forced frequent changes tend to lead to weaker, predictable passwords. Change it after a breach, a phishing mistake or a shared device.' },
+  { t: 'Accounts', q: 'What does two-factor authentication (2FA) add?', o: ['A second proof that it is you, such as a code or app approval', 'A second password that is the same as the first', 'Faster logins'], a: 0, why: 'Even if someone steals your password, they still need the second factor. It blocks most account takeovers.' },
+  { t: 'Accounts', q: 'Which second factor is generally the strongest?', o: ['An SMS code', 'An authenticator app or a security key', 'A security question about your mother\'s maiden name'], a: 1, why: 'SMS codes can be intercepted through SIM swaps. Authenticator apps and hardware keys are harder to steal. Security questions are often guessable from social media.' },
+  { t: 'Accounts', q: 'A code arrives by SMS that you did not ask for. What should you do?', o: ['Ignore the code but change your password soon, as someone may be trying to get in', 'Send it to the person who says they sent it by mistake', 'Reply STOP'], a: 0, why: 'An unexpected code means someone entered your number or username. Do not share the code. Secure the account and turn on stronger 2FA.' },
+  { t: 'Accounts', q: 'Your email account is hacked. Why is this especially serious?', o: ['It is not, emails are just messages', 'Password resets for many other accounts go to your email', 'It only affects your inbox storage'], a: 1, why: 'Email is the master key: attackers reset passwords for banks, social media and shops from it. Protect it with a unique password and 2FA.' },
+  { t: 'Updates', q: 'Why should you install phone and computer updates quickly?', o: ['They add ads', 'They fix security holes that criminals already know about', 'They slow the device so it lasts longer'], a: 1, why: 'Updates patch known weaknesses. Delaying leaves a door open that attackers actively try.' },
+  { t: 'Updates', q: 'A pop-up on a website says your browser is out of date and offers a download. What is safest?', o: ['Click Download, it must be true', 'Close it and update the browser from its own settings or the official store', 'Enter your email to receive the update'], a: 1, why: 'Fake update pop-ups install malware. Updates should come from your device settings or the official store.' },
+  { t: 'Wi-Fi', q: 'You are at a café using free public Wi-Fi. What is the safest choice?', o: ['Log in to your bank quickly, it will be fine', 'Avoid sensitive logins, or use mobile data or a trusted VPN for them', 'Turn off your screen lock'], a: 1, why: 'Public networks can be watched or copied by fake hotspots. Keep banking and shopping for mobile data or a network you trust.' },
+  { t: 'Wi-Fi', q: 'What should you change first on a new home router?', o: ['The colour of the lights', 'The default admin password and the Wi-Fi password', 'Nothing, defaults are secure'], a: 1, why: 'Default passwords are widely known. Anyone nearby could join your network or change your settings.' },
+  { t: 'Wi-Fi', q: 'You see two networks named "Hotel_Guest" and "Hotel_Guest_Free". What should you do?', o: ['Connect to the free one', 'Ask reception which one is real', 'Connect to both'], a: 1, why: 'Criminals set up look-alike networks. Confirming the exact name with staff avoids handing them your traffic.' },
+  { t: 'Backups', q: 'What is the 3-2-1 backup idea?', o: ['3 copies, on 2 kinds of storage, with 1 kept away from the main device', '3 passwords, 2 emails and 1 phone', 'Back up 3 times a day for 2 days a week'], a: 0, why: 'A copy off your device, such as a drive kept elsewhere or a cloud backup, survives theft, fire and ransomware.' },
+  { t: 'Backups', q: 'Ransomware locks your files and demands payment. What protects you best in advance?', o: ['Paying quickly', 'Regular backups that are not always connected to your computer', 'A shorter password'], a: 1, why: 'With a clean backup you can restore without paying. Payment does not guarantee you get your files back.' },
+  { t: 'Malware', q: 'An email attachment from a stranger is named "invoice.zip". What should you do?', o: ['Open it in case it is important', 'Do not open it, and check with the company through a contact you already know', 'Forward it to friends'], a: 1, why: 'Attachments from unknown senders are a common way to deliver malware. Verify first through another channel.' },
+  { t: 'Malware', q: 'Your phone suddenly gets very hot, drains fast and shows many ads. What could be happening?', o: ['It could be malware or an unwanted app', 'It is definitely nothing', 'Only Apple phones get malware'], a: 0, why: 'Unusual behaviour can be a sign of unwanted software. Remove unfamiliar apps, update the phone and run a security scan.' },
+  { t: 'Malware', q: 'Where is it safest to install apps from?', o: ['Links sent in chat', 'The official app store, checking the developer and reviews', 'Any site that offers a free "cracked" version'], a: 1, why: 'Official stores check apps, though not perfectly. Cracked apps outside them often hide spyware.' },
+  { t: 'Privacy', q: 'Which of these is safest to post publicly?', o: ['A photo of your new ID card or boarding pass', 'A photo of a sunset from your trip after you have returned home', 'Your house address and when you are away'], a: 1, why: 'IDs, tickets and addresses can be used for fraud or burglary. Posting after you return reduces risk.' },
+  { t: 'Privacy', q: 'What is "oversharing" on social media?', o: ['Posting details that help strangers guess passwords or find you, like pet names, school, birthday and routine', 'Sharing pictures of food', 'Following too many pages'], a: 0, why: 'Security questions and password guesses are built from personal details. Less public detail is safer.' },
+  { t: 'Privacy', q: 'An app asks for access to your contacts, camera and location, but it is a simple torch app. What should you do?', o: ['Allow everything', 'Deny the extra permissions or choose a different app', 'Allow it once and forget'], a: 1, why: 'Apps should only ask for what they need. Excess permissions are a sign of data harvesting.' },
+  { t: 'Privacy', q: 'What is a good habit before you post a photo of your child in school uniform?', o: ['Check the background and details such as school name and location', 'Add the school name to be friendly', 'Post it with your exact street'], a: 0, why: 'Uniforms, names and locations let strangers find children. Share with a private audience and remove identifying details.' },
+  { t: 'Social engineering', q: 'What is "social engineering"?', o: ['Building social media apps', 'Tricking people into giving away information or access rather than hacking machines', 'Fixing computer networks'], a: 1, why: 'It is the human side of attack: pretending to be someone trusted, creating urgency or fear so you break your own rules.' },
+  { t: 'Social engineering', q: 'A caller says they are from your bank and asks you to confirm your PIN "for security". What now?', o: ['Give it, they are the bank', 'Hang up and call the number on the back of your card', 'Give half of it'], a: 1, why: 'Banks never ask for your PIN. Ending the call and calling back on a number you trust defeats the trick.' },
+  { t: 'Social engineering', q: 'Which is a sign of a scam message?', o: ['It gives you time and points you to your app', 'It creates urgency, fear or excitement and asks for a code, money or a click', 'It uses your correct name'], a: 1, why: 'Strong emotion and a request are the pair to watch. Your name can be found easily.' },
+  { t: 'Social engineering', q: 'What is a family "safe word" for?', o: ['Naming the Wi-Fi', 'Checking that a caller who sounds like a relative really is', 'Unlocking the fridge'], a: 1, why: 'Voice cloning makes calls convincing. A private word only family knows lets you verify an emergency request.' },
+  { t: 'Mobile money', q: 'Someone says they sent you money by mistake and asks you to send it back. What is safest?', o: ['Send it back straight away to be helpful', 'Check the balance in your own app, and if funds arrived, ask your provider to reverse it', 'Send half back'], a: 1, why: 'Fake confirmation messages are common. A real reversal goes through your provider, not directly to a stranger.' },
+  { t: 'Mobile money', q: 'A friend asks you to lend them your wallet PIN for a "quick check". Should you?', o: ['Yes, friends are trusted', 'No, never share your PIN with anyone', 'Only if they say please'], a: 1, why: 'The PIN is like the key to your money. Anyone with it can move funds in seconds.' },
+  { t: 'Mobile money', q: 'Your phone suddenly loses signal for hours and your SIM stops working, and you get no calls. What could it be?', o: ['Always bad weather', 'A possible SIM swap, so contact your provider and bank straight away', 'Nothing to worry about'], a: 1, why: 'A SIM swap sends your calls and codes to a criminal. Use another phone to reach your provider and bank quickly.' },
+  { t: 'Shopping', q: 'A shop offers a brand new phone at 70% off through a social media ad. What should you do?', o: ['Buy now before it sells out', 'Check reviews, the company\'s real website, and pay with a method with buyer protection', 'Pay by transfer to save time'], a: 1, why: 'Deals that are too good to be true usually are. Protected payments give you a chance to dispute the charge.' },
+  { t: 'Shopping', q: 'What does the padlock in your browser address bar prove?', o: ['The site is trustworthy', 'The connection is encrypted, but not that the site is honest', 'The site cannot be a scam'], a: 1, why: 'Scam sites can have padlocks too. Check the actual web address and the reputation of the seller.' },
+  { t: 'Shopping', q: 'A buyer wants to pay you by sending a link where you enter your card details to "receive" money. What is right?', o: ['Enter them, it is how payments work', 'Refuse: you never enter card details to receive money', 'Enter only the last four digits'], a: 1, why: 'Receiving money needs only your account details in your own app. Card entry steals your card.' },
+  { t: 'Family', q: 'How can you help older relatives avoid scams?', o: ['Tell them to avoid technology', 'Agree a simple rule: pause, hang up, and call a family member before sending money or codes', 'Give them your passwords'], a: 1, why: 'A simple rule and someone to ask makes scams much less effective. Shame stops people asking for help, so keep it kind.' },
+  { t: 'Family', q: 'What is a sensible way to protect children online?', o: ['No talking about it at all', 'Talk openly, use privacy settings and agree they can tell you about anything strange without getting in trouble', 'Give them full access at any age'], a: 1, why: 'Children who feel safe telling you about problems are protected best. Tools help, but trust matters more.' },
+  { t: 'Reporting', q: 'You clicked a scam link and entered your password. What is your first step?', o: ['Wait and see', 'Change that password now, from a safe device, and turn on 2FA', 'Delete your phone'], a: 1, why: 'Speed matters. Change the password, and on any other site where you used it, then check for strange activity.' },
+  { t: 'Reporting', q: 'You lost money to a scam. What should you do?', o: ['Stay quiet because it is embarrassing', 'Tell your bank or provider straight away, keep the evidence and report it to the police', 'Send more money to recover it'], a: 1, why: 'Fast reporting can sometimes stop or reverse transfers. Do not pay "recovery agents": they are often the same scammers.' },
+  { t: 'Reporting', q: 'What should you do with a scam message you did not fall for?', o: ['Forward it to everyone as a joke', 'Report or block it, and warn family and friends', 'Reply to say you know it is fake'], a: 1, why: 'Reporting helps providers block the sender. Replying tells scammers your number is active.' },
+  { t: 'Devices', q: 'Which lock on your phone is best?', o: ['No lock', 'A strong PIN, fingerprint or face unlock, with a short auto-lock time', 'The pattern 1234'], a: 1, why: 'A locked phone protects your accounts if it is lost or stolen. Avoid obvious PINs like birthdays.' },
+  { t: 'Devices', q: 'Your phone is stolen. What should you do first?', o: ['Wait a week', 'Lock or wipe it remotely, contact your provider to block the SIM, and change key passwords', 'Buy a new one only'], a: 1, why: 'Find My Device tools and a SIM block stop misuse. Change email and bank passwords too.' },
+  { t: 'Devices', q: 'What is a VPN mostly good for?', o: ['Making a scam message safe', 'Hiding your traffic from local Wi-Fi snoops, but not stopping phishing or malware', 'Making your phone faster'], a: 1, why: 'A VPN encrypts your connection on the network, but it cannot stop you from giving your password to a fake site.' },
+  { t: 'Work', q: 'A colleague emails asking you to change the bank details of a supplier. What should you do?', o: ['Change them right away', 'Verify by phoning the supplier on a known number before changing anything', 'Reply asking them to resend'], a: 1, why: 'Business email compromise relies on trust in email alone. A call to a known number defeats it.' },
+  { t: 'Work', q: 'You must leave your desk for a moment. What is best?', o: ['Leave the screen open', 'Lock your screen (Windows key + L) before you go', 'Turn down the brightness'], a: 1, why: 'A locked screen stops anyone using your logged-in session. It takes a second.' }
+];
+
+/* ---------- Breach drill: put the steps in order ---------- */
+const DRILL = [
+  { title: 'You typed your password into a fake site', text: 'You clicked a link in a message and entered your email password on a page that looked real. A moment later, you realise it was a fake.', steps: ['Change the password straight away from a safe device', 'Change it on any other site where you used the same password', 'Turn on two-factor authentication', 'Check recent sign-ins and sent mail for anything unusual', 'Report the message and warn your contacts'], why: 'Speed is what matters most. Once the password is changed the stolen one is useless, and 2FA protects you if it happens again.', myth: 'Waiting to see if anything happens gives criminals time. Deleting the message does not fix a password that has already been stolen.' },
+  { title: 'You sent money to a scammer', text: 'You paid N$3,000 to someone who turned out to be a fraudster.', steps: ['Contact your bank or mobile money provider immediately', 'Give them the details: amount, time, account and messages', 'Keep screenshots and stop all contact with the scammer', 'Report the case to the police', 'Warn family and be careful about "recovery" offers'], why: 'Fast reports sometimes allow a payment to be stopped. Evidence helps the bank and police.', myth: 'Never pay a "recovery agent" who offers to get your money back. It is often the same criminals.' },
+  { title: 'Your SIM suddenly stops working', text: 'Your phone shows no signal for hours. Later you learn that a new SIM was issued in your name.', steps: ['Use another phone or a landline to call your mobile provider', 'Ask them to block the new SIM and restore your number', 'Call your bank and mobile money provider to freeze access', 'Change passwords for email, banking and social media', 'Report the SIM swap to the police'], why: 'A SIM swap sends your codes to the attacker. Blocking the SIM stops new codes, and changing passwords locks them out.', myth: 'Waiting until signal comes back is the worst option. Criminals move quickly.' },
+  { title: 'Your phone is lost', text: 'You left your phone on a bus. It has your banking app, WhatsApp and email.', steps: ['Try to locate, lock or wipe it with Find My Device', 'Call your provider to block the SIM', 'Tell your bank so they can protect your app and cards', 'Change your email and important passwords', 'Log out of other sessions and re-enable WhatsApp on a new device'], why: 'A locked phone limits harm. Blocking the SIM stops codes, and changing passwords covers the rest.', myth: 'A screen lock is helpful but does not remove your accounts, so change passwords as well.' },
+  { title: 'A friend says you are sending them spam', text: 'Friends tell you that your social media account is sending strange links. You cannot log in.', steps: ['Try the "Forgot password" option or the platform\'s hacked account page', 'Regain access and set a new unique password', 'Turn on two-factor authentication', 'Remove unknown apps and log out of all other devices', 'Tell your contacts not to click the links'], why: 'Getting control back, then locking down the account, stops the hacker from returning.', myth: 'Replying to the hacker is pointless. Never pay someone to "return" your account.' },
+  { title: 'You shared a one-time code', text: 'A caller said they were from your bank, and you read a code out. You now think it was a scam.', steps: ['Call your bank straight away on the number on your card', 'Ask them to freeze the account and stop any payments', 'Change your online banking password and PIN', 'Check recent transactions and report anything unknown', 'Report the call to the police'], why: 'The code was used to approve something. The bank can block it if you act fast.', myth: 'The bank cannot help if you call back on the number the scammer gave you, so always use your own.' },
+  { title: 'Your files are locked with a ransom note', text: 'A message on your computer says your files are encrypted and demands payment in cryptocurrency.', steps: ['Disconnect the computer from Wi-Fi and the network', 'Do not pay, and take a photo of the note', 'Tell your IT team or a trusted technician', 'Restore files from a clean backup after the computer is cleaned', 'Change passwords from a different, clean device'], why: 'Disconnecting stops the spread. Payment funds crime and does not guarantee you get anything back.', myth: 'Do not restart repeatedly or plug in your backup drive while the computer is still infected.' },
+  { title: 'Your ID copy was sent to a scammer', text: 'You sent a clear photo of your ID and a selfie to someone who claimed to be a recruiter.', steps: ['Stop all contact with the person', 'Tell your bank and mobile provider so they can watch for fraud', 'Watch for accounts or loans opened in your name', 'Keep a record of what you sent and when', 'Report it to the police and get a case number'], why: 'Copies of ID are used to open accounts. Early warnings to your bank make misuse harder.', myth: 'Do not send more documents to "fix" the problem. Only use official channels.' }
+];
+
+/* ---------- Learn: check-up habits and glossary ---------- */
+const CHECKUP = [
+  ['My email account has a unique password and two-factor authentication.', 'Email resets everything else, so protect it first.'],
+  ['I use a password manager, or at least a different password for each important account.', 'Unique passwords limit the damage from any one breach.'],
+  ['Two-factor authentication is on for banking, social media and cloud storage.', 'It blocks most account takeovers.'],
+  ['My phone has a screen lock and finds/locks itself if lost.', 'It protects your accounts if the phone is lost or stolen.'],
+  ['My phone and computer install updates promptly.', 'Updates fix holes that criminals already know about.'],
+  ['I only install apps from the official store and check permissions.', 'Cracked apps and odd permissions are common malware routes.'],
+  ['I do not share OTPs, PINs or passwords with anyone, even people who say they are from the bank.', 'No real organisation needs them.'],
+  ['I have a backup of important photos and documents that is not on the same device.', 'Backups beat ransomware, theft and accidents.'],
+  ['I avoid banking on public Wi-Fi.', 'Use mobile data or a trusted network for sensitive tasks.'],
+  ['I have changed my home router\'s default admin and Wi-Fi passwords.', 'Defaults are widely known.'],
+  ['I check who sent a message and use my own app or bookmark instead of links.', 'Links are how phishing works.'],
+  ['My family has a plan: pause, hang up and call back before sending money.', 'A simple rule beats most scams.'],
+  ['I keep my social media privacy settings tight and think before posting personal details.', 'Personal details feed password guessing and scams.'],
+  ['I know how to report a scam and who to call if my SIM or bank card is compromised.', 'Speed matters after a problem.']
+];
+const TERMS = [
+  ['2FA / MFA', 'Two-factor or multi-factor authentication: proving it is you with more than a password.'],
+  ['Adware', 'Software that shows unwanted ads and can track what you do.'],
+  ['Authenticator app', 'An app that creates short-lived codes for logging in. Stronger than SMS codes.'],
+  ['Backup', 'A separate copy of your files that you can restore if something goes wrong.'],
+  ['Botnet', 'A network of hacked devices that criminals control to send spam or attack websites.'],
+  ['Brute force', 'Trying every possible password until one works. Long passwords make it impractical.'],
+  ['Business email compromise', 'Fraud that uses a fake or hacked work email to trick staff into paying or sharing information.'],
+  ['Catfishing', 'Pretending to be someone else online, often to build a fake relationship.'],
+  ['Credential stuffing', 'Trying leaked email and password pairs on many sites, hoping people reused them.'],
+  ['Data breach', 'When a company\'s data is stolen or exposed, for example customer emails and passwords.'],
+  ['Deepfake', 'A fake video, image or voice made with AI to look or sound like a real person.'],
+  ['Encryption', 'Scrambling data so only someone with the key can read it.'],
+  ['Firewall', 'A filter that blocks unwanted traffic to or from a device or network.'],
+  ['Identity theft', 'Using your personal details without permission, for example to open accounts or take loans.'],
+  ['Keylogger', 'Malware that records what you type, including passwords.'],
+  ['Malware', 'Any harmful software: viruses, spyware, ransomware and more.'],
+  ['Man-in-the-middle', 'An attacker who secretly sits between you and a website to watch or change your traffic.'],
+  ['Money mule', 'A person who moves stolen money for criminals, sometimes without realising it. It is a crime.'],
+  ['OTP', 'One-time password or code. It proves you are you, so never share it.'],
+  ['Password manager', 'A tool that creates and stores strong unique passwords behind one master password.'],
+  ['Patch', 'A software update that fixes a security weakness.'],
+  ['Phishing', 'A fake message that tries to trick you into giving away details or clicking a bad link.'],
+  ['Pretexting', 'Inventing a believable story, such as "I am from IT", to get information from you.'],
+  ['Quishing', 'Phishing that uses a fake QR code.'],
+  ['Ransomware', 'Malware that locks your files and demands payment to unlock them.'],
+  ['Romance scam', 'A fake relationship built to get money.'],
+  ['Sextortion', 'Threatening to share private images unless paid. Do not pay: stop contact, keep evidence and report it.'],
+  ['SIM swap', 'A criminal moves your phone number to a SIM they control so they receive your calls and codes.'],
+  ['Smishing', 'Phishing by SMS or WhatsApp.'],
+  ['Social engineering', 'Manipulating people, not machines, to give up information or access.'],
+  ['Spear phishing', 'A targeted phishing message that uses details about you or your job.'],
+  ['Spoofing', 'Faking a name, number or address so a message looks like it came from someone you trust.'],
+  ['Spyware', 'Software that secretly watches what you do and sends it to someone else.'],
+  ['Trojan', 'Malware disguised as something useful, like a free game or tool.'],
+  ['VPN', 'A tool that encrypts your traffic between your device and the VPN provider.'],
+  ['Vishing', 'Phishing by phone call, often pretending to be your bank.'],
+  ['Zero-day', 'A weakness that criminals find before the maker can fix it.']
+];
+
+/* Cyber space: tabs plus red flag hunt, quiz, breach drill and learn. Uses A, HUNT, QUIZ, DRILL, CHECKUP, TERMS. */
+(function () {
+  const $ = A.$, SL = 'phish-or-legit', reduced = () => A.reduced();
+  const done = (fn) => { fn(); window.scrollTo({ top: 0, behavior: reduced() ? 'auto' : 'smooth' }); };
+  const setBest = (id, slug, val, unit) => { const b = A.best(slug); if (b) { const el = $(id); el.textContent = 'Your best so far: ' + b + unit; el.hidden = false; } };
+  const rankOf = (pct, list) => { for (const r of list) if (pct >= r[0]) return r[1]; return list[list.length - 1][1]; };
+  const TAB_KEY = 'aware.' + SL + '.tab';
+
+  /* ---------- tabs ---------- */
+  let tab = 'swipe';
+  function setTab(name) {
+    if (document.body.classList.contains('playing')) return;
+    tab = name; document.querySelectorAll('.pane').forEach((p) => { p.hidden = p.id !== 'p-' + name; });
+    document.querySelectorAll('#tabs [data-tab]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === name)));
+    A.store.set(TAB_KEY, name);
+  }
+  document.querySelectorAll('#tabs [data-tab]').forEach((b) => b.addEventListener('click', () => setTab(b.dataset.tab)));
+  document.querySelectorAll('[data-go]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); $('end').hidden = true; $('intro').hidden = false; setTab(a.dataset.go); window.scrollTo(0, 0); }));
+  document.querySelectorAll('[data-share]').forEach((b) => b.addEventListener('click', () => window.Toybox && Toybox.share()));
+  document.getElementById('tabs').addEventListener('keydown', (e) => {
+    const names = ['swipe', 'hunt', 'quiz', 'drill', 'learn'], k = names.indexOf(tab);
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { const n = names[(k + (e.key === 'ArrowRight' ? 1 : names.length - 1)) % names.length]; setTab(n); document.querySelector('#tabs [data-tab="' + n + '"]').focus(); }
+  });
+
+  /* ---------- red flag hunt ---------- */
+  const HRANK = [[0.9, 'Red flag radar'], [0.7, 'Sharp eyed'], [0.45, 'Getting there'], [0, 'Look again, slowly']];
+  const HSLUG = SL + '-hunt', HN = 5;
+  let hDeck = [], hI = 0, hPts = 0, hMax = 0, hChecked = false, hToks = [];
+  const isPunct = (s) => /^[\s.,!?;:"'()\-]*$/.test(s);
+  function hParse(text) {
+    const out = [], re = /\{\{(.+?)\|(.+?)\}\}/g; let last = 0, m;
+    const plain = (s) => s.split(/(\s+)/).forEach((w) => { if (!w) return; out.push({ t: w, tap: !/^\s+$/.test(w) && !isPunct(w), flag: false }); });
+    while ((m = re.exec(text))) { plain(text.slice(last, m.index)); out.push({ t: m[1], tap: true, flag: true, why: m[2] }); last = re.lastIndex; }
+    plain(text.slice(last)); return out;
+  }
+  function hShow() {
+    const c = hDeck[hI]; hChecked = false; hToks = hParse(c.text);
+    const flags = hToks.filter((t) => t.flag).length; c.max = c.ok ? 1 : flags;
+    let h = '<div class="meta"><span>' + A.esc(c.ch) + '</span><span>Message ' + (hI + 1) + '</span></div><div class="from">' + A.esc(c.from) + '</div><div class="toks" id="hToks">';
+    hToks.forEach((t, k) => { h += t.tap ? '<span role="button" tabindex="0" class="tok" data-k="' + k + '" aria-pressed="false">' + A.esc(t.t) + '</span>' : A.esc(t.t); });
+    h += '</div><p class="lgd">Tap the parts that look suspicious.</p>';
+    $('hMsg').innerHTML = h; $('hMsg').querySelectorAll('.tok').forEach((b) => { const tg = () => { if (hChecked) return; const on = !b.classList.contains('on'); b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); A.sfx.tap(); }; b.addEventListener('click', tg); b.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tg(); } }); });
+    $('hWhy').hidden = true; $('hNextRow').hidden = true; $('hAct').hidden = false;
+    $('hN').textContent = hI + 1; $('hT').textContent = hDeck.length; $('hS').textContent = hPts; $('hBar').style.width = (hI / hDeck.length * 100) + '%';
+  }
+  function hResolve(pressedFine) {
+    if (hChecked) return; hChecked = true; const c = hDeck[hI];
+    const sel = new Set([...$('hMsg').querySelectorAll('.tok.on')].map((b) => +b.dataset.k));
+    let hits = 0, fal = 0, miss = 0; const items = [];
+    hToks.forEach((t, k) => {
+      const b = $('hMsg').querySelector('.tok[data-k="' + k + '"]'); if (b) { b.setAttribute('tabindex', '-1'); b.classList.remove('on'); }
+      if (t.flag) { if (sel.has(k) && !pressedFine) { hits++; b.classList.add('hit'); } else { miss++; if (b) b.classList.add('miss'); } items.push(t); }
+      else if (sel.has(k) && b) { fal++; b.classList.add('false'); }
+    });
+    if (pressedFine) { hits = 0; fal = 0; }
+    let pts, ok;
+    if (c.ok) { ok = pressedFine || sel.size === 0; pts = ok ? 1 : 0; }
+    else { pts = pressedFine ? 0 : Math.max(0, hits - fal); ok = miss === 0 && fal === 0 && !pressedFine; }
+    hPts += pts; ok ? A.sfx.good() : A.sfx.bad();
+    const w = $('hWhy'); w.className = 'why pop ' + (ok ? 'good' : 'bad');
+    let body;
+    if (c.ok) body = '<span class="tag">' + (ok ? 'Well spotted' : 'This one was fine') + '</span><p>' + (ok ? 'Nothing here pushes you, asks for a secret or sends you to an unknown link. It points you to your own app or number. Not everything is a scam, and knowing what a safe message looks like helps you spot a bad one.' : 'This message is the real thing: no pressure, no secrets and no strange link. Being over-suspicious is better than being caught out, but it helps to know what a safe message looks like.') + '</p>';
+    else body = '<span class="tag">' + (ok ? 'Every flag found' : 'You found ' + hits + ' of ' + items.length + (fal ? ' with ' + fal + ' false alarm' + (fal > 1 ? 's' : '') : '')) + '</span><ul>' + items.map((t) => '<li><b>' + A.esc(t.t) + '</b>: ' + A.esc(t.why) + '</li>').join('') + '</ul>';
+    w.innerHTML = body + '<p style="color:var(--mute);font-size:14px">+' + pts + ' point' + (pts === 1 ? '' : 's') + '</p>'; w.hidden = false;
+    $('hAct').hidden = true; $('hNextRow').hidden = false; $('hNext').textContent = hI + 1 >= hDeck.length ? 'See my result' : 'Next message';
+    $('hS').textContent = hPts; $('hBar').style.width = ((hI + 1) / hDeck.length * 100) + '%'; $('hNext').focus({ preventScroll: true });
+  }
+  function hFinish() {
+    document.body.classList.remove('playing'); $('hPlay').hidden = true; $('hEnd').hidden = false;
+    const pct = hMax ? Math.round(hPts / hMax * 100) : 0, isBest = A.saveBest(HSLUG, pct), n = A.plays(HSLUG);
+    $('hScore').textContent = hPts + '/' + hMax; $('hRank').textContent = rankOf(pct / 100, HRANK);
+    $('hEBest').textContent = (isBest && n > 1 ? 'New best. ' : '') + 'Your best is ' + A.best(HSLUG) + '%.';
+    if (window.Toybox) Toybox.setResult('Cyber space: Red flags', pct + '%'); A.sfx.done(); window.scrollTo(0, 0);
+  }
+  function hStart() {
+    const bad = A.shuffle(HUNT.filter((h) => !h.ok)).slice(0, HN - 1), okc = A.shuffle(HUNT.filter((h) => h.ok)).slice(0, 1);
+    hDeck = A.shuffle(bad.concat(okc)).map((h) => Object.assign({}, h)); hI = 0; hPts = 0;
+    hMax = hDeck.reduce((a, h) => a + (h.ok ? 1 : (h.text.match(/\{\{/g) || []).length), 0);
+    document.body.classList.add('playing'); $('hIntro').hidden = true; $('hEnd').hidden = true; $('hPlay').hidden = false; hShow(); A.audio();
+  }
+  $('hStart').addEventListener('click', hStart); $('hCheck').addEventListener('click', () => hResolve(false)); $('hFine').addEventListener('click', () => hResolve(true));
+  $('hNext').addEventListener('click', () => { hI++; if (hI >= hDeck.length) return hFinish(); hShow(); window.scrollTo({ top: 0, behavior: reduced() ? 'auto' : 'smooth' }); });
+  $('hAgain').addEventListener('click', () => { $('hEnd').hidden = true; $('hIntro').hidden = false; setBest('hBest', HSLUG, 0, '%'); window.scrollTo(0, 0); });
+  setBest('hBest', HSLUG, 0, '%');
+
+  /* ---------- quiz ---------- */
+  const QN = 10, QSLUG = SL + '-quiz', QRANK = [[0.9, 'Cyber smart'], [0.7, 'Safe and sensible'], [0.4, 'Building good habits'], [0, 'Every expert started here']];
+  let qDeck = [], qI = 0, qScore = 0, qAns = false, qMissed = [];
+  function qShow() {
+    const q = qDeck[qI]; qAns = false;
+    $('qText').textContent = q.q; $('qTopic').textContent = q.t;
+    $('qOpts').innerHTML = ''; q.order.forEach((oi, n) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'opt pop'; b.dataset.i = oi; b.innerHTML = '<span class="k">' + 'ABC'[n] + '</span> ' + A.esc(q.o[oi]); b.addEventListener('click', () => qPick(oi, b)); $('qOpts').appendChild(b); });
+    $('qWhy').hidden = true; $('qNextRow').hidden = true; $('qN').textContent = qI + 1; $('qT').textContent = qDeck.length; $('qS').textContent = qScore; $('qBar').style.width = (qI / qDeck.length * 100) + '%';
+  }
+  function qPick(oi, btn) {
+    if (qAns) return; qAns = true; const q = qDeck[qI], ok = oi === q.a;
+    if (ok) { qScore++; A.sfx.good(); } else { A.sfx.bad(); qMissed.push(q); }
+    document.querySelectorAll('#qOpts .opt').forEach((b) => { b.disabled = true; if (+b.dataset.i === q.a) b.classList.add('right'); }); if (!ok) btn.classList.add('wrong');
+    const w = $('qWhy'); w.className = 'why pop ' + (ok ? 'good' : 'bad'); w.innerHTML = '<span class="tag">' + (ok ? 'Correct' : 'Not quite') + '</span><p>' + A.esc(q.why) + '</p>'; w.hidden = false;
+    $('qNextRow').hidden = false; $('qNext').textContent = qI + 1 >= qDeck.length ? 'See my result' : 'Next question'; $('qS').textContent = qScore; $('qBar').style.width = ((qI + 1) / qDeck.length * 100) + '%'; $('qNext').focus({ preventScroll: true });
+  }
+  function qFinish() {
+    document.body.classList.remove('playing'); $('qPlay').hidden = true; $('qEnd').hidden = false;
+    const isBest = A.saveBest(QSLUG, qScore), n = A.plays(QSLUG);
+    $('qScore').textContent = qScore + '/' + qDeck.length; $('qRank').textContent = rankOf(qScore / qDeck.length, QRANK);
+    $('qEBest').textContent = (isBest && n > 1 ? 'New best. ' : '') + 'Your best is ' + A.best(QSLUG) + '/' + QN + '.';
+    $('qMissed').innerHTML = qMissed.length ? '<div class="missed"><h3>Worth another look</h3><ul>' + qMissed.map((q) => '<li><b>' + A.esc(q.q) + '</b><br>' + A.esc(q.o[q.a]) + '. ' + A.esc(q.why) + '</li>').join('') + '</ul></div>' : '<p class="note">No misses. Impressive.</p>';
+    if (window.Toybox) Toybox.setResult('Cyber space: Quiz', qScore + '/' + qDeck.length); A.sfx.done(); window.scrollTo(0, 0);
+  }
+  function qStart() {
+    qDeck = A.shuffle(QUIZ).slice(0, QN).map((q) => Object.assign({}, q, { order: A.shuffle(q.o.map((x, i) => i)) })); qI = 0; qScore = 0; qMissed = [];
+    document.body.classList.add('playing'); $('qIntro').hidden = true; $('qEnd').hidden = true; $('qPlay').hidden = false; qShow(); A.audio();
+  }
+  $('qStart').addEventListener('click', qStart);
+  $('qNext').addEventListener('click', () => { qI++; if (qI >= qDeck.length) return qFinish(); qShow(); window.scrollTo({ top: 0, behavior: reduced() ? 'auto' : 'smooth' }); });
+  $('qAgain').addEventListener('click', () => { $('qEnd').hidden = true; $('qIntro').hidden = false; setBest('qBest', QSLUG, 0, '/' + QN); window.scrollTo(0, 0); });
+  setBest('qBest', QSLUG, 0, '/' + QN);
+
+  /* ---------- breach drill ---------- */
+  const DN = 5, DSLUG = SL + '-drill', DRANK = [[0.85, 'Calm under attack'], [0.65, 'Ready to respond'], [0.4, 'Learning fast'], [0, 'A good start']];
+  const stars = (n) => '★'.repeat(n) + '☆'.repeat(3 - n);
+  let dDeck = [], dI = 0, dTot = 0, dLeft = 3, dNext = 0, dCur = null;
+  function dShow() {
+    dCur = dDeck[dI]; dNext = 0; dLeft = 3;
+    $('dTitle').textContent = dCur.title; $('dText').textContent = dCur.text;
+    $('dSlots').innerHTML = ''; dCur.steps.forEach(() => { const li = document.createElement('li'); li.className = 'empty'; li.textContent = '...'; $('dSlots').appendChild(li); });
+    $('dPool').innerHTML = ''; A.shuffle(dCur.steps.map((t, i) => i)).forEach((si) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'tile'; b.dataset.i = si; b.textContent = dCur.steps[si]; b.addEventListener('click', () => dTap(b, si)); $('dPool').appendChild(b); });
+    $('dWhy').hidden = true; $('dNextRow').hidden = true; $('dHintRow').hidden = false; $('dPoolLabel').hidden = false;
+    $('dN').textContent = dI + 1; $('dT').textContent = dDeck.length; $('dS').textContent = dTot; $('dC').textContent = dLeft; $('dBar').style.width = (dI / dDeck.length * 100) + '%';
+  }
+  function dTap(b, si) {
+    if (si === dNext) {
+      A.sfx.tap(); const li = $('dSlots').children[dNext]; li.className = ''; li.textContent = dCur.steps[si]; b.remove(); dNext++;
+      document.querySelectorAll('#dPool .tile.hint').forEach((x) => x.classList.remove('hint'));
+      if (dNext >= dCur.steps.length) dDone();
+    } else { A.sfx.bad(); dLeft = Math.max(0, dLeft - 1); $('dC').textContent = dLeft; b.classList.remove('no'); void b.offsetWidth; b.classList.add('no'); }
+  }
+  function dHint() { if (dLeft <= 0) return; dLeft--; $('dC').textContent = dLeft; A.sfx.tap(); const t = document.querySelector('#dPool .tile[data-i="' + dNext + '"]'); if (t) t.classList.add('hint'); }
+  function dDone() {
+    dTot += dLeft; A.sfx.good(); $('dHintRow').hidden = true; $('dPoolLabel').hidden = true;
+    const w = $('dWhy'); w.className = 'why pop good'; w.innerHTML = '<span class="tag">Done <span class="stars">' + stars(dLeft) + '</span></span><p>' + A.esc(dCur.why) + '</p><p><b>Worth remembering:</b> ' + A.esc(dCur.myth) + '</p>'; w.hidden = false;
+    $('dNextRow').hidden = false; $('dNext').textContent = dI + 1 >= dDeck.length ? 'See my result' : 'Next scenario'; $('dS').textContent = dTot; $('dBar').style.width = ((dI + 1) / dDeck.length * 100) + '%'; $('dNext').focus({ preventScroll: true });
+  }
+  function dFinish() {
+    document.body.classList.remove('playing'); $('dPlay').hidden = true; $('dEnd').hidden = false;
+    const max = dDeck.length * 3, isBest = A.saveBest(DSLUG, dTot), n = A.plays(DSLUG);
+    $('dScore').textContent = dTot + '/' + max; $('dRank').textContent = rankOf(dTot / max, DRANK);
+    $('dEBest').textContent = (isBest && n > 1 ? 'New best. ' : '') + 'Your best is ' + A.best(DSLUG) + '/' + (DN * 3) + '.';
+    if (window.Toybox) Toybox.setResult('Cyber space: Drill', dTot + '/' + max); A.sfx.done(); window.scrollTo(0, 0);
+  }
+  function dStart() { dDeck = A.shuffle(DRILL).slice(0, DN); dI = 0; dTot = 0; document.body.classList.add('playing'); $('dIntro').hidden = true; $('dEnd').hidden = true; $('dPlay').hidden = false; dShow(); A.audio(); }
+  $('dStart').addEventListener('click', dStart); $('dHint').addEventListener('click', dHint);
+  $('dNext').addEventListener('click', () => { dI++; if (dI >= dDeck.length) return dFinish(); dShow(); window.scrollTo({ top: 0, behavior: reduced() ? 'auto' : 'smooth' }); });
+  $('dAgain').addEventListener('click', () => { $('dEnd').hidden = true; $('dIntro').hidden = false; setBest('dBest', DSLUG, 0, '/' + (DN * 3)); window.scrollTo(0, 0); });
+  setBest('dBest', DSLUG, 0, '/' + (DN * 3));
+
+  /* ---------- learn: check-up and glossary ---------- */
+  const CKEY = 'aware.' + SL + '.checkup', CRANK = [[1, 'Cyber safe champion'], [0.7, 'Strong habits'], [0.4, 'Good start, keep going'], [0, 'Room to grow, and that is fine']];
+  let ticks = []; try { ticks = JSON.parse(A.store.get(CKEY, '[]')) || []; } catch (e) { ticks = []; }
+  function cuDraw() {
+    $('cuTot').textContent = CHECKUP.length; $('cuNum').textContent = ticks.length; $('cuBar').style.width = (ticks.length / CHECKUP.length * 100) + '%'; $('cuRank').textContent = rankOf(ticks.length / CHECKUP.length, CRANK);
+    $('cuList').querySelectorAll('label').forEach((l, k) => l.classList.toggle('done', ticks.indexOf(k) >= 0));
+  }
+  $('cuList').innerHTML = CHECKUP.map((c, k) => '<li><label><input type="checkbox" data-k="' + k + '"' + (ticks.indexOf(k) >= 0 ? ' checked' : '') + '><span>' + A.esc(c[0]) + '<small>' + A.esc(c[1]) + '</small></span></label></li>').join('');
+  $('cuList').addEventListener('change', (e) => { const k = +e.target.dataset.k, at = ticks.indexOf(k); if (e.target.checked && at < 0) { ticks.push(k); A.sfx.tap(); } else if (!e.target.checked && at >= 0) ticks.splice(at, 1); A.store.set(CKEY, JSON.stringify(ticks)); cuDraw(); });
+  $('cuReset').addEventListener('click', () => { ticks = []; A.store.set(CKEY, '[]'); $('cuList').querySelectorAll('input').forEach((i) => { i.checked = false; }); cuDraw(); });
+  cuDraw();
+  function tDraw(q) {
+    const s = (q || '').trim().toLowerCase(), list = TERMS.filter((t) => !s || t[0].toLowerCase().includes(s) || t[1].toLowerCase().includes(s));
+    $('tList').innerHTML = list.map((t) => '<div><dt>' + A.esc(t[0]) + '</dt><dd>' + A.esc(t[1]) + '</dd></div>').join(''); $('tNone').hidden = list.length > 0;
+  }
+  $('tSearch').addEventListener('input', (e) => tDraw(e.target.value)); tDraw('');
+
+  const saved = A.store.get(TAB_KEY, 'swipe'); if (['hunt', 'quiz', 'drill', 'learn'].indexOf(saved) >= 0) setTab(saved);
+  window.__cy = { tab: () => tab, setTab, hunt: () => ({ hI, hPts, hMax, deck: hDeck }), quiz: () => ({ qI, qScore, cur: qDeck[qI] }), drill: () => ({ dI, dTot, cur: dCur }) };
+})();
 
 </script>
 </body>

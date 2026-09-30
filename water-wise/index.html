@@ -92,6 +92,9 @@ body.playing .top { padding-top: 56px; }
 .stage canvas { display: block; width: 100%; height: auto; aspect-ratio: 360 / 440; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
 .tip { min-height: 3em; margin: 12px 0 0; color: var(--mute); font-size: 15px; text-align: center; text-wrap: balance; }
 
+.btn.sm { padding: 0 16px; font-size: 14px; min-height: 40px; }
+[data-mode][aria-pressed="true"] { background: var(--acc); color: var(--acc-ink); border-color: var(--acc); }
+
 </style>
 <style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #061a2b; }</style>
 <!-- toybox-shared -->
@@ -109,6 +112,8 @@ body.playing .top { padding-top: 56px; }
   <section id="intro" class="panel">
     <h2>How it works</h2>
     <p class="note" style="margin-top:8px;font-size:15px">Leaks pop up around the house and drain your tank. Tap a leaking spot to fix it. The longer a leak runs the faster it drains. Tap a passing rain cloud to top the tank up. Keyboard: number keys 1 to 9.</p>
+    <p class="note" style="font-size:14px;margin-top:12px">Choose a mode. Relaxed drains the tank slowly, Tough springs leaks faster. Each mode keeps its own best.</p>
+    <div class="row"><button class="btn ghost sm" type="button" data-mode="relaxed" aria-pressed="false">Relaxed</button><button class="btn ghost sm" type="button" data-mode="normal" aria-pressed="true">Normal</button><button class="btn ghost sm" type="button" data-mode="tough" aria-pressed="false">Tough</button></div>
     <div class="row"><button class="btn" id="bStart" type="button">Start</button></div>
     <p class="note" id="bestLine" hidden></p>
   </section>
@@ -181,8 +186,16 @@ const FACTS = [
   'Reuse grey water from washing up or showers on garden plants. Just avoid soaps with harsh chemicals on food plants.',
   'Water the garden in the cool of the morning or evening. In the middle of the day much of it just evaporates.',
   'A bucket to catch the shower water while it warms up is free irrigation for a pot plant.',
-  'Fixing a leaking tap or toilet is usually a cheap repair that pays for itself quickly on your water bill.'
+  'Fixing a leaking tap or toilet is usually a cheap repair that pays for itself quickly on your water bill.',
+  'Mulch around plants with dry leaves or straw. It keeps the soil cooler and cuts the water lost to evaporation.',
+  'Use a bucket and a cloth to wash the car instead of a running hose. The hose can use many times more water.',
+  'Keep a jug of drinking water in the fridge instead of running the tap until it turns cold.',
+  'Water deep and less often. Deep watering encourages plant roots to grow down, where the soil stays moist for longer.',
+  'Choose local, drought-tolerant plants for the garden. They are used to dry conditions and need far less watering.',
+  'Rainwater tanks and barrels catch the free water that falls on your roof, ready for the garden later.'
 ];
+const MODES = { relaxed: { n: 'Relaxed', drain: 0.6, spawn: 1.35, slug: 'water-wise-relaxed' }, normal: { n: 'Normal', drain: 1, spawn: 1, slug: 'water-wise' }, tough: { n: 'Tough', drain: 1.35, spawn: 0.8, slug: 'water-wise-tough' } };
+let mode = 'normal';
 const cv = A.$('cv'), g = cv.getContext('2d'); const $ = A.$;
 let run = false, paused = false, last = 0, raf = 0, t = 0, tank = 100, fixed = 0, spawn = 1.5, leaks = [], cloud = null, cloudT = 8, bursts = [], drips = [], shake = 0;
 const cells = []; for (let i = 0; i < N; i++) { const c = i % 3, r = (i / 3) | 0; cells.push({ x: 10 + c * 116, y: 110 + r * 108, w: 108, h: 100 }); }
@@ -241,8 +254,8 @@ function tick(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   if (!paused) {
     t += dt; shake = Math.max(0, shake - dt);
-    spawn -= dt; if (spawn <= 0) { addLeak(); spawn = Math.max(0.75, 2.5 - t * 0.022) * (0.7 + Math.random() * 0.6); }
-    let drain = 0; for (const l of leaks) { l.age += dt; drain += l.age > 6 ? 1.6 : 0.8; } tank -= drain * dt;
+    spawn -= dt; if (spawn <= 0) { addLeak(); spawn = Math.max(0.75, 2.5 - t * 0.022) * (0.7 + Math.random() * 0.6) * MODES[mode].spawn; }
+    let drain = 0; for (const l of leaks) { l.age += dt; drain += l.age > 6 ? 1.6 : 0.8; } tank -= drain * MODES[mode].drain * dt;
     cloudT -= dt; if (!cloud && cloudT <= 0) { cloud = { x: -50, y: 88 }; }
     if (cloud) { cloud.x += 34 * dt; if (cloud.x > W + 10) { cloud = null; cloudT = 9 + Math.random() * 6; } }
     for (const b of bursts) b.t += dt; bursts = bursts.filter((b) => b.t < 0.5);
@@ -262,10 +275,10 @@ function fixLeak(i) {
 }
 function over() {
   run = false; cancelAnimationFrame(raf); document.body.classList.remove('playing'); $('play').hidden = true; $('end').hidden = false;
-  const days = Math.floor(t / 3), isBest = A.saveBest('water-wise', days), n = A.plays('water-wise');
+  const days = Math.floor(t / 3), isBest = A.saveBest(MODES[mode].slug, days), n = A.plays(MODES[mode].slug);
   $('eScore').textContent = days + (days === 1 ? ' day' : ' days');
   $('eRank').textContent = days >= 30 ? 'Water hero' : days >= 20 ? 'Leak buster' : days >= 10 ? 'Handy with a spanner' : 'Every drop counts';
-  $('eBest').textContent = (isBest && n > 1 ? 'New best. ' : '') + 'Your best is ' + A.best('water-wise') + ' days. You fixed ' + fixed + ' leaks.';
+  $('eBest').textContent = (isBest && n > 1 ? 'New best. ' : '') + MODES[mode].n + ' mode. Your best is ' + A.best(MODES[mode].slug) + ' days. You fixed ' + fixed + ' leaks.';
   const f = A.shuffle(FACTS).slice(0, 3); $('facts').innerHTML = f.map((x) => '<li>' + A.esc(x) + '</li>').join('');
   if (window.Toybox) Toybox.setResult('Water Wise', days + ' days');
   A.sfx.bad(); window.scrollTo(0, 0);
@@ -280,10 +293,12 @@ function pos(e) { const r = cv.getBoundingClientRect(); return [(e.clientX - r.l
 cv.addEventListener('pointerdown', (e) => { const p = pos(e); hit(p[0], p[1]); });
 document.addEventListener('keydown', (e) => { if (!run) return; if (/^[1-9]$/.test(e.key)) fixLeak(+e.key - 1); else if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') pause(); });
 document.addEventListener('visibilitychange', () => { if (document.hidden) pause(true); });
+function setMode(m) { mode = m; document.querySelectorAll('[data-mode]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.mode === m)); const b = A.best(MODES[m].slug), el = $('bestLine'); el.textContent = b ? 'Your best in ' + MODES[m].n + ' mode: ' + b + ' days' : ''; el.hidden = !b; try { localStorage.setItem('aware.water-wise.mode', m); } catch (e) {} }
+document.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.mode)));
 $('bStart').addEventListener('click', start); $('bAgain').addEventListener('click', start); $('bPause').addEventListener('click', () => pause());
 $('bShare').addEventListener('click', () => window.Toybox && Toybox.share());
-(function () { const b = A.best('water-wise'); if (b) { const el = $('bestLine'); el.textContent = 'Your best so far: ' + b + ' days'; el.hidden = false; } draw(); })();
-window.__ww = { leaks: () => leaks.map((l) => l.i), fix: fixLeak, state: () => ({ tank, t, fixed, run }), fastforward: (s) => { t += s; } };
+(function () { let m = 'normal'; try { m = localStorage.getItem('aware.water-wise.mode') || 'normal'; } catch (e) {} setMode(MODES[m] ? m : 'normal'); draw(); })();
+window.__ww = { leaks: () => leaks.map((l) => l.i), fix: fixLeak, state: () => ({ tank, t, fixed, run, mode }), fastforward: (s) => { t += s; } };
 
 </script>
 </body>

@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="A recycling awareness game. Drop each item in the right bin before the pile grows.">
+<meta name="theme-color" content="#0e1a12">
+<title>Sort It Out</title>
+<meta property="og:type" content="website">
+<meta property="og:title" content="Sort It Out">
+<meta property="og:description" content="A recycling awareness game. Drop each item in the right bin before the pile grows.">
+<meta property="og:image" content="https://tinytoybox.me/sort-it-out/img/preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://tinytoybox.me/sort-it-out/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Sort It Out">
+<meta name="twitter:description" content="A recycling awareness game. Drop each item in the right bin before the pile grows.">
+<meta name="twitter:image" content="https://tinytoybox.me/sort-it-out/img/preview.png">
+<link rel="icon" type="image/png" sizes="64x64" href="img/favicon-64.png">
+<link rel="apple-touch-icon" href="img/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600&family=DM+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --bg: #0a1622; --bg2: #10243a; --ink: #edf3fa; --mute: #9db2c8; --line: rgba(170, 200, 235, 0.22);
+  --card: rgba(255, 255, 255, 0.06); --acc: #ffcf4a; --acc-ink: #1a1400; --good: #4ad9a0; --bad: #ff6b7a;
+  --display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --body: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { min-height: 100%; }
+body { margin: 0; min-height: 100vh; color: var(--ink); font: 400 16px/1.55 var(--body); background: radial-gradient(800px 480px at 12% 0%, var(--glow1, rgba(255, 207, 74, 0.10)), transparent 60%), radial-gradient(700px 480px at 100% 40%, var(--glow2, rgba(74, 217, 160, 0.09)), transparent 60%), linear-gradient(180deg, var(--bg), var(--bg2)); background-color: var(--bg); padding-inline: 16px; padding-block: 0 24px; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+.wrap { max-width: 640px; margin: 0 auto; }
+.top { padding-top: 60px; }
+.kicker { margin: 0; font: 500 12px/1 var(--body); letter-spacing: 0.16em; text-transform: uppercase; color: var(--acc); }
+h1 { margin: 8px 0 0; font: 600 clamp(2.1rem, 9vw, 3.2rem)/1 var(--display); letter-spacing: -0.02em; text-wrap: balance; }
+.lede { margin: 12px 0 0; color: var(--mute); max-width: 52ch; text-wrap: pretty; }
+h2 { margin: 0; font: 600 1.5rem/1.15 var(--display); letter-spacing: -0.01em; text-wrap: balance; }
+.stats { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 0; padding: 0; list-style: none; }
+.stats li { font: 500 13px/1 var(--body); padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--mute); font-variant-numeric: tabular-nums; }
+.stats b { color: var(--ink); font-weight: 600; }
+.bar { height: 6px; margin-top: 14px; border-radius: 999px; background: rgba(255, 255, 255, 0.10); overflow: hidden; }
+.bar > i { display: block; height: 100%; width: 0; background: var(--acc); border-radius: inherit; transition: width 0.35s ease; }
+.panel { margin-top: 20px; padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 22px; border: 0; border-radius: 12px; font: 600 16px/1 var(--body); color: var(--acc-ink); background: var(--acc); cursor: pointer; }
+.btn:hover { filter: brightness(1.06); }
+.btn:active { transform: translateY(1px); }
+.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.btn.ghost:hover { border-color: var(--acc); }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.btn:focus-visible, .opt:focus-visible, .chip:focus-visible, a:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.opt { display: block; width: 100%; text-align: left; padding: 14px 16px; margin-top: 10px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink); font: 500 16px/1.4 var(--body); cursor: pointer; }
+.opt:hover:not(:disabled) { border-color: var(--acc); }
+.opt.right { border-color: var(--good); background: rgba(74, 217, 160, 0.14); }
+.opt.wrong { border-color: var(--bad); background: rgba(255, 107, 122, 0.14); }
+.opt:disabled { cursor: default; }
+.why { margin-top: 16px; padding: 14px 16px; border-left: 4px solid var(--acc); border-radius: 4px 10px 10px 4px; background: rgba(255, 255, 255, 0.05); }
+.why.good { border-left-color: var(--good); } .why.bad { border-left-color: var(--bad); }
+.why p { margin: 0; } .why p + p { margin-top: 8px; }
+.why .tag { display: block; margin-bottom: 6px; font: 600 12px/1 var(--body); letter-spacing: 0.14em; text-transform: uppercase; }
+.why.good .tag { color: var(--good); } .why.bad .tag { color: var(--bad); }
+.result { text-align: center; }
+.result .big { margin: 6px 0 0; font: 600 clamp(3rem, 14vw, 5rem)/1 var(--display); color: var(--acc); font-variant-numeric: tabular-nums; }
+.result .rank { margin: 8px 0 0; font: 600 1.3rem/1.2 var(--display); }
+.remember { margin: 18px 0 0; padding: 0; list-style: none; text-align: left; display: grid; gap: 10px; }
+.remember li { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255, 255, 255, 0.04); }
+.remember b { color: var(--acc); }
+.note { margin: 18px 0 0; font-size: 13px; color: var(--mute); }
+.credit { margin: 32px 0 0; text-align: center; font-size: 13px; color: var(--mute); }
+.credit a { color: var(--ink); }
+@keyframes pop { 0% { transform: scale(0.96); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+.pop { animation: pop 0.25s ease-out; }
+@media (prefers-reduced-motion: reduce) { .pop { animation: none; } .bar > i { transition: none; } }
+html.tb-reduced .pop { animation: none; } html.tb-reduced .bar > i { transition: none; }
+@media (max-width: 380px) { .panel { padding: 16px; } .btn { padding: 0 16px; } }
+@media (max-height: 520px) and (orientation: landscape) {
+  body.playing .top { display: none; }
+  body.playing .wrap { padding-top: 52px; }
+  .top { padding-top: 52px; }
+  .scene canvas { max-height: 46vh; width: auto; margin: 0 auto; }
+}
+
+:root { --bg: #0e1a12; --bg2: #17321f; --acc: #8be36a; --acc-ink: #0a2005; --glow1: rgba(139, 227, 106, 0.12); --glow2: rgba(255, 207, 74, 0.07); }
+body.playing .lede { display: none; }
+body.playing .top { padding-top: 56px; }
+.itemcard { position: relative; margin-top: 18px; padding: 22px 18px 26px; text-align: center; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05)); box-shadow: 0 12px 30px rgba(0,0,0,0.35); overflow: hidden; }
+.itemcard .tiny { font: 600 12px/1 var(--body); letter-spacing: 0.14em; text-transform: uppercase; color: var(--mute); }
+.itemcard .name { margin-top: 10px; font: 600 clamp(1.6rem, 7vw, 2.2rem)/1.1 var(--display); text-wrap: balance; }
+.itemcard .hint { margin-top: 6px; min-height: 1.4em; color: var(--mute); font-size: 15px; }
+.timer { position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: rgba(255,255,255,0.10); }
+.timer i { display: block; height: 100%; width: 100%; background: var(--acc); transform-origin: left; }
+.timer i.low { background: var(--bad); }
+.bins { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 16px; }
+.bin { position: relative; min-height: 78px; padding: 10px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border: 2px solid transparent; border-radius: 14px; color: #fff; font: 700 14px/1.1 var(--body); text-align: center; cursor: pointer; }
+.bin svg { width: 28px; height: 28px; }
+.bin small { position: absolute; top: 5px; left: 8px; font: 600 11px/1 var(--body); opacity: 0.8; }
+.bin:hover:not(:disabled) { filter: brightness(1.12); }
+.bin:disabled { cursor: default; opacity: 0.55; }
+.bin.right { opacity: 1; border-color: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,0.35); }
+.bin.wrong { opacity: 1; border-color: var(--bad); animation: shk 0.3s; }
+.bin:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+@keyframes shk { 20% { transform: translateX(-5px); } 40% { transform: translateX(5px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(3px); } }
+html.tb-reduced .bin.wrong { animation: none; }
+@media (prefers-reduced-motion: reduce) { .bin.wrong { animation: none; } }
+@media (max-width: 380px) { .bin { font-size: 13px; } }
+
+</style>
+<style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #0e1a12; }</style>
+<!-- toybox-shared -->
+<link rel="manifest" href="manifest.webmanifest">
+<script src="../toybox.js"></script>
+</head>
+<body>
+<main class="wrap">
+  <header class="top">
+    <p class="kicker">Awareness · Waste and recycling</p>
+    <h1>Sort It Out</h1>
+    <p class="lede">Rubbish goes in the wrong bin more often than you think. Sort twenty items before you run out of lives.</p>
+  </header>
+
+  <section id="intro" class="panel">
+    <h2>How it works</h2>
+    <p class="note" style="margin-top:8px;font-size:15px">An item appears. Tap the bin it belongs in before the timer runs out. You have three lives, and each wrong bin or timeout costs one. Keys 1 to 7 also work. Bin colours differ from town to town, so always read the labels.</p>
+    <div class="row"><button class="btn" id="bStart" type="button">Start</button></div>
+    <p class="note" id="bestLine" hidden></p>
+  </section>
+
+  <section id="play" hidden aria-live="polite">
+    <ul class="stats"><li>Sorted <b id="sN">0</b>/<span id="sT">20</span></li><li>Lives <b id="sL" aria-label="lives left">3</b></li><li>Streak <b id="sK">0</b></li></ul>
+    <div class="bar" aria-hidden="true"><i id="pBar"></i></div>
+    <div class="itemcard" id="item" aria-live="assertive"><div class="tiny" id="iCat"></div><div class="name" id="iName"></div><div class="hint" id="iHint"></div><div class="timer" aria-hidden="true"><i id="tBar"></i></div></div>
+    <div id="why" class="why" hidden></div>
+    <div class="bins" id="bins"></div>
+    <div class="row" id="nextRow" hidden><button class="btn" id="bNext" type="button">Next item</button></div>
+  </section>
+
+  <section id="end" class="panel result" hidden>
+    <p class="kicker" id="eKick">Round over</p>
+    <p class="big" id="eScore">0</p>
+    <p class="rank" id="eRank"></p>
+    <p class="note" id="eBest"></p>
+    <ul class="remember">
+      <li><b>Reduce first.</b> The best waste is the waste you never make. Carry a bag and a bottle.</li>
+      <li><b>Reuse next.</b> Jars, tubs and cartons can be used again before they are thrown away.</li>
+      <li><b>Rinse and dry.</b> Clean containers recycle better. Food and grease spoil good paper and plastic.</li>
+      <li><b>Special items need special places.</b> Batteries, old phones, bulbs, paint and medicine should not go in household rubbish. Ask your municipality or shops about drop-off points.</li>
+    </ul>
+    <div class="row" style="justify-content:center"><button class="btn" id="bAgain" type="button">Play again</button><button class="btn ghost" id="bShare" type="button">Share</button></div>
+  </section>
+
+  <p class="credit">Made by <a href="https://phellep.vercel.app">Phellep Shapopi</a></p>
+</main>
+
+<script>
+/* Awareness shell: small helpers shared by the Awareness toys */
+const A = (() => {
+  const $ = (id) => document.getElementById(id);
+  const store = { get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+  const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const reduced = () => !!(window.Toybox && Toybox.reduced);
+  const soundOn = () => !(window.Toybox) || Toybox.sound;
+  let ctx = null;
+  function audio() { if (!ctx) { try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; } } if (ctx.state === 'suspended') ctx.resume(); return ctx; }
+  function tone(f, d, type, vol, slide, delay) {
+    if (!soundOn()) return; const c = audio(); if (!c) return;
+    const t = c.currentTime + (delay || 0), o = c.createOscillator(), g = c.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(f, t); if (slide) o.frequency.linearRampToValueAtTime(Math.max(30, f + slide), t + d);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol || 0.1, t + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + d + 0.05);
+  }
+  const sfx = {
+    good() { tone(660, 0.12, 'triangle', 0.10); tone(880, 0.18, 'triangle', 0.10, 0, 0.09); },
+    bad() { tone(220, 0.22, 'sawtooth', 0.07, -90); },
+    tap() { tone(520, 0.05, 'triangle', 0.06); },
+    done() { [523, 659, 784, 1046].forEach((f, i) => tone(f, 0.22, 'triangle', 0.09, 0, i * 0.11)); }
+  };
+  function bestKey(slug) { return 'aware.' + slug + '.best'; }
+  function best(slug) { const v = +store.get(bestKey(slug), 0); return isFinite(v) ? v : 0; }
+  function saveBest(slug, n) { const old = best(slug); if (n > old) { store.set(bestKey(slug), String(n)); return true; } return false; }
+  function plays(slug) { const n = (+store.get('aware.' + slug + '.plays', 0) || 0) + 1; store.set('aware.' + slug + '.plays', String(n)); return n; }
+  return { $, store, shuffle, esc, reduced, soundOn, audio, tone, sfx, best, saveBest, plays };
+})();
+
+const BINS = [
+  { id: 'paper', n: 'Paper', c: '#3b7bd6', svg: '<path d="M6 3h9l5 5v13H6z"/><path d="M15 3v5h5M9 13h8M9 17h8"/>' },
+  { id: 'plastic', n: 'Plastic', c: '#c99a0b', svg: '<path d="M9 2h6v3l2 3v13a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V8l2-3z"/><path d="M8 12h8"/>' },
+  { id: 'glass', n: 'Glass', c: '#1f9f73', svg: '<path d="M10 2h4v5l2 3v11a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V10l2-3z"/><path d="M9 14h6"/>' },
+  { id: 'metal', n: 'Metal', c: '#6f7d8c', svg: '<path d="M7 5h10v14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2z"/><path d="M7 5c0-1 2-2 5-2s5 1 5 2M7 10h10"/>' },
+  { id: 'compost', n: 'Food and garden', c: '#8a6238', svg: '<path d="M12 21c-5 0-8-3-8-8 4 0 7 1 8 5 1-4 4-5 8-5 0 5-3 8-8 8z"/><path d="M12 3v9"/>' },
+  { id: 'special', n: 'Special', c: '#c73e4f', svg: '<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/>' },
+  { id: 'general', n: 'General', c: '#4a5262', svg: '<path d="M5 7h14l-1 14H6z"/><path d="M3 7h18M9 7V4h6v3"/>' }
+];
+const I = (name, bin, why, hint) => ({ name, bin, why, hint });
+const ITEMS = [
+  I('Newspaper', 'paper', 'Clean, dry paper is one of the easiest things to recycle.'), I('Flattened cardboard box', 'paper', 'Flatten boxes to save space. Cardboard recycles well when it is dry and clean.'), I('Paper bag', 'paper', 'Paper bags can be recycled or reused. Keep them dry.'), I('Cereal box', 'paper', 'Cardboard boxes go with paper. Take out the plastic inner bag first.'), I('Egg carton (cardboard)', 'paper', 'Cardboard egg cartons can be recycled, or torn up for the compost.'), I('Old magazine', 'paper', 'Magazines are paper and can be recycled.'), I('Office printing paper', 'paper', 'Office paper is high-value recycling. Keep it clean and dry.'),
+  I('Empty plastic bottle', 'plastic', 'Empty, rinse and put the lid back on. Plastic bottles are widely recycled.'), I('Rinsed yoghurt tub', 'plastic', 'A clean plastic tub can be recycled. A quick rinse helps.'), I('Shampoo bottle', 'plastic', 'Empty plastic bathroom bottles can be recycled. Rinse them first.'), I('Detergent bottle', 'plastic', 'Rinse out the last of the liquid before you put it in the plastic bin.'), I('Clean plastic bag', 'plastic', 'Better still, reuse it. Clean bags can go with plastics, or to collection points at shops that take them.'), I('Milk bottle (plastic)', 'plastic', 'Rinse and recycle with plastics.'),
+  I('Glass jar', 'glass', 'Glass can be recycled again and again. Rinse it and remove the lid.'), I('Beer or cool drink bottle', 'glass', 'Bottles are great to recycle. Some can be returned for a deposit, so check first.'), I('Sauce bottle', 'glass', 'Rinse and recycle. Glass jars and bottles keep their quality forever.'), I('Glass jam jar', 'glass', 'Reuse it for storing food, or recycle it.'),
+  I('Aluminium drink can', 'metal', 'Aluminium cans are valuable to recycle and can be melted down over and over.'), I('Empty tin of beans', 'metal', 'Rinse the tin. Steel cans recycle well.'), I('Clean aluminium foil', 'metal', 'Clean foil can be recycled. Scrunch it into a ball so it is easier to sort.'), I('Metal bottle top', 'metal', 'Small metal lids are recyclable. Put them in the metal bin.'),
+  I('Banana peel', 'compost', 'Fruit and vegetable scraps make good compost and can feed a garden.'), I('Apple core', 'compost', 'Food scraps go on the compost heap, or a worm farm.'), I('Eggshells', 'compost', 'Eggshells add calcium to compost.'), I('Vegetable peelings', 'compost', 'Peelings and scraps are perfect for composting.'), I('Grass cuttings', 'compost', 'Garden waste is good for compost or mulch.'), I('Coffee grounds', 'compost', 'Coffee grounds are great in compost.'), I('Dry leaves', 'compost', 'Leaves make good mulch and compost.'),
+  I('AA batteries', 'special', 'Batteries contain harmful metals and can start fires. Take them to a drop-off point.'), I('Old mobile phone', 'special', 'Electronics hold valuable materials and toxic parts. Give it to an e-waste collection.'), I('Energy-saving light bulb', 'special', 'Some bulbs contain mercury. Take them to a special drop-off.'), I('Leftover paint', 'special', 'Paint is hazardous. Never pour it down the drain or put it with normal rubbish.'), I('Expired medicine', 'special', 'Return medicine to a pharmacy. Do not flush it or put it in the bin.'), I('Old phone charger', 'special', 'Cables and chargers are electronic waste. Give them to an e-waste drop-off.'),
+  I('Used tissue', 'general', 'Used tissues are too dirty to recycle and can go into general waste, or the compost if it is only paper.'), I('Greasy pizza box', 'general', 'Food grease spoils paper for recycling. Tear off any clean lid and recycle that only.'), I('Crisp packet', 'general', 'Mixed layers of plastic and foil are very hard to recycle.'), I('Disposable nappy', 'general', 'Nappies go in general waste. Wrap them up first.'), I('Broken mirror', 'general', 'Mirror glass is treated differently to bottles and jars. Wrap it safely and put it in general waste.'), I('Polystyrene takeaway box', 'general', 'Polystyrene is hard to recycle. Choose reusable containers when you can.'), I('Broken plate', 'general', 'Ceramics melt at a different temperature to glass and spoil recycling. Wrap it and bin it.'), I('Sweet wrapper', 'general', 'Small mixed wrappers usually go into general waste.')
+];
+const $ = A.$; const ROUND = 20;
+let deck = [], i = 0, sorted = 0, lives = 3, streak = 0, cur = null, live = false, tLeft = 1, tLen = 8, raf = 0, last = 0;
+const binsEl = $('bins');
+BINS.forEach((b, k) => { const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'bin'; btn.dataset.id = b.id; btn.style.background = b.c; btn.setAttribute('aria-label', b.n + ' bin, key ' + (k + 1)); btn.innerHTML = '<small>' + (k + 1) + '</small><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + b.svg + '</svg><span>' + b.n + '</span>'; btn.addEventListener('click', () => choose(b.id)); binsEl.appendChild(btn); });
+const catName = (id) => BINS.find((b) => b.id === id).n;
+
+function heart() { return '♥'.repeat(lives) + '♡'.repeat(3 - lives); }
+function show() {
+  cur = deck[i]; live = true; $('iName').textContent = cur.name; $('iCat').textContent = 'Item ' + (i + 1) + ' of ' + ROUND; $('iHint').textContent = 'Which bin?';
+  tLen = Math.max(4, 8 - i * 0.2); tLeft = 1; $('tBar').classList.remove('low');
+  document.querySelectorAll('.bin').forEach((b) => { b.disabled = false; b.classList.remove('right', 'wrong'); });
+  $('why').hidden = true; $('nextRow').hidden = true; $('item').classList.remove('pop'); void $('item').offsetWidth; $('item').classList.add('pop');
+  $('sN').textContent = sorted; $('sL').textContent = heart(); $('sK').textContent = streak; $('pBar').style.width = (i / ROUND * 100) + '%';
+  last = performance.now(); cancelAnimationFrame(raf); raf = requestAnimationFrame(tick);
+}
+function tick(now) {
+  if (!live) return; const dt = (now - last) / 1000; last = now; tLeft -= dt / tLen; $('tBar').style.transform = 'scaleX(' + Math.max(0, tLeft) + ')'; $('tBar').classList.toggle('low', tLeft < 0.3);
+  if (tLeft <= 0) return choose(null); raf = requestAnimationFrame(tick);
+}
+function choose(id) {
+  if (!live) return; live = false; cancelAnimationFrame(raf);
+  const ok = id === cur.bin;
+  document.querySelectorAll('.bin').forEach((b) => { b.disabled = true; if (b.dataset.id === cur.bin) b.classList.add('right'); if (!ok && b.dataset.id === id) b.classList.add('wrong'); });
+  if (ok) { sorted++; streak++; A.sfx.good(); } else { lives--; streak = 0; A.sfx.bad(); }
+  const w = $('why'); w.className = 'why pop ' + (ok ? 'good' : 'bad');
+  w.innerHTML = '<span class="tag">' + (ok ? 'Right bin' : (id ? 'Wrong bin' : 'Out of time')) + ': ' + A.esc(catName(cur.bin)) + '</span><p>' + A.esc(cur.why) + '</p>'; w.hidden = false;
+  $('sN').textContent = sorted; $('sL').textContent = heart(); $('sK').textContent = streak; $('pBar').style.width = ((i + 1) / ROUND * 100) + '%';
+  const over = lives <= 0 || i + 1 >= ROUND; $('nextRow').hidden = false; $('bNext').textContent = over ? 'See my result' : 'Next item'; $('bNext').focus({ preventScroll: true });
+}
+function next() { i++; if (lives <= 0 || i >= ROUND) return finish(); show(); window.scrollTo({ top: 0, behavior: A.reduced() ? 'auto' : 'smooth' }); }
+function finish() {
+  live = false; cancelAnimationFrame(raf); document.body.classList.remove('playing'); $('play').hidden = true; $('end').hidden = false;
+  const isBest = A.saveBest('sort-it-out', sorted), n = A.plays('sort-it-out');
+  $('eKick').textContent = lives > 0 ? 'All items sorted' : 'Out of lives';
+  $('eScore').textContent = sorted + '/' + ROUND;
+  $('eRank').textContent = sorted >= 19 ? 'Recycling champion' : sorted >= 15 ? 'Green thumb' : sorted >= 10 ? 'Getting the hang of it' : 'Keep sorting';
+  $('eBest').textContent = (isBest && n > 1 ? 'New best. ' : '') + 'Your best is ' + A.best('sort-it-out') + '/' + ROUND + '.';
+  if (window.Toybox) Toybox.setResult('Sort It Out', sorted + '/' + ROUND);
+  A.sfx.done(); window.scrollTo(0, 0);
+}
+function start() {
+  const per = {}; ITEMS.forEach((it) => { (per[it.bin] = per[it.bin] || []).push(it); });
+  deck = []; A.shuffle(BINS.map((b) => b.id)).forEach((id) => deck.push(A.shuffle(per[id])[0])); /* one of each first, then fill */
+  const rest = A.shuffle(ITEMS.filter((it) => deck.indexOf(it) < 0)); while (deck.length < ROUND) deck.push(rest.pop());
+  deck = A.shuffle(deck); i = 0; sorted = 0; lives = 3; streak = 0;
+  document.body.classList.add('playing'); $('intro').hidden = true; $('end').hidden = true; $('play').hidden = false; $('sT').textContent = ROUND; A.audio(); show();
+}
+$('bStart').addEventListener('click', start); $('bAgain').addEventListener('click', start); $('bNext').addEventListener('click', next);
+$('bShare').addEventListener('click', () => window.Toybox && Toybox.share());
+document.addEventListener('keydown', (e) => { if ($('play').hidden) return; if (/^[1-7]$/.test(e.key) && live) choose(BINS[+e.key - 1].id); else if (e.key === 'Enter' && !live && !$('nextRow').hidden && document.activeElement !== $('bNext')) next(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden && live) { tLeft = Math.min(1, tLeft + 0.0); } });
+(function () { const b = A.best('sort-it-out'); if (b) { const el = $('bestLine'); el.textContent = 'Your best so far: ' + b + '/' + ROUND; el.hidden = false; } })();
+window.__so = { info: () => ({ cur, i, sorted, lives, live }), choose };
+
+</script>
+</body>
+</html>
