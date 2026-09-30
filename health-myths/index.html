@@ -225,7 +225,7 @@ const CFG = {
   slug: 'health-myths', kicker: 'Awareness · Health', title: 'Health Myths',
   lede: 'Myth or fact? HIV, TB, malaria, hygiene and more.',
   how: 'Swipe left for <b style="color:var(--bad)">Myth</b>, right for <b style="color:var(--good)">Fact</b>.',
-  leftLabel: 'Myth', rightLabel: 'Fact', leftWord: 'Myth', rightWord: 'Fact', keyL: 'm', keyR: 'f', rounds: [6, 12], leftShare: 0.5,
+  leftLabel: 'Myth', rightLabel: 'Fact', leftWord: 'Myth', rightWord: 'Fact', keyL: 'm', keyR: 'f', rounds: [6, 12, 20], count: 12, leftShare: 0.5,
   ranks: [[0.92, 'Health champion'], [0.75, 'Well informed'], [0.5, 'On your way'], [0, 'Time to learn more']],
   remember: [['Get tested.', 'Regular testing for HIV and other conditions helps you get treatment early. Visit your nearest clinic.'], ['Finish treatment.', 'Take medicines exactly as prescribed, including TB and HIV treatment, even when you feel better.'], ['Protect yourself.', 'Wash hands, use mosquito nets where needed, protect your skin from the sun and keep up to date with vaccines.'], ['Ask a health worker.', 'A nurse or doctor can answer questions in private. Rumours travel fast, good advice comes from trained people.']],
   foot: 'This is general information based on public health guidance. It does not replace advice from a doctor or nurse.',
@@ -254,7 +254,23 @@ const DECK = [
   { ch: 'Water', from: 'Myth or fact?', text: 'In hot weather you should drink water often, not wait until you are very thirsty.', a: 'R', flags: [], why: 'Thirst comes after your body already needs fluid. Sip water regularly when it is hot, or when you are active.' },
   { ch: 'Sun', from: 'Myth or fact?', text: 'Shade, a hat and sunscreen lower your risk of sunburn and skin damage.', a: 'R', flags: [], why: 'Repeated sunburn raises the risk of skin cancer later in life. Cover up during the strongest sun in the middle of the day.' },
   { ch: 'Food', from: 'Myth or fact?', text: 'Eating more vegetables and fruit and less sugar and salt is good for your long-term health.', a: 'R', flags: [], why: 'A balanced diet helps protect your heart, weight and blood sugar. Small changes add up.' },
-  { ch: 'Mind', from: 'Myth or fact?', text: 'Talking to someone you trust, or a health worker, can help when you feel very low or worried for a long time.', a: 'R', flags: [], why: 'Sharing a problem lightens it, and health workers can offer support and treatment. You do not have to cope alone.' }
+  { ch: 'Mind', from: 'Myth or fact?', text: 'Talking to someone you trust, or a health worker, can help when you feel very low or worried for a long time.', a: 'R', flags: [], why: 'Sharing a problem lightens it, and health workers can offer support and treatment. You do not have to cope alone.' },
+
+  { ch: 'Cold', from: 'Myth or fact?', text: 'Going out with wet hair or in cold weather gives you a cold.', a: 'L', flags: [], why: 'Colds are caused by viruses, not by the temperature. You catch them from other people. Being cold may make you feel miserable but it does not cause the infection.' },
+  { ch: 'Water', from: 'Myth or fact?', text: 'Everyone must drink exactly eight glasses of water a day.', a: 'L', flags: [], why: 'How much you need depends on your size, the weather and how active you are. Drink to keep your urine pale and drink more in the heat.' },
+  { ch: 'Eyes', from: 'Myth or fact?', text: 'Reading in low light will permanently damage your eyes.', a: 'L', flags: [], why: 'Dim light can make your eyes tired and give you a headache, but it does not cause lasting damage.' },
+  { ch: 'Sleep', from: 'Myth or fact?', text: 'You can catch up on all the sleep you missed during the week by sleeping in on the weekend.', a: 'L', flags: [], why: 'A long lie-in helps a bit, but regular sleep is much better for your body and mood. A steady bedtime does more than a big catch-up.' },
+  { ch: 'Skin', from: 'Myth or fact?', text: 'Popping a pimple makes it go away faster.', a: 'L', flags: [], why: 'Squeezing can push germs deeper, cause scarring and make it last longer. Keep the skin clean and see a clinic if it is bad.' },
+  { ch: 'Fever', from: 'Myth or fact?', text: 'A person with a fever should be wrapped in blankets to sweat it out.', a: 'L', flags: [], why: 'Too many layers can make you hotter. Wear light clothing, drink fluids and see a clinic if the fever is high or lasts more than a couple of days.' },
+  { ch: 'Medicine', from: 'Myth or fact?', text: 'Taking a double dose of medicine will work twice as fast.', a: 'L', flags: [], why: 'More is not better. Too much of a medicine can be dangerous. Follow the label or ask a pharmacist or nurse.' },
+
+  { ch: 'Sleep', from: 'Myth or fact?', text: 'Teenagers and adults need regular sleep to stay healthy, and a screen-free wind-down before bed can help.', a: 'R', flags: [], why: 'Sleep helps your mood, memory and immune system. Putting screens away before bed helps many people fall asleep more easily.' },
+  { ch: 'Teeth', from: 'Myth or fact?', text: 'Brushing your teeth twice a day with fluoride toothpaste helps prevent cavities.', a: 'R', flags: [], why: 'Fluoride strengthens teeth, and brushing removes the plaque that causes decay. Cutting down on sugary drinks helps too.' },
+  { ch: 'Activity', from: 'Myth or fact?', text: 'Regular activity like walking, cycling or playing sport is good for your heart and your mood.', a: 'R', flags: [], why: 'You do not need a gym. Moving most days helps your heart, weight, sleep and mental wellbeing.' },
+  { ch: 'Smoking', from: 'Myth or fact?', text: 'Stopping smoking helps your body recover, even if you have smoked for years.', a: 'R', flags: [], why: 'Your heart and lungs begin to recover soon after you stop. It is never too late, and clinics can help you quit.' },
+  { ch: 'Food', from: 'Myth or fact?', text: 'Keeping raw meat apart from ready-to-eat food, and cooking it well, helps prevent food poisoning.', a: 'R', flags: [], why: 'Raw meat can carry germs. Separate boards, clean hands and thorough cooking stop them from reaching your plate.' },
+  { ch: 'Eyes', from: 'Myth or fact?', text: 'Wearing sunglasses that block UV helps protect your eyes from the sun.', a: 'R', flags: [], why: 'Too much UV can harm the eyes over time. Look for sunglasses that say they block UV, and wear a hat too.' },
+  { ch: 'Pregnancy', from: 'Myth or fact?', text: 'Going to the clinic regularly during pregnancy helps keep both mother and baby healthy.', a: 'R', flags: [], why: 'Check-ups can spot problems early and give the mother advice, tests and supplements. Start visits as early as you can.' }
 ];
 
 /* Generic swipe deck. Needs CFG and DECK from the toy's own file. */

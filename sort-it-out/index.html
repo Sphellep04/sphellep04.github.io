@@ -110,6 +110,9 @@ html.tb-reduced .bin.wrong { animation: none; }
 @media (prefers-reduced-motion: reduce) { .bin.wrong { animation: none; } }
 @media (max-width: 380px) { .bin { font-size: 13px; } }
 
+.btn.sm { min-height: 40px; padding: 0 16px; font-size: 15px; }
+.btn.ghost[aria-pressed="true"] { background: var(--acc); color: var(--acc-ink); }
+
 /* Sort It Out: chunky stickers with hard shadows */
 :root { --bg: #ffe873; --bg2: #ffd84a; --ink: #12321c; --mute: #3f5c47; --line: #12321c; --card: #fffdf0; --acc: #1e9b4a; --acc-ink: #ffffff; --good: #1e9b4a; --bad: #e0392b; --wash: rgba(18, 50, 28, 0.06); --track: rgba(18, 50, 28, 0.16); --display: "Lilita One", "Arial Rounded MT Bold", "Trebuchet MS", system-ui, sans-serif; --body: "Baloo 2", system-ui, "Segoe UI", sans-serif; color-scheme: light; }
 html { background: #ffe873 !important; }
@@ -128,6 +131,7 @@ h2 { font-family: var(--display); font-weight: 400; }
 .bin:active { transform: translate(3px, 3px); box-shadow: none; }
 .result .big { font-family: var(--display); font-weight: 400; color: var(--acc); text-shadow: 3px 3px 0 var(--ink); }
 .credit a { color: var(--ink); font-weight: 800; }
+.btn.ghost[aria-pressed="true"] { background: var(--acc); color: #fff; }
 
 </style>
 <style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #ffe873; }</style>
@@ -145,6 +149,8 @@ h2 { font-family: var(--display); font-weight: 400; }
 
   <section id="intro" class="panel">
     <p class="note" style="margin-top:8px;font-size:15px">Tap the bin the item belongs in before the timer runs out. A wrong bin costs a life. Keys 1 to 7 work too.</p>
+    <p class="note" style="font-size:14px;margin-top:12px">Chill has no timer, Rush is fast. Each mode keeps its own best.</p>
+    <div class="row"><button class="btn ghost sm" type="button" data-mode="chill" aria-pressed="false">Chill</button><button class="btn ghost sm" type="button" data-mode="normal" aria-pressed="true">Normal</button><button class="btn ghost sm" type="button" data-mode="rush" aria-pressed="false">Rush</button></div>
     <div class="row"><button class="btn" id="bStart" type="button">Start</button></div>
     <p class="note" id="bestLine" hidden></p>
   </section>
@@ -223,9 +229,18 @@ const ITEMS = [
   I('Aluminium drink can', 'metal', 'Aluminium cans are valuable to recycle and can be melted down over and over.'), I('Empty tin of beans', 'metal', 'Rinse the tin. Steel cans recycle well.'), I('Clean aluminium foil', 'metal', 'Clean foil can be recycled. Scrunch it into a ball so it is easier to sort.'), I('Metal bottle top', 'metal', 'Small metal lids are recyclable. Put them in the metal bin.'),
   I('Banana peel', 'compost', 'Fruit and vegetable scraps make good compost and can feed a garden.'), I('Apple core', 'compost', 'Food scraps go on the compost heap, or a worm farm.'), I('Eggshells', 'compost', 'Eggshells add calcium to compost.'), I('Vegetable peelings', 'compost', 'Peelings and scraps are perfect for composting.'), I('Grass cuttings', 'compost', 'Garden waste is good for compost or mulch.'), I('Coffee grounds', 'compost', 'Coffee grounds are great in compost.'), I('Dry leaves', 'compost', 'Leaves make good mulch and compost.'),
   I('AA batteries', 'special', 'Batteries contain harmful metals and can start fires. Take them to a drop-off point.'), I('Old mobile phone', 'special', 'Electronics hold valuable materials and toxic parts. Give it to an e-waste collection.'), I('Energy-saving light bulb', 'special', 'Some bulbs contain mercury. Take them to a special drop-off.'), I('Leftover paint', 'special', 'Paint is hazardous. Never pour it down the drain or put it with normal rubbish.'), I('Expired medicine', 'special', 'Return medicine to a pharmacy. Do not flush it or put it in the bin.'), I('Old phone charger', 'special', 'Cables and chargers are electronic waste. Give them to an e-waste drop-off.'),
-  I('Used tissue', 'general', 'Used tissues are too dirty to recycle and can go into general waste, or the compost if it is only paper.'), I('Greasy pizza box', 'general', 'Food grease spoils paper for recycling. Tear off any clean lid and recycle that only.'), I('Crisp packet', 'general', 'Mixed layers of plastic and foil are very hard to recycle.'), I('Disposable nappy', 'general', 'Nappies go in general waste. Wrap them up first.'), I('Broken mirror', 'general', 'Mirror glass is treated differently to bottles and jars. Wrap it safely and put it in general waste.'), I('Polystyrene takeaway box', 'general', 'Polystyrene is hard to recycle. Choose reusable containers when you can.'), I('Broken plate', 'general', 'Ceramics melt at a different temperature to glass and spoil recycling. Wrap it and bin it.'), I('Sweet wrapper', 'general', 'Small mixed wrappers usually go into general waste.')
+  I('Used tissue', 'general', 'Used tissues are too dirty to recycle and can go into general waste, or the compost if it is only paper.'), I('Greasy pizza box', 'general', 'Food grease spoils paper for recycling. Tear off any clean lid and recycle that only.'), I('Crisp packet', 'general', 'Mixed layers of plastic and foil are very hard to recycle.'), I('Disposable nappy', 'general', 'Nappies go in general waste. Wrap them up first.'), I('Broken mirror', 'general', 'Mirror glass is treated differently to bottles and jars. Wrap it safely and put it in general waste.'), I('Polystyrene takeaway box', 'general', 'Polystyrene is hard to recycle. Choose reusable containers when you can.'), I('Broken plate', 'general', 'Ceramics melt at a different temperature to glass and spoil recycling. Wrap it and bin it.'), I('Sweet wrapper', 'general', 'Small mixed wrappers usually go into general waste.'),
+I('Envelope', 'paper', 'Plain paper envelopes can go with your paper, as long as they are dry.'), I('Old exercise book', 'paper', 'Old school books are paper. Tear off any plastic cover first.'), I('Toilet roll tube', 'paper', 'Cardboard tubes recycle with your paper and cardboard.'), I('Brown paper packet', 'paper', 'Clean, dry brown paper is easy to recycle.'),
+I('Ice cream tub', 'plastic', 'Rinse it out and it can be recycled with your plastic.'), I('Cool drink bottle (plastic)', 'plastic', 'Empty, rinse and squash plastic bottles to save space.'), I('Cooking oil bottle (plastic)', 'plastic', 'Empty it fully into the bin for used oil, wipe it and it can be recycled.'), I('Cleaning spray bottle', 'plastic', 'Rinse the bottle out. The plastic bottle can be recycled once it is empty and clean.'),
+I('Wine bottle', 'glass', 'Glass can be recycled again and again without losing quality.'), I('Baby food jar', 'glass', 'Rinse glass jars and they can go to glass recycling.'), I('Pickle jar', 'glass', 'Empty and rinse it. Glass jars are recycled over and over.'),
+I('Tuna tin', 'metal', 'Rinse and it can be recycled. Steel tins are widely recycled.'), I('Coffee tin', 'metal', 'Empty metal tins recycle well. Remove any plastic lid first.'), I('Old cutlery', 'metal', 'Metal cutlery can be recycled as scrap metal.'),
+I('Orange peel', 'compost', 'Fruit peels can rot down into compost. Chop them for faster breakdown.'), I('Stale bread', 'compost', 'Bread rots down, though in small amounts so it does not attract rats.'), I('Flower clippings', 'compost', 'Plant trimmings break down into useful compost.'),
+I('Car battery', 'special', 'Car batteries contain lead and acid. Take them to a battery collection point, never a normal bin.'), I('Fluorescent tube', 'special', 'Tubes contain mercury. Take them to a special waste drop-off.'), I('Old laptop', 'special', 'Electronics contain useful metals and harmful chemicals. Take them to an e-waste drop-off.'), I('Button battery', 'special', 'Small batteries can leak and are dangerous for children. Use a battery collection point.'),
+I('Cling wrap', 'general', 'Thin plastic films tangle machines and usually cannot be recycled at home.'), I('Chewing gum', 'general', 'Gum cannot be recycled or composted. Wrap it up and put it in the general bin.'), I('Cigarette butt', 'general', 'Butts contain plastic and chemicals. Put them out and bin them, never on the ground.'), I('Broken ceramic mug', 'general', 'Ceramics are not glass and melt at a higher temperature, so they spoil glass recycling.'), I('Kitchen sponge', 'general', 'Sponges are made of mixed materials and go in the general bin.')
 ];
 const $ = A.$; const ROUND = 20;
+const MODES = { chill: { n: 'Chill', slug: 'sort-it-out-chill' }, normal: { n: 'Normal', slug: 'sort-it-out' }, rush: { n: 'Rush', slug: 'sort-it-out-rush' } };
+let mode = 'normal';
 let deck = [], i = 0, sorted = 0, lives = 3, streak = 0, cur = null, live = false, tLeft = 1, tLen = 8, raf = 0, last = 0;
 const binsEl = $('bins');
 BINS.forEach((b, k) => { const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'bin'; btn.dataset.id = b.id; btn.style.background = b.c; btn.setAttribute('aria-label', b.n + ' bin, key ' + (k + 1)); btn.innerHTML = '<small>' + (k + 1) + '</small><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + b.svg + '</svg><span>' + b.n + '</span>'; btn.addEventListener('click', () => choose(b.id)); binsEl.appendChild(btn); });
@@ -234,7 +249,7 @@ const catName = (id) => BINS.find((b) => b.id === id).n;
 function heart() { return '♥'.repeat(lives) + '♡'.repeat(3 - lives); }
 function show() {
   cur = deck[i]; live = true; $('iName').textContent = cur.name; $('iCat').textContent = 'Item ' + (i + 1) + ' of ' + ROUND; $('iHint').textContent = 'Which bin?';
-  tLen = Math.max(4, 8 - i * 0.2); tLeft = 1; $('tBar').classList.remove('low');
+  tLen = mode === 'chill' ? 1e9 : mode === 'rush' ? Math.max(2.5, 5 - i * 0.15) : Math.max(4, 8 - i * 0.2); tLeft = 1; $('tBar').parentNode.style.visibility = mode === 'chill' ? 'hidden' : ''; $('tBar').classList.remove('low');
   document.querySelectorAll('.bin').forEach((b) => { b.disabled = false; b.classList.remove('right', 'wrong'); });
   $('why').hidden = true; $('nextRow').hidden = true; $('item').classList.remove('pop'); void $('item').offsetWidth; $('item').classList.add('pop');
   $('sN').textContent = sorted; $('sL').textContent = heart(); $('sK').textContent = streak; $('pBar').style.width = (i / ROUND * 100) + '%';
@@ -257,11 +272,11 @@ function choose(id) {
 function next() { i++; if (lives <= 0 || i >= ROUND) return finish(); show(); window.scrollTo({ top: 0, behavior: A.reduced() ? 'auto' : 'smooth' }); }
 function finish() {
   live = false; cancelAnimationFrame(raf); document.body.classList.remove('playing'); $('play').hidden = true; $('end').hidden = false;
-  const isBest = A.saveBest('sort-it-out', sorted), n = A.plays('sort-it-out');
+  const isBest = A.saveBest(MODES[mode].slug, sorted), n = A.plays(MODES[mode].slug);
   $('eKick').textContent = lives > 0 ? 'All items sorted' : 'Out of lives';
   $('eScore').textContent = sorted + '/' + ROUND;
   $('eRank').textContent = sorted >= 19 ? 'Recycling champion' : sorted >= 15 ? 'Green thumb' : sorted >= 10 ? 'Getting the hang of it' : 'Keep sorting';
-  $('eBest').textContent = (isBest && n > 1 ? 'New best. ' : '') + 'Your best is ' + A.best('sort-it-out') + '/' + ROUND + '.';
+  $('eBest').textContent = (isBest && n > 1 ? 'New best. ' : '') + MODES[mode].n + ' mode. Your best is ' + A.best(MODES[mode].slug) + '/' + ROUND + '.';
   if (window.Toybox) Toybox.setResult('Sort It Out', sorted + '/' + ROUND);
   A.sfx.done(); window.scrollTo(0, 0);
 }
@@ -276,8 +291,10 @@ $('bStart').addEventListener('click', start); $('bAgain').addEventListener('clic
 $('bShare').addEventListener('click', () => window.Toybox && Toybox.share());
 document.addEventListener('keydown', (e) => { if ($('play').hidden) return; if (/^[1-7]$/.test(e.key) && live) choose(BINS[+e.key - 1].id); else if (e.key === 'Enter' && !live && !$('nextRow').hidden && document.activeElement !== $('bNext')) next(); });
 document.addEventListener('visibilitychange', () => { if (document.hidden && live) { tLeft = Math.min(1, tLeft + 0.0); } });
-(function () { const b = A.best('sort-it-out'); if (b) { const el = $('bestLine'); el.textContent = 'Your best so far: ' + b + '/' + ROUND; el.hidden = false; } })();
-window.__so = { info: () => ({ cur, i, sorted, lives, live }), choose };
+function setMode(m) { mode = m; document.querySelectorAll('[data-mode]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.mode === m)); const b = A.best(MODES[m].slug), el = $('bestLine'); el.textContent = b ? 'Your best in ' + MODES[m].n + ' mode: ' + b + '/' + ROUND : ''; el.hidden = !b; A.store.set('aware.sort-it-out.mode', m); }
+document.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.mode)));
+(function () { const m = A.store.get('aware.sort-it-out.mode', 'normal'); setMode(MODES[m] ? m : 'normal'); })();
+window.__so = { info: () => ({ cur, i, sorted, lives, live, mode }), choose };
 
 </script>
 </body>

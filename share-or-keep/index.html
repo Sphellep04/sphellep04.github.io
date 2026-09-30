@@ -224,7 +224,7 @@ const CFG = {
   slug: 'share-or-keep', kicker: 'Awareness · Privacy', title: 'Share or Keep',
   lede: 'Post it, or keep it to yourself?',
   how: 'Swipe left to <b style="color:var(--bad)">Keep private</b>, right if it is <b style="color:var(--good)">Safe to share</b>.',
-  leftLabel: 'Keep private', rightLabel: 'Safe to share', leftWord: 'Keep private', rightWord: 'Safe to share', keyL: 'k', keyR: 's', rounds: [6, 12], leftShare: 0.5,
+  leftLabel: 'Keep private', rightLabel: 'Safe to share', leftWord: 'Keep private', rightWord: 'Safe to share', keyL: 'k', keyR: 's', rounds: [6, 12, 20], count: 12, leftShare: 0.5,
   ranks: [[0.92, 'Privacy pro'], [0.75, 'Careful sharer'], [0.5, 'Think twice'], [0, 'Oversharing alert']],
   remember: [['Ask three questions.', 'Does it show where I am, who I am or private details? Would I be fine with a stranger seeing it? Could it hurt someone else?'], ['Check your settings.', 'Make accounts private where you can and turn off location tags on photos.'], ['Ask before you post others.', 'Get permission before sharing photos or private messages that include someone else.'], ['Remember: online is forever.', 'Even deleted posts can be screenshotted, so pause before you post.']],
   gloss: [['Location tag', 'Extra information in a post or photo that shows where it was taken.'], ['Digital footprint', 'The trail of things you post, like and share, which others can find.'], ['Doxxing', 'Sharing someone\'s private details, like their address, to harass them.']]
@@ -252,7 +252,23 @@ const DECK = [
   { ch: 'Post idea', from: 'Music', text: 'Your favourite playlist.', a: 'R', flags: [], why: 'It is about what you like, not who or where you are.' },
   { ch: 'Post idea', from: 'Business', text: 'A photo of your handmade crafts on your business page, with your business phone number and not your home address.', a: 'R', flags: [], why: 'Business details are meant to be public. Keep a separate business number and never list your home address.' },
   { ch: 'Post idea', from: 'Learning', text: 'A status sharing three tips to spot scams.', a: 'R', flags: [], why: 'Helping others stay safe is a great use of your voice.' },
-  { ch: 'Post idea', from: 'Achievement', text: 'A photo of your graduation cap in the air, taken with friends who are happy to be in it.', a: 'R', flags: [], why: 'Everyone is happy to share and nothing sensitive is shown. Celebrate away.' }
+  { ch: 'Post idea', from: 'Achievement', text: 'A photo of your graduation cap in the air, taken with friends who are happy to be in it.', a: 'R', flags: [], why: 'Everyone is happy to share and nothing sensitive is shown. Celebrate away.' },
+
+  { ch: 'Post idea', from: 'Photo', text: 'A photo of your front gate with your house number and your car\'s number plate in view.', a: 'L', flags: ['house number', 'number plate'], why: 'Together they tell a stranger exactly where you live and what you drive. Crop or skip it.' },
+  { ch: 'Post idea', from: 'Quiz', text: 'A "fun" quiz post that asks you to share your first pet\'s name, your mother\'s maiden name and the street you grew up on.', a: 'L', flags: ['first pet\'s name', 'mother\'s maiden name', 'street you grew up on'], why: 'Those are common security questions for accounts. Quizzes like this are a way to collect the answers.' },
+  { ch: 'Post idea', from: 'Location', text: 'Checking in live at the mall every time you visit, with a tag on the shop and the floor.', a: 'L', flags: ['live', 'every time you visit'], why: 'A pattern of live check-ins shows people where you are and where you will be again. Post afterwards, or keep it to close friends.' },
+  { ch: 'Post idea', from: 'Chat', text: 'Sending a photo of yourself to someone you met online last week because they asked.', a: 'L', flags: ['met online last week'], why: 'You cannot be sure who is on the other end, and photos can be saved and shared. Take it slowly with people you have only just met.' },
+  { ch: 'Post idea', from: 'Screenshot', text: 'Posting a screenshot of a group chat where a classmate said something embarrassing.', a: 'L', flags: ['embarrassing'], why: 'It was said in a private space, and putting it out there could hurt them and get you in trouble. Think how you would feel.' },
+  { ch: 'Post idea', from: 'Delivery', text: 'A photo of a parcel with the shipping label still on it, showing your full name and address.', a: 'L', flags: ['shipping label', 'full name and address'], why: 'Labels carry your name, address and sometimes your phone number. Cover them or tear them off before posting.' },
+  { ch: 'Post idea', from: 'Wi-Fi', text: 'A photo of your router with the Wi-Fi name and password on the sticker, to show your new set-up.', a: 'L', flags: ['Wi-Fi name and password'], why: 'Anyone who sees it can join your network. Keep the sticker out of the shot.' },
+
+  { ch: 'Post idea', from: 'Art', text: 'A photo of a drawing you made, with no personal details in it.', a: 'R', flags: [], why: 'It is your own work and shows nothing private. Share and enjoy.' },
+  { ch: 'Post idea', from: 'Pets', text: 'A cute video of your dog in the garden, with no street signs or house numbers showing.', a: 'R', flags: [], why: 'Nothing in it gives away where you live. Pet videos are a fine thing to share.' },
+  { ch: 'Post idea', from: 'Hobby', text: 'A time-lapse of you baking a cake, posted to your public page.', a: 'R', flags: [], why: 'It shows your hobby and skill, not your private life. Just keep any kitchen documents or letters out of the shot.' },
+  { ch: 'Post idea', from: 'Group', text: 'Tagging friends in a group photo after checking that they are happy with it.', a: 'R', flags: [], why: 'You asked first. Respecting other people\'s wishes about photos is the right way to do it.' },
+  { ch: 'Post idea', from: 'Help', text: 'Reporting a rude comment on a friend\'s post and sending your friend a kind message.', a: 'R', flags: [], why: 'Standing up for others helps make the internet a nicer place. Reporting is better than replying in anger.' },
+  { ch: 'Post idea', from: 'Trip', text: 'A photo of a beach holiday, posted once you are home, with the location left out.', a: 'R', flags: [], why: 'You are home safe and the post does not say where you live or where you were. Good habits.' },
+  { ch: 'Post idea', from: 'Safety', text: 'Sharing a tip about turning on two-step login for your accounts.', a: 'R', flags: [], why: 'It helps others and gives away nothing about you. Sharing safety advice is a great use of your account.' }
 ];
 
 /* Generic swipe deck. Needs CFG and DECK from the toy's own file. */
