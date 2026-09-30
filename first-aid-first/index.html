@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="A first aid awareness game. Put the steps in the right order for six common emergencies.">
-<meta name="theme-color" content="#0b1d17">
+<meta name="theme-color" content="#fbf6ef">
 <title>First Aid First</title>
 <meta property="og:type" content="website">
 <meta property="og:title" content="First Aid First">
@@ -21,13 +21,14 @@
 <link rel="apple-touch-icon" href="img/favicon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600&family=DM+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&family=Nunito+Sans:wght@400;600;800&display=swap">
 <style>
 :root {
   --bg: #0a1622; --bg2: #10243a; --ink: #edf3fa; --mute: #9db2c8; --line: rgba(170, 200, 235, 0.22);
-  --card: rgba(255, 255, 255, 0.06); --acc: #ffcf4a; --acc-ink: #1a1400; --good: #4ad9a0; --bad: #ff6b7a;
+  --card: var(--wash); --acc: #ffcf4a; --acc-ink: #1a1400; --good: #4ad9a0; --bad: #ff6b7a;
   --display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
   --body: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --wash: rgba(255, 255, 255, 0.05); --track: rgba(255, 255, 255, 0.11); --radius: 12px; --shadow: 0 12px 30px rgba(0,0,0,0.35);
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -43,7 +44,7 @@ h2 { margin: 0; font: 600 1.5rem/1.15 var(--display); letter-spacing: -0.01em; t
 .stats { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 0; padding: 0; list-style: none; }
 .stats li { font: 500 13px/1 var(--body); padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--mute); font-variant-numeric: tabular-nums; }
 .stats b { color: var(--ink); font-weight: 600; }
-.bar { height: 6px; margin-top: 14px; border-radius: 999px; background: rgba(255, 255, 255, 0.10); overflow: hidden; }
+.bar { height: 6px; margin-top: 14px; border-radius: 999px; background: var(--track); overflow: hidden; }
 .bar > i { display: block; height: 100%; width: 0; background: var(--acc); border-radius: inherit; transition: width 0.35s ease; }
 .panel { margin-top: 20px; padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 22px; border: 0; border-radius: 12px; font: 600 16px/1 var(--body); color: var(--acc-ink); background: var(--acc); cursor: pointer; }
@@ -59,7 +60,7 @@ h2 { margin: 0; font: 600 1.5rem/1.15 var(--display); letter-spacing: -0.01em; t
 .opt.right { border-color: var(--good); background: rgba(74, 217, 160, 0.14); }
 .opt.wrong { border-color: var(--bad); background: rgba(255, 107, 122, 0.14); }
 .opt:disabled { cursor: default; }
-.why { margin-top: 16px; padding: 14px 16px; border-left: 4px solid var(--acc); border-radius: 4px 10px 10px 4px; background: rgba(255, 255, 255, 0.05); }
+.why { margin-top: 16px; padding: 14px 16px; border-left: 4px solid var(--acc); border-radius: 4px 10px 10px 4px; background: var(--wash); }
 .why.good { border-left-color: var(--good); } .why.bad { border-left-color: var(--bad); }
 .why p { margin: 0; } .why p + p { margin-top: 8px; }
 .why .tag { display: block; margin-bottom: 6px; font: 600 12px/1 var(--body); letter-spacing: 0.14em; text-transform: uppercase; }
@@ -68,7 +69,7 @@ h2 { margin: 0; font: 600 1.5rem/1.15 var(--display); letter-spacing: -0.01em; t
 .result .big { margin: 6px 0 0; font: 600 clamp(3rem, 14vw, 5rem)/1 var(--display); color: var(--acc); font-variant-numeric: tabular-nums; }
 .result .rank { margin: 8px 0 0; font: 600 1.3rem/1.2 var(--display); }
 .remember { margin: 18px 0 0; padding: 0; list-style: none; text-align: left; display: grid; gap: 10px; }
-.remember li { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255, 255, 255, 0.04); }
+.remember li { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--wash); }
 .remember b { color: var(--acc); }
 .note { margin: 18px 0 0; font-size: 13px; color: var(--mute); }
 .credit { margin: 32px 0 0; text-align: center; font-size: 13px; color: var(--mute); }
@@ -105,8 +106,31 @@ body.playing .top { padding-top: 56px; }
 html.tb-reduced .tile.no, html.tb-reduced .slots li { animation: none; }
 .stars { letter-spacing: 0.15em; color: var(--acc); }
 
+/* First Aid First: clean poster, red cross */
+:root { --bg: #fbf6ef; --bg2: #f4ebdf; --ink: #2a2321; --mute: #6d625c; --line: rgba(80, 40, 30, 0.16); --card: #ffffff; --acc: #d62839; --acc-ink: #ffffff; --good: #1f9d63; --bad: #d62839; --wash: rgba(80, 40, 30, 0.04); --track: rgba(80, 40, 30, 0.10); --display: "Nunito", "Trebuchet MS", system-ui, sans-serif; --body: "Nunito Sans", system-ui, "Segoe UI", sans-serif; --shadow: 0 8px 24px rgba(80, 40, 30, 0.10); color-scheme: light; }
+body { background: var(--bg); background-image: radial-gradient(circle at 100% 0, rgba(214, 40, 57, 0.08), transparent 45%); }
+html { background: #fbf6ef !important; }
+.top { padding-top: 64px; }
+.kicker { color: var(--acc); font-weight: 800; }
+h1 { font: 900 clamp(2.2rem, 10vw, 3.4rem)/1 var(--display); letter-spacing: -0.02em; display: flex; align-items: center; gap: 14px; }
+h1::before { content: ""; flex: 0 0 auto; width: 0.85em; height: 0.85em; border-radius: 10px; background: linear-gradient(var(--acc), var(--acc)) center / 62% 24% no-repeat, linear-gradient(var(--acc), var(--acc)) center / 24% 62% no-repeat, #fff; box-shadow: 0 0 0 3px var(--acc) inset; }
+h2 { font-weight: 900; }
+.panel { background: #fff; border: 0; border-radius: 20px; box-shadow: var(--shadow); }
+.btn { border-radius: 14px; font-weight: 800; }
+.btn.ghost { background: #fff; }
+.stats li { background: #fff; }
+.tile { background: #fff; border-radius: 14px; box-shadow: 0 2px 0 rgba(80, 40, 30, 0.08); }
+.slots li { background: #fdecee; border-color: var(--acc); border-radius: 14px; }
+.slots li.empty { background: transparent; border-color: var(--line); }
+.tile.hint { box-shadow: 0 0 0 3px rgba(214, 40, 57, 0.3); }
+.why { background: #fff; box-shadow: var(--shadow); }
+.remember li { background: #fff; }
+.stars { color: #e5a100; }
+.result .big { color: var(--acc); }
+.credit a { color: var(--acc); }
+
 </style>
-<style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #0b1d17; }</style>
+<style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #fbf6ef; }</style>
 <!-- toybox-shared -->
 <link rel="manifest" href="manifest.webmanifest">
 <script src="../toybox.js"></script>
@@ -116,12 +140,11 @@ html.tb-reduced .tile.no, html.tb-reduced .slots li { animation: none; }
   <header class="top">
     <p class="kicker">Awareness · First aid</p>
     <h1>First Aid First</h1>
-    <p class="lede">Ten common emergencies, six each round. Tap the steps in the right order and learn the myths to leave behind.</p>
+    <p class="lede">What would you do first? Put the steps in order.</p>
   </header>
 
   <section id="intro" class="panel">
-    <h2>How it works</h2>
-    <p class="note" style="margin-top:8px;font-size:15px">Each emergency gives you a set of shuffled steps. Tap them in the order you would do them. You earn up to three stars for each one. Wrong taps cost a star, and Hint shows you the next step.</p>
+    <p class="note" style="margin-top:8px;font-size:15px">Tap the steps in the order you would do them. Three stars each, and a wrong tap costs one.</p>
     <p class="note">This is awareness, not training. A hands-on first aid course teaches the real skills, and in an emergency call for help straight away.</p>
     <div class="row"><button class="btn" id="bStart" type="button">Start</button></div>
     <p class="note" id="bestLine" hidden></p>

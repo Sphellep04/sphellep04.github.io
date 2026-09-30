@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="A password awareness lab. Test a password privately, build a strong passphrase and learn how criminals guess.">
-<meta name="theme-color" content="#0d1424">
+<meta name="theme-color" content="#070a08">
 <title>Password Lab</title>
 <meta property="og:type" content="website">
 <meta property="og:title" content="Password Lab">
@@ -21,13 +21,14 @@
 <link rel="apple-touch-icon" href="img/favicon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600&family=DM+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&display=swap">
 <style>
 :root {
   --bg: #0a1622; --bg2: #10243a; --ink: #edf3fa; --mute: #9db2c8; --line: rgba(170, 200, 235, 0.22);
-  --card: rgba(255, 255, 255, 0.06); --acc: #ffcf4a; --acc-ink: #1a1400; --good: #4ad9a0; --bad: #ff6b7a;
+  --card: var(--wash); --acc: #ffcf4a; --acc-ink: #1a1400; --good: #4ad9a0; --bad: #ff6b7a;
   --display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
   --body: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --wash: rgba(255, 255, 255, 0.05); --track: rgba(255, 255, 255, 0.11); --radius: 12px; --shadow: 0 12px 30px rgba(0,0,0,0.35);
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -43,7 +44,7 @@ h2 { margin: 0; font: 600 1.5rem/1.15 var(--display); letter-spacing: -0.01em; t
 .stats { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 0; padding: 0; list-style: none; }
 .stats li { font: 500 13px/1 var(--body); padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--mute); font-variant-numeric: tabular-nums; }
 .stats b { color: var(--ink); font-weight: 600; }
-.bar { height: 6px; margin-top: 14px; border-radius: 999px; background: rgba(255, 255, 255, 0.10); overflow: hidden; }
+.bar { height: 6px; margin-top: 14px; border-radius: 999px; background: var(--track); overflow: hidden; }
 .bar > i { display: block; height: 100%; width: 0; background: var(--acc); border-radius: inherit; transition: width 0.35s ease; }
 .panel { margin-top: 20px; padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 22px; border: 0; border-radius: 12px; font: 600 16px/1 var(--body); color: var(--acc-ink); background: var(--acc); cursor: pointer; }
@@ -59,7 +60,7 @@ h2 { margin: 0; font: 600 1.5rem/1.15 var(--display); letter-spacing: -0.01em; t
 .opt.right { border-color: var(--good); background: rgba(74, 217, 160, 0.14); }
 .opt.wrong { border-color: var(--bad); background: rgba(255, 107, 122, 0.14); }
 .opt:disabled { cursor: default; }
-.why { margin-top: 16px; padding: 14px 16px; border-left: 4px solid var(--acc); border-radius: 4px 10px 10px 4px; background: rgba(255, 255, 255, 0.05); }
+.why { margin-top: 16px; padding: 14px 16px; border-left: 4px solid var(--acc); border-radius: 4px 10px 10px 4px; background: var(--wash); }
 .why.good { border-left-color: var(--good); } .why.bad { border-left-color: var(--bad); }
 .why p { margin: 0; } .why p + p { margin-top: 8px; }
 .why .tag { display: block; margin-bottom: 6px; font: 600 12px/1 var(--body); letter-spacing: 0.14em; text-transform: uppercase; }
@@ -68,7 +69,7 @@ h2 { margin: 0; font: 600 1.5rem/1.15 var(--display); letter-spacing: -0.01em; t
 .result .big { margin: 6px 0 0; font: 600 clamp(3rem, 14vw, 5rem)/1 var(--display); color: var(--acc); font-variant-numeric: tabular-nums; }
 .result .rank { margin: 8px 0 0; font: 600 1.3rem/1.2 var(--display); }
 .remember { margin: 18px 0 0; padding: 0; list-style: none; text-align: left; display: grid; gap: 10px; }
-.remember li { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255, 255, 255, 0.04); }
+.remember li { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--wash); }
 .remember b { color: var(--acc); }
 .note { margin: 18px 0 0; font-size: 13px; color: var(--mute); }
 .credit { margin: 32px 0 0; text-align: center; font-size: 13px; color: var(--mute); }
@@ -96,7 +97,7 @@ html.tb-reduced .pop { animation: none; } html.tb-reduced .bar > i { transition:
 .pwrow input:focus { outline: 3px solid var(--acc); outline-offset: 1px; border-color: var(--acc); }
 .pwrow .btn { min-height: 52px; padding: 0 16px; }
 .meter { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 14px; }
-.meter i { height: 8px; border-radius: 999px; background: rgba(255, 255, 255, 0.12); transition: background 0.2s; }
+.meter i { height: 8px; border-radius: 999px; background: var(--track); transition: background 0.2s; }
 .verdict { margin: 12px 0 0; font: 600 1.25rem/1.2 var(--display); }
 .crack { margin: 4px 0 0; color: var(--mute); }
 .checks { margin: 14px 0 0; padding: 0; list-style: none; display: grid; gap: 6px; }
@@ -109,8 +110,26 @@ html.tb-reduced .pop { animation: none; } html.tb-reduced .bar > i { transition:
 .seg button[aria-checked="true"] { border-color: var(--acc); background: rgba(99, 230, 194, 0.2); }
 .phrase { margin-top: 18px; padding: 16px; border: 1.5px dashed var(--acc); border-radius: 12px; font: 600 clamp(1.1rem, 5vw, 1.5rem)/1.4 ui-monospace, Menlo, Consolas, monospace; word-break: break-word; min-height: 4.4em; user-select: all; -webkit-user-select: all; }
 
+/* Password Lab: a green phosphor terminal */
+:root { --bg: #070a08; --bg2: #0d140f; --ink: #d4f7dc; --mute: #7fa98a; --line: rgba(57, 255, 136, 0.28); --card: rgba(57, 255, 136, 0.04); --acc: #39ff88; --acc-ink: #04140a; --good: #39ff88; --bad: #ff5f56; --display: "IBM Plex Mono", "Courier New", monospace; --body: "IBM Plex Mono", "Courier New", monospace; --glow1: rgba(57, 255, 136, 0.10); --glow2: rgba(57, 255, 136, 0.04); }
+body { background: repeating-linear-gradient(0deg, rgba(57, 255, 136, 0.035) 0 1px, transparent 1px 3px), radial-gradient(900px 500px at 50% 0, rgba(57, 255, 136, 0.10), transparent 60%), #070a08; font-size: 15px; }
+html { background: #070a08 !important; }
+h1 { font: 700 clamp(1.7rem, 8vw, 2.6rem)/1.1 var(--display); letter-spacing: 0; text-transform: none; text-shadow: 0 0 14px rgba(57, 255, 136, 0.45); }
+h1::before { content: "> "; color: var(--acc); }
+h1::after { content: "_"; animation: blink 1s steps(2) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { h1::after { animation: none; } }
+h2 { font: 700 1.1rem/1.2 var(--display); text-transform: uppercase; letter-spacing: 0.06em; }
+.kicker { letter-spacing: 0.1em; text-transform: none; } .kicker::before { content: "# "; }
+.panel, .btn, .stats li, .opt, .why, .search, .seg button, .remember li, input { border-radius: 0 !important; }
+.panel { border: 1px solid var(--line); background: rgba(57, 255, 136, 0.03); box-shadow: 0 0 0 1px rgba(57, 255, 136, 0.06) inset; }
+.btn { font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; font-size: 14px; }
+.btn.ghost { border-color: var(--line); color: var(--acc); }
+.result .big { text-shadow: 0 0 18px rgba(57, 255, 136, 0.5); }
+.credit a { color: var(--acc); }
+
 </style>
-<style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #0d1424; }</style>
+<style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #070a08; }</style>
 <!-- toybox-shared -->
 <link rel="manifest" href="manifest.webmanifest">
 <script src="../toybox.js"></script>
@@ -120,7 +139,7 @@ html.tb-reduced .pop { animation: none; } html.tb-reduced .bar > i { transition:
   <header class="top">
     <p class="kicker">Awareness · Passwords</p>
     <h1>Password Lab</h1>
-    <p class="lede">See how criminals guess passwords, test your habits in private, build a strong passphrase and check what you know.</p>
+    <p class="lede">Test a password, build a better one.</p>
   </header>
 
   <div class="tabs" role="tablist" aria-label="Password Lab sections">

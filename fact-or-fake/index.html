@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="A misinformation awareness game. Decide if each claim, post or headline checks out or is fake.">
-<meta name="theme-color" content="#101423">
+<meta name="theme-color" content="#f2ecdc">
 <title>Fact or Fake</title>
 <meta property="og:type" content="website">
 <meta property="og:title" content="Fact or Fake">
@@ -21,13 +21,14 @@
 <link rel="apple-touch-icon" href="img/favicon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600&family=DM+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Libre+Franklin:wght@400;600;800&display=swap">
 <style>
 :root {
   --bg: #0a1622; --bg2: #10243a; --ink: #edf3fa; --mute: #9db2c8; --line: rgba(170, 200, 235, 0.22);
-  --card: rgba(255, 255, 255, 0.06); --acc: #ffcf4a; --acc-ink: #1a1400; --good: #4ad9a0; --bad: #ff6b7a;
+  --card: var(--wash); --acc: #ffcf4a; --acc-ink: #1a1400; --good: #4ad9a0; --bad: #ff6b7a;
   --display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
   --body: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --wash: rgba(255, 255, 255, 0.05); --track: rgba(255, 255, 255, 0.11); --radius: 12px; --shadow: 0 12px 30px rgba(0,0,0,0.35);
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -43,7 +44,7 @@ h2 { margin: 0; font: 600 1.5rem/1.15 var(--display); letter-spacing: -0.01em; t
 .stats { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 0; padding: 0; list-style: none; }
 .stats li { font: 500 13px/1 var(--body); padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--mute); font-variant-numeric: tabular-nums; }
 .stats b { color: var(--ink); font-weight: 600; }
-.bar { height: 6px; margin-top: 14px; border-radius: 999px; background: rgba(255, 255, 255, 0.10); overflow: hidden; }
+.bar { height: 6px; margin-top: 14px; border-radius: 999px; background: var(--track); overflow: hidden; }
 .bar > i { display: block; height: 100%; width: 0; background: var(--acc); border-radius: inherit; transition: width 0.35s ease; }
 .panel { margin-top: 20px; padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 22px; border: 0; border-radius: 12px; font: 600 16px/1 var(--body); color: var(--acc-ink); background: var(--acc); cursor: pointer; }
@@ -59,7 +60,7 @@ h2 { margin: 0; font: 600 1.5rem/1.15 var(--display); letter-spacing: -0.01em; t
 .opt.right { border-color: var(--good); background: rgba(74, 217, 160, 0.14); }
 .opt.wrong { border-color: var(--bad); background: rgba(255, 107, 122, 0.14); }
 .opt:disabled { cursor: default; }
-.why { margin-top: 16px; padding: 14px 16px; border-left: 4px solid var(--acc); border-radius: 4px 10px 10px 4px; background: rgba(255, 255, 255, 0.05); }
+.why { margin-top: 16px; padding: 14px 16px; border-left: 4px solid var(--acc); border-radius: 4px 10px 10px 4px; background: var(--wash); }
 .why.good { border-left-color: var(--good); } .why.bad { border-left-color: var(--bad); }
 .why p { margin: 0; } .why p + p { margin-top: 8px; }
 .why .tag { display: block; margin-bottom: 6px; font: 600 12px/1 var(--body); letter-spacing: 0.14em; text-transform: uppercase; }
@@ -68,7 +69,7 @@ h2 { margin: 0; font: 600 1.5rem/1.15 var(--display); letter-spacing: -0.01em; t
 .result .big { margin: 6px 0 0; font: 600 clamp(3rem, 14vw, 5rem)/1 var(--display); color: var(--acc); font-variant-numeric: tabular-nums; }
 .result .rank { margin: 8px 0 0; font: 600 1.3rem/1.2 var(--display); }
 .remember { margin: 18px 0 0; padding: 0; list-style: none; text-align: left; display: grid; gap: 10px; }
-.remember li { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255, 255, 255, 0.04); }
+.remember li { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--wash); }
 .remember b { color: var(--acc); }
 .note { margin: 18px 0 0; font-size: 13px; color: var(--mute); }
 .credit { margin: 32px 0 0; text-align: center; font-size: 13px; color: var(--mute); }
@@ -86,7 +87,7 @@ html.tb-reduced .pop { animation: none; } html.tb-reduced .bar > i { transition:
 }
 
 .msgwrap { margin-top: 18px; perspective: 800px; touch-action: pan-y; }
-.msg { position: relative; padding: 16px 16px 18px; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05)); box-shadow: 0 12px 30px rgba(0,0,0,0.35); cursor: grab; user-select: none; -webkit-user-select: none; touch-action: pan-y; will-change: transform; transition: transform 0.25s ease, border-color 0.2s ease; }
+.msg { position: relative; padding: 16px 16px 18px; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(180deg, var(--track), var(--wash)); box-shadow: 0 12px 30px rgba(0,0,0,0.35); cursor: grab; user-select: none; -webkit-user-select: none; touch-action: pan-y; will-change: transform; transition: transform 0.25s ease, border-color 0.2s ease; }
 .msg.drag { transition: none; cursor: grabbing; }
 .msg.left { border-color: var(--bad); } .msg.right { border-color: var(--good); }
 .msg .meta { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mute); }
@@ -106,7 +107,7 @@ body.playing .top { padding-top: 56px; }
 .lens { display: flex; gap: 8px; margin-top: 10px; }
 .lens button { flex: 1 1 0; min-height: 48px; padding: 8px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink); font: 600 15px/1.2 var(--body); cursor: pointer; }
 .lens button:hover { border-color: var(--acc); }
-.lens button[aria-checked="true"] { border-color: var(--acc); background: rgba(255, 255, 255, 0.12); }
+.lens button[aria-checked="true"] { border-color: var(--acc); background: var(--track); }
 .lens button:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
 .gloss { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 12px; }
 .gloss summary { cursor: pointer; font-weight: 600; color: var(--acc); }
@@ -116,8 +117,38 @@ body.playing .top { padding-top: 56px; }
 
 :root { --bg: #101423; --bg2: #1d2440; --acc: #8fb4ff; --acc-ink: #06122e; --glow1: rgba(143, 180, 255, 0.12); --glow2: rgba(255, 107, 122, 0.07); }
 
+/* Fact or Fake: newspaper clippings and rubber stamps */
+:root { --bg: #f2ecdc; --bg2: #e8e0c9; --ink: #1c1a16; --mute: #5e584a; --line: rgba(28, 26, 22, 0.55); --card: #fbf8ef; --acc: #b3261e; --acc-ink: #fff8ef; --good: #1f6b3a; --bad: #b3261e; --wash: rgba(28, 26, 22, 0.05); --track: rgba(28, 26, 22, 0.14); --display: "Playfair Display", Georgia, "Times New Roman", serif; --body: "Libre Franklin", "Helvetica Neue", Arial, sans-serif; color-scheme: light; --shadow: 3px 3px 0 rgba(28,26,22,0.85); }
+html { background: #f2ecdc !important; }
+body { background: repeating-linear-gradient(0deg, rgba(0,0,0,0.018) 0 2px, transparent 2px 4px), #f2ecdc; }
+.top { padding-top: 64px; text-align: center; border-bottom: 4px double var(--ink); padding-bottom: 14px; }
+.kicker { color: var(--ink); letter-spacing: 0.3em; font-weight: 700; }
+h1 { font: 900 clamp(2.4rem, 11vw, 3.8rem)/0.95 var(--display); }
+.lede { margin-left: auto; margin-right: auto; font-family: var(--display); font-style: italic; }
+h2 { font-family: var(--display); font-weight: 900; }
+.panel { border-radius: 0; background: var(--card); border: 1.5px solid var(--ink); box-shadow: var(--shadow); }
+.btn { border-radius: 0; text-transform: uppercase; letter-spacing: 0.08em; font-size: 14px; font-weight: 800; border: 1.5px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); }
+.btn:active { transform: translate(2px, 2px); box-shadow: none; }
+.btn.ghost { background: var(--card); }
+.stats li { border-radius: 0; border-color: var(--ink); background: var(--card); text-transform: uppercase; letter-spacing: 0.06em; font-size: 12px; }
+.bar { border-radius: 0; border: 1px solid var(--ink); background: transparent; height: 8px; } .bar > i { border-radius: 0; background: var(--ink); }
+.msg { border-radius: 0; background: var(--card); border: 1.5px solid var(--ink); box-shadow: var(--shadow); }
+.msg .from { font-family: var(--display); font-weight: 900; font-size: 1.25rem; }
+.msg .text { font-family: var(--display); font-size: 1.1rem; line-height: 1.5; }
+.msg .meta { border-bottom: 1px solid var(--ink); padding-bottom: 6px; }
+.msg mark { background: rgba(179, 38, 30, 0.14); box-shadow: 0 -2px 0 rgba(179, 38, 30, 0.6) inset; color: inherit; border-radius: 0; }
+.msg .verdict { border: 3px solid currentColor; background: transparent !important; border-radius: 4px; font-size: 15px; padding: 5px 9px; transform: rotate(-9deg); opacity: 0; }
+.msg.answered .verdict { opacity: 0.92; }
+.msg.isL .verdict { color: var(--bad); } .msg.isR .verdict { color: var(--good); }
+.dec.bad, .dec.good { border: 1.5px solid var(--ink); color: #fff8ef; } .dec.good { background: var(--good); }
+.why { border-radius: 0; background: var(--card); border: 1.5px solid var(--ink); border-left-width: 6px; }
+.remember li, .lens button, .chips button, .opt { border-radius: 0; background: var(--card); border-color: var(--ink); }
+.lens button[aria-checked="true"], .chips button[aria-checked="true"] { background: var(--ink); color: var(--card); }
+.result .big { font-family: var(--display); color: var(--acc); }
+.credit a { color: var(--acc); }
+
 </style>
-<style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #101423; }</style>
+<style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #f2ecdc; }</style>
 <!-- toybox-shared -->
 <link rel="manifest" href="manifest.webmanifest">
 <script src="../toybox.js"></script>
@@ -131,7 +162,6 @@ body.playing .top { padding-top: 56px; }
   </header>
 
   <section id="intro" class="panel">
-    <h2>How it works</h2>
     <p class="note" id="how" style="margin-top:8px;font-size:15px;color:var(--mute)"></p>
     <h2 style="margin-top:20px;font-size:1.15rem">Round length</h2>
     <div class="lens" id="lens" role="radiogroup" aria-label="Round length"></div>
@@ -198,8 +228,8 @@ const A = (() => {
 
 const CFG = {
   slug: 'fact-or-fake', kicker: 'Awareness · Misinformation', title: 'Fact or Fake',
-  lede: 'Rumours travel faster than facts. Look at each post, photo or headline and decide whether it checks out or is fake.',
-  how: 'Swipe left for <b style="color:var(--bad)">Fake</b>, right for <b style="color:var(--good)">Checks out</b>. Look for who posted it, when, and whether anyone else reliable reports it. The examples are made up.',
+  lede: 'Rumours move faster than facts.',
+  how: 'Swipe left for <b style="color:var(--bad)">Fake</b>, right for <b style="color:var(--good)">Checks out</b>. The posts are made up.',
   leftLabel: 'Fake', rightLabel: 'Checks out', leftWord: 'Fake', rightWord: 'Checks out', keyL: 'f', keyR: 'c', rounds: [6, 12], leftShare: 0.5,
   ranks: [[0.92, 'Fact checker'], [0.75, 'Careful reader'], [0.5, 'Learning to pause'], [0, 'Check before you share']],
   remember: [['Check the source.', 'Who posted it? Is it a known, verified account or site, or something new with few followers?'], ['Check the date.', 'Old stories and photos are often shared again as if they just happened.'], ['See who else reports it.', 'Real news usually appears in more than one trustworthy place.'], ['Pause before you share.', 'Fear, anger and "forward to everyone" are signs a message wants to spread, not to inform.']],
@@ -232,18 +262,25 @@ const DECK = [
 ];
 
 /* Generic swipe deck. Needs CFG and DECK from the toy's own file. */
-let deck = [], i = 0, score = 0, streak = 0, answered = false, cur = null, ROUND = CFG.rounds[CFG.rounds.length - 1];
+let deck = [], i = 0, score = 0, streak = 0, answered = false, cur = null, ROUND = CFG.count || CFG.rounds[CFG.rounds.length - 1];
 const msg = A.$('msg'), $ = A.$;
-const MAXLEN = CFG.rounds[CFG.rounds.length - 1];
+const MAXLEN = CFG.count || CFG.rounds[CFG.rounds.length - 1];
 $('kick').textContent = CFG.kicker; $('ttl').textContent = CFG.title; $('lede').textContent = CFG.lede; $('how').innerHTML = CFG.how;
 $('bLeft').innerHTML = '&larr; ' + A.esc(CFG.leftLabel); $('bRight').innerHTML = A.esc(CFG.rightLabel) + ' &rarr;';
 $('bLeft').setAttribute('aria-keyshortcuts', 'ArrowLeft'); $('bRight').setAttribute('aria-keyshortcuts', 'ArrowRight');
 $('remember').innerHTML = CFG.remember.map((r) => '<li><b>' + A.esc(r[0]) + '</b> ' + A.esc(r[1]) + '</li>').join('');
 if (CFG.foot) { $('foot').innerHTML = CFG.foot; $('foot').hidden = false; }
-if (CFG.gloss && CFG.gloss.length) { $('glossList').innerHTML = CFG.gloss.map((g) => '<dt>' + A.esc(g[0]) + '</dt><dd>' + A.esc(g[1]) + '</dd>').join(''); $('gloss').hidden = false; }
+if (CFG.gloss && CFG.gloss.length && $('glossList')) { $('glossList').innerHTML = CFG.gloss.map((g) => '<dt>' + A.esc(g[0]) + '</dt><dd>' + A.esc(g[1]) + '</dd>').join(''); $('gloss').hidden = false; }
 let chosen = +A.store.get('aware.' + CFG.slug + '.len', MAXLEN); if (CFG.rounds.indexOf(chosen) < 0) chosen = MAXLEN;
 function drawLens() { $('lens').innerHTML = CFG.rounds.map((n) => '<button type="button" role="radio" data-n="' + n + '" aria-checked="' + (n === chosen) + '">' + n + ' cards' + (n === MAXLEN ? ' (counts for best)' : '') + '</button>').join(''); $('lens').querySelectorAll('button').forEach((b) => b.addEventListener('click', () => { chosen = +b.dataset.n; A.store.set('aware.' + CFG.slug + '.len', String(chosen)); drawLens(); })); }
 drawLens();
+let topic = 'all';
+if (CFG.topics && $('topics')) {
+  const cnt = (k) => DECK.filter((c) => k === 'all' || c.t === k).length;
+  topic = A.store.get('aware.' + CFG.slug + '.topic', 'all'); if (!CFG.topics.some((t) => t[0] === topic)) topic = 'all';
+  const drawTopics = () => { $('topics').innerHTML = CFG.topics.map((t) => '<button type="button" role="radio" data-k="' + t[0] + '" aria-checked="' + (t[0] === topic) + '">' + A.esc(t[1]) + ' <small>' + cnt(t[0]) + '</small></button>').join(''); $('topics').querySelectorAll('button').forEach((b) => b.addEventListener('click', () => { topic = b.dataset.k; A.store.set('aware.' + CFG.slug + '.topic', topic); drawTopics(); })); };
+  drawTopics(); $('topicWrap').hidden = false;
+}
 
 function hi(text, flags) { let out = A.esc(text); for (const f of flags || []) { const e = A.esc(f); out = out.split(e).join('<mark>' + e + '</mark>'); } return out; }
 function show() {
@@ -271,17 +308,18 @@ function answer(sayLeft) {
 function next() { if (!answered) return; i++; if (i >= ROUND) return finish(); show(); window.scrollTo({ top: 0, behavior: A.reduced() ? 'auto' : 'smooth' }); }
 function finish() {
   document.body.classList.remove('playing'); $('play').hidden = true; $('end').hidden = false;
-  const full = ROUND === MAXLEN, isBest = full && A.saveBest(CFG.slug, score), n = A.plays(CFG.slug);
+  const full = ROUND === MAXLEN && topic === 'all', isBest = full && A.saveBest(CFG.slug, score), n = A.plays(CFG.slug);
   $('eScore').textContent = score + '/' + ROUND;
   const pct = score / ROUND; let rank = CFG.ranks[CFG.ranks.length - 1][1]; for (const r of CFG.ranks) if (pct >= r[0]) { rank = r[1]; break; }
   $('eRank').textContent = rank;
-  $('eBest').textContent = full ? ((isBest && n > 1 ? 'New best. ' : '') + 'Your best is ' + A.best(CFG.slug) + '/' + MAXLEN + '.') : 'Short rounds do not count towards your best. Try the full round.';
+  $('eBest').textContent = full ? ((isBest && n > 1 ? 'New best. ' : '') + 'Your best is ' + A.best(CFG.slug) + '/' + MAXLEN + '.') : 'Short and single-topic rounds do not count towards your best. Try the full mixed round.';
   if (window.Toybox) Toybox.setResult(CFG.title, score + '/' + ROUND);
   A.sfx.done(); window.scrollTo(0, 0);
 }
 function start() {
-  ROUND = chosen; const L = A.shuffle(DECK.filter((c) => c.a === 'L')), R = A.shuffle(DECK.filter((c) => c.a === 'R'));
-  const nl = Math.min(L.length, Math.round(ROUND * (CFG.leftShare || 0.5))), nr = Math.min(R.length, ROUND - nl);
+  ROUND = chosen; const pool = DECK.filter((c) => topic === 'all' || c.t === topic), L = A.shuffle(pool.filter((c) => c.a === 'L')), R = A.shuffle(pool.filter((c) => c.a === 'R'));
+  let nl = Math.min(L.length, Math.round(ROUND * (CFG.leftShare || 0.5))), nr = Math.min(R.length, ROUND - nl);
+  if (nl + nr < ROUND) nl = Math.min(L.length, ROUND - nr);
   deck = A.shuffle(L.slice(0, nl).concat(R.slice(0, nr))); ROUND = deck.length; i = 0; score = 0; streak = 0;
   document.body.classList.add('playing'); $('intro').hidden = true; $('end').hidden = true; $('play').hidden = false; show(); A.audio();
 }

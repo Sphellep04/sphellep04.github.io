@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="A calm breathing pacer with short stress awareness tips. Pick a rhythm and follow the glow.">
-<meta name="theme-color" content="#150f2b">
+<meta name="theme-color" content="#1c1530">
 <title>Breathe Easy</title>
 <meta property="og:type" content="website">
 <meta property="og:title" content="Breathe Easy">
@@ -21,13 +21,14 @@
 <link rel="apple-touch-icon" href="img/favicon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600&family=DM+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;1,300&family=Karla:wght@400;500&display=swap">
 <style>
 :root {
   --bg: #0a1622; --bg2: #10243a; --ink: #edf3fa; --mute: #9db2c8; --line: rgba(170, 200, 235, 0.22);
-  --card: rgba(255, 255, 255, 0.06); --acc: #ffcf4a; --acc-ink: #1a1400; --good: #4ad9a0; --bad: #ff6b7a;
+  --card: var(--wash); --acc: #ffcf4a; --acc-ink: #1a1400; --good: #4ad9a0; --bad: #ff6b7a;
   --display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
   --body: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --wash: rgba(255, 255, 255, 0.05); --track: rgba(255, 255, 255, 0.11); --radius: 12px; --shadow: 0 12px 30px rgba(0,0,0,0.35);
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -43,7 +44,7 @@ h2 { margin: 0; font: 600 1.5rem/1.15 var(--display); letter-spacing: -0.01em; t
 .stats { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 0; padding: 0; list-style: none; }
 .stats li { font: 500 13px/1 var(--body); padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--mute); font-variant-numeric: tabular-nums; }
 .stats b { color: var(--ink); font-weight: 600; }
-.bar { height: 6px; margin-top: 14px; border-radius: 999px; background: rgba(255, 255, 255, 0.10); overflow: hidden; }
+.bar { height: 6px; margin-top: 14px; border-radius: 999px; background: var(--track); overflow: hidden; }
 .bar > i { display: block; height: 100%; width: 0; background: var(--acc); border-radius: inherit; transition: width 0.35s ease; }
 .panel { margin-top: 20px; padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 22px; border: 0; border-radius: 12px; font: 600 16px/1 var(--body); color: var(--acc-ink); background: var(--acc); cursor: pointer; }
@@ -59,7 +60,7 @@ h2 { margin: 0; font: 600 1.5rem/1.15 var(--display); letter-spacing: -0.01em; t
 .opt.right { border-color: var(--good); background: rgba(74, 217, 160, 0.14); }
 .opt.wrong { border-color: var(--bad); background: rgba(255, 107, 122, 0.14); }
 .opt:disabled { cursor: default; }
-.why { margin-top: 16px; padding: 14px 16px; border-left: 4px solid var(--acc); border-radius: 4px 10px 10px 4px; background: rgba(255, 255, 255, 0.05); }
+.why { margin-top: 16px; padding: 14px 16px; border-left: 4px solid var(--acc); border-radius: 4px 10px 10px 4px; background: var(--wash); }
 .why.good { border-left-color: var(--good); } .why.bad { border-left-color: var(--bad); }
 .why p { margin: 0; } .why p + p { margin-top: 8px; }
 .why .tag { display: block; margin-bottom: 6px; font: 600 12px/1 var(--body); letter-spacing: 0.14em; text-transform: uppercase; }
@@ -68,7 +69,7 @@ h2 { margin: 0; font: 600 1.5rem/1.15 var(--display); letter-spacing: -0.01em; t
 .result .big { margin: 6px 0 0; font: 600 clamp(3rem, 14vw, 5rem)/1 var(--display); color: var(--acc); font-variant-numeric: tabular-nums; }
 .result .rank { margin: 8px 0 0; font: 600 1.3rem/1.2 var(--display); }
 .remember { margin: 18px 0 0; padding: 0; list-style: none; text-align: left; display: grid; gap: 10px; }
-.remember li { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255, 255, 255, 0.04); }
+.remember li { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--wash); }
 .remember b { color: var(--acc); }
 .note { margin: 18px 0 0; font-size: 13px; color: var(--mute); }
 .credit { margin: 32px 0 0; text-align: center; font-size: 13px; color: var(--mute); }
@@ -107,8 +108,21 @@ body.playing .top { padding-top: 56px; }
 .cue span { margin-top: 4px; font: 600 clamp(2rem, 9vw, 3rem)/1 var(--display); font-variant-numeric: tabular-nums; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5); }
 #scaleBefore .chip, #scaleAfter .chip { flex: 1 1 0; min-width: 0; padding: 8px 2px; }
 
+/* Breathe Easy: quiet dusk, serif type, no boxes */
+:root { --bg: #1c1530; --bg2: #3a2456; --ink: #f6eefc; --mute: #c3b3d8; --line: rgba(246, 238, 252, 0.16); --card: rgba(255, 255, 255, 0.05); --acc: #f2b8a2; --acc-ink: #2a1526; --glow1: rgba(242, 184, 162, 0.16); --glow2: rgba(150, 120, 255, 0.16); --display: "Fraunces", Georgia, "Times New Roman", serif; --body: "Karla", system-ui, "Segoe UI", sans-serif; }
+body { background: radial-gradient(900px 600px at 50% -10%, rgba(242, 184, 162, 0.22), transparent 60%), linear-gradient(180deg, #2a1c47, #1c1530 70%); }
+.top { text-align: center; padding-top: 70px; } .lede { margin-left: auto; margin-right: auto; }
+h1 { font: 300 clamp(2.4rem, 11vw, 3.6rem)/1.05 var(--display); font-style: italic; letter-spacing: -0.01em; }
+h2 { font: 400 1.4rem/1.2 var(--display); }
+.kicker { letter-spacing: 0.3em; color: var(--acc); }
+.panel { background: transparent; border: 0; border-top: 1px solid var(--line); border-radius: 0; padding: 22px 0; }
+.btn { border-radius: 999px; padding: 0 30px; font-weight: 500; letter-spacing: 0.03em; }
+.btn.ghost { border-color: var(--line); }
+.result .big { font-weight: 300; }
+.credit a { color: var(--acc); }
+
 </style>
-<style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #150f2b; }</style>
+<style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #1c1530; }</style>
 <!-- toybox-shared -->
 <link rel="manifest" href="manifest.webmanifest">
 <script src="../toybox.js"></script>
@@ -118,7 +132,7 @@ body.playing .top { padding-top: 56px; }
   <header class="top">
     <p class="kicker">Awareness · Stress and calm</p>
     <h1>Breathe Easy</h1>
-    <p class="lede">A gentle breathing pacer. Pick a rhythm, follow the glow, and finish with a short tip about looking after your mind.</p>
+    <p class="lede">Follow the glow. Breathe in, breathe out.</p>
   </header>
 
   <section id="intro" class="panel">

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="A road safety awareness game. Ten everyday driving and walking situations, one safe choice each.">
-<meta name="theme-color" content="#12151d">
+<meta name="theme-color" content="#17191e">
 <title>Road Ready</title>
 <meta property="og:type" content="website">
 <meta property="og:title" content="Road Ready">
@@ -21,13 +21,14 @@
 <link rel="apple-touch-icon" href="img/favicon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600&family=DM+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
 <style>
 :root {
   --bg: #0a1622; --bg2: #10243a; --ink: #edf3fa; --mute: #9db2c8; --line: rgba(170, 200, 235, 0.22);
-  --card: rgba(255, 255, 255, 0.06); --acc: #ffcf4a; --acc-ink: #1a1400; --good: #4ad9a0; --bad: #ff6b7a;
+  --card: var(--wash); --acc: #ffcf4a; --acc-ink: #1a1400; --good: #4ad9a0; --bad: #ff6b7a;
   --display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
   --body: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --wash: rgba(255, 255, 255, 0.05); --track: rgba(255, 255, 255, 0.11); --radius: 12px; --shadow: 0 12px 30px rgba(0,0,0,0.35);
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -43,7 +44,7 @@ h2 { margin: 0; font: 600 1.5rem/1.15 var(--display); letter-spacing: -0.01em; t
 .stats { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 0; padding: 0; list-style: none; }
 .stats li { font: 500 13px/1 var(--body); padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--mute); font-variant-numeric: tabular-nums; }
 .stats b { color: var(--ink); font-weight: 600; }
-.bar { height: 6px; margin-top: 14px; border-radius: 999px; background: rgba(255, 255, 255, 0.10); overflow: hidden; }
+.bar { height: 6px; margin-top: 14px; border-radius: 999px; background: var(--track); overflow: hidden; }
 .bar > i { display: block; height: 100%; width: 0; background: var(--acc); border-radius: inherit; transition: width 0.35s ease; }
 .panel { margin-top: 20px; padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 22px; border: 0; border-radius: 12px; font: 600 16px/1 var(--body); color: var(--acc-ink); background: var(--acc); cursor: pointer; }
@@ -59,7 +60,7 @@ h2 { margin: 0; font: 600 1.5rem/1.15 var(--display); letter-spacing: -0.01em; t
 .opt.right { border-color: var(--good); background: rgba(74, 217, 160, 0.14); }
 .opt.wrong { border-color: var(--bad); background: rgba(255, 107, 122, 0.14); }
 .opt:disabled { cursor: default; }
-.why { margin-top: 16px; padding: 14px 16px; border-left: 4px solid var(--acc); border-radius: 4px 10px 10px 4px; background: rgba(255, 255, 255, 0.05); }
+.why { margin-top: 16px; padding: 14px 16px; border-left: 4px solid var(--acc); border-radius: 4px 10px 10px 4px; background: var(--wash); }
 .why.good { border-left-color: var(--good); } .why.bad { border-left-color: var(--bad); }
 .why p { margin: 0; } .why p + p { margin-top: 8px; }
 .why .tag { display: block; margin-bottom: 6px; font: 600 12px/1 var(--body); letter-spacing: 0.14em; text-transform: uppercase; }
@@ -68,7 +69,7 @@ h2 { margin: 0; font: 600 1.5rem/1.15 var(--display); letter-spacing: -0.01em; t
 .result .big { margin: 6px 0 0; font: 600 clamp(3rem, 14vw, 5rem)/1 var(--display); color: var(--acc); font-variant-numeric: tabular-nums; }
 .result .rank { margin: 8px 0 0; font: 600 1.3rem/1.2 var(--display); }
 .remember { margin: 18px 0 0; padding: 0; list-style: none; text-align: left; display: grid; gap: 10px; }
-.remember li { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255, 255, 255, 0.04); }
+.remember li { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--wash); }
 .remember b { color: var(--acc); }
 .note { margin: 18px 0 0; font-size: 13px; color: var(--mute); }
 .credit { margin: 32px 0 0; text-align: center; font-size: 13px; color: var(--mute); }
@@ -105,8 +106,51 @@ body.playing .top { padding-top: 56px; }
 .xtot { font-size: 18px; margin: 6px 0; }
 body.playing #explorer { display: none; }
 
+.dt { margin-top: 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
+.dt summary { cursor: pointer; padding: 14px 16px; font-weight: 600; color: var(--acc); }
+.dt[open] summary { border-bottom: 1px solid var(--line); }
+.dt p, .dt ul { margin: 0; padding: 12px 16px 0; color: var(--mute); font-size: 15px; } .dt ul { padding-left: 34px; } .dt li { margin-top: 6px; }
+.dt b { color: var(--ink); } .dt .src { padding-bottom: 14px; font-size: 13px; } .dt a { color: var(--ink); }
+.mini { margin: 18px 0 8px; font: 600 12px/1 var(--body); letter-spacing: 0.14em; text-transform: uppercase; color: var(--mute); }
+.slots { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; counter-reset: s; }
+.slots li { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border: 1px solid var(--acc); border-radius: 12px; background: rgba(255, 176, 32, 0.10); }
+.slots li::before { counter-increment: s; content: counter(s); flex: 0 0 26px; height: 26px; border-radius: 50%; background: var(--acc); color: var(--acc-ink); font: 700 14px/26px var(--body); text-align: center; }
+.slots li.empty { border-style: dashed; border-color: var(--line); background: transparent; color: var(--mute); }
+.slots li.empty::before { background: transparent; border: 1px solid var(--line); color: var(--mute); line-height: 24px; }
+.pool { display: grid; gap: 8px; }
+.tile { text-align: left; padding: 13px 14px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink); font: 500 16px/1.4 var(--body); cursor: pointer; }
+.tile:hover { border-color: var(--acc); } .tile:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+.tile.no { border-color: var(--bad); background: rgba(255, 107, 122, 0.16); animation: shk 0.3s; }
+.tile.hint { border-color: var(--acc); box-shadow: 0 0 0 3px rgba(255, 176, 32, 0.35); }
+@keyframes shk { 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+@media (prefers-reduced-motion: reduce) { .tile.no { animation: none; } }
+html.tb-reduced .tile.no { animation: none; }
+.stars { letter-spacing: 0.15em; color: var(--acc); }
+body.playing #system, body.playing #drillbox { display: none; }
+
+/* Road Ready: asphalt, road-sign yellow, hazard stripes */
+:root { --bg: #17191e; --bg2: #22252c; --ink: #f4f1e6; --mute: #b3b0a4; --line: rgba(255, 213, 51, 0.28); --card: #1f2229; --acc: #ffd533; --acc-ink: #17191e; --good: #58d68d; --bad: #ff5d4d; --display: "Barlow Condensed", "Arial Narrow", Impact, sans-serif; --body: "Barlow", system-ui, "Segoe UI", sans-serif; --radius: 4px; }
+body { background: var(--bg); background-image: linear-gradient(180deg, #17191e, #101216); }
+.top { padding-top: 64px; border-bottom: 6px solid transparent; border-image: repeating-linear-gradient(-45deg, #ffd533 0 14px, #17191e 14px 28px) 6; padding-bottom: 14px; }
+.kicker { color: var(--acc); font-family: var(--display); font-weight: 600; letter-spacing: 0.2em; font-size: 14px; }
+h1 { font: 700 clamp(2.6rem, 12vw, 4rem)/0.95 var(--display); text-transform: uppercase; letter-spacing: 0.01em; }
+h2 { font-family: var(--display); font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; font-size: 1.7rem; }
+.panel { border-radius: 4px; border: 2px solid var(--line); background: var(--card); }
+.btn { border-radius: 4px; text-transform: uppercase; letter-spacing: 0.06em; font-family: var(--display); font-size: 19px; font-weight: 700; }
+.btn.ghost { border-width: 2px; border-color: var(--line); }
+.stats li { border-radius: 4px; background: #101216; border-color: var(--line); text-transform: uppercase; letter-spacing: 0.06em; font-family: var(--display); font-size: 14px; }
+.bar { border-radius: 0; height: 8px; } .bar > i { background: repeating-linear-gradient(-45deg, var(--acc) 0 10px, #c9a300 10px 20px); }
+.opt { border-radius: 4px; border-width: 2px; background: #101216; }
+.opt .k { display: inline-grid; place-items: center; min-width: 1.7em; height: 1.7em; margin-right: 6px; border-radius: 50%; background: var(--acc); color: var(--acc-ink); font-weight: 800; }
+.why { border-radius: 0; background: #101216; border-left-width: 6px; }
+.scene { border-radius: 4px; border: 3px solid var(--acc); }
+.dt, .tile, .slots li { border-radius: 4px; }
+.result .big { font-family: var(--display); color: var(--acc); }
+.remember li { border-radius: 4px; }
+.btn.ghost[aria-pressed="true"] { background: var(--acc); color: var(--acc-ink); }
+
 </style>
-<style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #12151d; }</style>
+<style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #17191e; }</style>
 <!-- toybox-shared -->
 <link rel="manifest" href="manifest.webmanifest">
 <script src="../toybox.js"></script>
@@ -116,14 +160,66 @@ body.playing #explorer { display: none; }
   <header class="top">
     <p class="kicker">Awareness · Road safety</p>
     <h1>Road Ready</h1>
-    <p class="lede">Ten everyday moments on Namibian roads, from goats at dusk to gravel corners. Pick the safest choice each time.</p>
+    <p class="lede">Goats at dusk, gravel, NaTIS and the MVA Fund. Pick the safe move.</p>
   </header>
 
   <section id="intro" class="panel">
-    <h2>How it works</h2>
-    <p class="note" style="margin-top:8px;font-size:15px">Each round is ten situations picked from a bigger set of twenty. Choose an answer, then read why it is safest. There is no timer, so take your time.</p>
+    <p class="note" style="margin-top:8px;font-size:15px">Ten situations from a set of forty. Pick an answer, then see why. No timer.</p>
     <div class="row"><button class="btn" id="bStart" type="button">Start</button></div>
     <p class="note" id="bestLine" hidden></p>
+  </section>
+
+  <section id="system" class="panel">
+    <h2>How the road system works</h2>
+    <p class="note" style="margin-top:8px;font-size:15px">Who does what on Namibia's roads. General info only, rules and fees change.</p>
+    <details class="dt"><summary>NaTIS and the Roads Authority</summary>
+      <p><b>NaTIS</b> is the traffic information system run by the Roads Authority. It holds the records for driving licences, learner's licences, vehicle registration and annual vehicle licences, and it links to the driving test centres.</p>
+      <ul><li>Renew a vehicle licence or book a test through the <a href="https://online.ra.org.na/" rel="noopener">NaTIS Online portal</a>, or at a NaTIS office. Type the address yourself rather than trust a link in a message.</li><li>Vehicle licences are renewed every year. Keep your papers in order and display your disc.</li><li>A driving licence that has been expired for over a year may need an affidavit when you renew.</li><li>Tell NaTIS when you sell a vehicle so fines and liabilities do not stay in your name.</li></ul>
+      <p class="src"><a href="https://ra.org.na/natis-licence" rel="noopener">Roads Authority: licence renewal</a></p>
+    </details>
+    <details class="dt"><summary>The MVA Fund</summary>
+      <p>The <b>Motor Vehicle Accident (MVA) Fund</b> helps people injured in road crashes, and the families of people killed. You do not buy it: it is paid for from money collected on fuel.</p>
+      <ul><li><b>What it covers:</b> treatment, rehabilitation, lost income, support for dependants and funeral benefits. It does not repair your car.</li><li><b>How it works:</b> after a crash an ambulance is sent, the Fund opens a reference number, a case manager visits and gives you a claim form, and after you are discharged you submit it.</li><li><b>Time limits:</b> the law sets strict deadlines for claims, so start early.</li><li><b>Limits:</b> drivers who were unlicensed or drunk can lose benefits, and at-fault drivers may only receive non-cash help.</li><li><b>Scams:</b> never pay a stranger to "speed up" a claim. Use the Fund's official contacts.</li></ul>
+      <p class="src"><a href="https://www.mvafund.com.na/services/claiming-process/" rel="noopener">MVA Fund: claiming process</a></p>
+    </details>
+    <details class="dt"><summary>The Road Fund and the fuel levy</summary>
+      <p>The <b>Road Fund Administration</b> collects road user charges: the fuel levy, vehicle registration and licence fees, and charges on heavy and foreign vehicles. The money goes to the road sector.</p>
+      <ul><li>The <b>fuel levy</b> is charged on every litre of petrol and diesel, and it is already included in the pump price.</li><li>It follows a user-pays idea: more fuel, more contribution.</li><li>It funds building and maintaining roads, road safety and traffic law enforcement.</li><li>Farming, mining, construction and fishing users can claim back levy for fuel used off public roads.</li></ul>
+      <p class="src"><a href="https://www.rfanam.com.na/fuel-levy/" rel="noopener">Road Fund Administration: fuel levy</a></p>
+    </details>
+    <details class="dt"><summary>Rules worth knowing</summary>
+      <ul><li><b>Default speed limits:</b> 60 km/h in urban areas, and 120 km/h on tarred open roads. Limits are maximums, not targets.</li><li><b>Seatbelts:</b> required for front and rear occupants.</li><li><b>Helmets:</b> motorcycle riders and passengers must wear a fastened helmet.</li><li><b>Drink and drugs:</b> the safest amount before driving is none.</li><li><b>Crash:</b> stop, help, swap details and report it as the law requires.</li></ul>
+      <p class="src"><a href="https://cdn.who.int/media/docs/default-source/country-profiles/road-safety/road-safety-2023-nam.pdf" rel="noopener">WHO road safety country profile: Namibia</a></p>
+    </details>
+  </section>
+
+  <section id="drillbox" class="panel">
+    <h3 style="margin:0 0 6px;font-size:18px">Crash and paperwork drill</h3>
+    <p class="note" style="font-size:14px;margin-top:0">Three short scenarios: a small bump, a serious crash and an expired vehicle licence. Tap the steps in the right order.</p>
+    <div class="row"><button class="btn ghost sm" id="bDrill" type="button">Try the drill</button></div>
+    <p class="note" id="drillBest" hidden></p>
+  </section>
+
+  <section id="dplay" hidden aria-live="polite">
+    <ul class="stats"><li>Scenario <b id="dN">1</b>/<span id="dT">3</span></li><li>Stars <b id="dS">0</b></li><li>This one <b id="dC">3</b> left</li></ul>
+    <div class="bar" aria-hidden="true"><i id="dBar"></i></div>
+    <h2 id="dTitle" style="margin-top:18px"></h2>
+    <p id="dText" class="lede" style="margin-top:6px"></p>
+    <p class="mini">Your order</p>
+    <ol id="dSlots" class="slots"></ol>
+    <p class="mini" id="dPoolLabel">Tap the next step</p>
+    <div id="dPool" class="pool"></div>
+    <div class="row" id="dHintRow"><button class="btn ghost" id="dHint" type="button">Hint (costs a star)</button></div>
+    <div id="dWhy" class="why" hidden></div>
+    <div class="row" id="dNextRow" hidden><button class="btn" id="dNext" type="button">Next scenario</button></div>
+  </section>
+
+  <section id="dend" class="panel result" hidden>
+    <p class="kicker">Drill complete</p>
+    <p class="big" id="dScore">0</p>
+    <p class="rank" id="dRank"></p>
+    <p class="note" id="dEBest"></p>
+    <div class="row" style="justify-content:center"><button class="btn" id="dAgain" type="button">Try again</button><button class="btn ghost" id="dBack" type="button">Back to Road Ready</button></div>
   </section>
 
   <section id="explorer" class="panel">
@@ -219,7 +315,27 @@ const QS = [
   { scene: 'school', q: 'A minibus taxi stops and passengers begin crossing in front of it. You cannot see past the taxi.', o: ['Pass quickly on the outside', 'Slow right down or stop and wait until you can see the road clearly', 'Hoot and drive through'], a: 1, why: 'People often step out from in front of a stopped vehicle into your path. Waiting until you can see clearly gives you time to react.' },
   { scene: 'belt', q: 'You are a passenger and the driver is speeding and overtaking dangerously. You feel unsafe.', o: ['Say nothing, it is rude to speak up', 'Speak up calmly, ask them to slow down and ask to be dropped off if they will not', 'Close your eyes and hope for the best'], a: 1, why: 'Passengers have a voice too. Asking politely but firmly can change the driver\'s behaviour, and it is fine to get out if you feel unsafe.' },
   { scene: 'rain', q: 'You drive through a low-lying road and see water flowing across it. You cannot tell how deep it is.', o: ['Drive through fast so you do not stall', 'Do not enter. Turn around or wait, because you cannot judge the depth or the current', 'Follow the car in front, it looks fine'], a: 1, why: 'Even shallow moving water can float a car and hide damage to the road. Turning back is always safer than testing it.' },
-  { scene: 'walker', q: 'You are on a bicycle at dusk with no lights or reflectors on it.', o: ['Ride fast to get home before dark', 'Use lights and reflective gear, or push the bike on the verge if you have none', 'Ride in the middle of the road so people see you'], a: 1, why: 'Drivers see cyclists late at dusk. Lights and reflective items make you visible from much further away.' }
+  { scene: 'walker', q: 'You are on a bicycle at dusk with no lights or reflectors on it.', o: ['Ride fast to get home before dark', 'Use lights and reflective gear, or push the bike on the verge if you have none', 'Ride in the middle of the road so people see you'], a: 1, why: 'Drivers see cyclists late at dusk. Lights and reflective items make you visible from much further away.' },
+{ scene: 'crash', q: 'You are hurt as a passenger in a crash. Nobody in the taxi has a special insurance policy. Can the MVA Fund still help?', o: ['No, only drivers with paid-up insurance can claim', 'Yes, the Fund is set up to help people injured or bereaved in road crashes in Namibia, without needing your own policy', 'Only if you were wearing a suit'], a: 1, why: 'The Motor Vehicle Accident (MVA) Fund exists to help people hurt in road crashes, and the families of those who die. You do not buy it yourself: it is paid for from money collected on fuel. Benefits are set by law, so ask the Fund about your case.' },
+  { scene: 'crash', q: 'You were injured in a crash last month. When should you start your claim with the MVA Fund?', o: ['As soon as you can, because the law sets time limits', 'Wait until you feel completely better, even if that takes years', 'Only when a lawyer tells you to'], a: 0, why: 'The MVA Fund Act sets strict time limits for claims (as written, a year from when the claim arose, with an extension in some cases). Starting early keeps records fresh and protects your right to benefits. Contact the Fund directly to check your case.' },
+  { scene: 'crash', q: 'Which of these is NOT something the MVA Fund is set up to pay for?', o: ['Medical treatment and rehabilitation', 'Replacing or repairing your damaged car', 'Support for the family of someone who died, including funeral benefits'], a: 1, why: 'The Fund deals with injuries and deaths: treatment, rehabilitation, lost income, support for dependants and funeral benefits. Damage to vehicles is a matter for car insurance.' },
+  { scene: 'tired', q: 'Under the MVA Fund Act, which behaviour can cost a driver their benefits after a crash?', o: ['Driving without a valid licence, or while drunk or drugged', 'Driving a small car', 'Wearing a seatbelt'], a: 0, why: 'The Act as written excludes drivers who were unlicensed or under the influence, and it also limits what an at-fault driver can receive. Another good reason to stay licensed, sober and careful.' },
+  { scene: 'fuel', q: 'How is the MVA Fund mainly paid for?', o: ['From money collected on fuel sold in Namibia', 'Only from traffic fines', 'Voluntary donations from drivers'], a: 0, why: 'Money collected from fuel sales is set aside for the Fund, which means everyone who fills up helps pay for it. That is why the Fund can help you even if you never bought a policy.' },
+  { scene: 'crash', q: 'A stranger offers to "speed up" your MVA Fund claim if you pay them a fee upfront. What should you do?', o: ['Pay, since you want the money quickly', 'Be careful: contact the Fund directly through its official website or offices before paying anyone', 'Give them your ID and bank PIN so they can check'], a: 1, why: 'Fake helpers target injured people and grieving families. Use the Fund\'s official contact details, never give out your PIN and never pay to have a form submitted.' },
+  { scene: 'crash', q: 'After you were treated in hospital, the MVA Fund case manager gives you a claim form. What is the next step?', o: ['Throw it away, the Fund already knows everything', 'Complete it carefully and submit it, keeping copies and your reference number', 'Post it to a friend'], a: 1, why: 'Once you are discharged, the claim form is how the Fund assesses your case and plans your benefits. Keep your MVAF reference number and copies of everything.' },
+  { scene: 'fuel', q: 'What is the fuel levy that is included in the price of petrol and diesel used for?', o: ['Building and maintaining roads, and supporting road safety and traffic law enforcement', 'Paying fuel station staff', 'Reducing the price of new cars'], a: 0, why: 'The Road Fund Administration collects road user charges, including the fuel levy, and passes them on to the road sector for construction, maintenance and road safety.' },
+  { scene: 'fuel', q: 'Who ends up paying more fuel levy in total?', o: ['People who drive more, and heavier or thirstier vehicles', 'Only taxi drivers', 'Nobody, it is a fixed amount per person'], a: 0, why: 'The levy is charged per litre, so it works on a user-pays idea: the more fuel you burn, the more you contribute to the roads you use.' },
+  { scene: 'card', q: 'What does NaTIS do?', o: ['It is the national system for driver licensing, vehicle registration and vehicle licences, run by the Roads Authority', 'It fixes potholes', 'It sells car insurance'], a: 0, why: 'NaTIS is Namibia\'s traffic information system. Licence and registration records, test bookings and licence renewals all run through it, and it also has an online portal.' },
+  { scene: 'card', q: 'Your vehicle licence disc ran out last month and you keep driving. What is the right move?', o: ['Renew it straight away, driving an unlicensed vehicle can lead to fines', 'Keep going until someone notices', 'Swap the disc with a friend\'s car'], a: 0, why: 'Vehicle licences are renewed every year. Driving without a valid licence risks fines and trouble with insurance, and swapping discs is illegal.' },
+  { scene: 'phone', q: 'An SMS says "NaTIS: you have an unpaid fine. Pay now at this link or your licence will be cancelled". What should you do?', o: ['Click quickly, since it says NaTIS', 'Do not click. Check through the official NaTIS Online portal or a NaTIS office by typing the address yourself', 'Reply with your ID number'], a: 1, why: 'Scammers copy official names and add threats. The real portal is run by the Roads Authority, and you should type its address yourself rather than trust a link in a message.' },
+  { scene: 'card', q: 'Your driving licence expired more than a year ago. What is sensible?', o: ['Keep driving, nobody checks', 'Renew it through NaTIS, and be ready with extra paperwork such as an affidavit if it has been expired for more than 12 months', 'Ask a friend to lend theirs'], a: 1, why: 'Driving with an expired licence can lead to fines. The Roads Authority asks for an affidavit if a licence has been expired for over 12 months or is lost, so check the current requirements before you go.' },
+  { scene: 'card', q: 'You want to learn to drive. What is the first legal step?', o: ['Practise on a public road with a friend before doing anything else', 'Apply for a learner\'s licence and pass the theory test at a NaTIS testing centre', 'Buy a licence from someone who says they know a person at the office'], a: 1, why: 'The learner\'s licence lets you practise legally with supervision. Paying an "agent" to skip tests is corruption and puts everyone on the road at risk.' },
+  { scene: 'tyre', q: 'You are buying a second-hand car. What should you check?', o: ['Only the paint and the music system', 'That it is roadworthy and that the papers match the seller\'s ID and the vehicle\'s identification numbers', 'Nothing, cash is enough'], a: 1, why: 'Checking the registration papers and identification numbers helps you avoid stolen or cloned vehicles. A roadworthy check protects your safety and is usually needed when ownership changes.' },
+  { scene: 'card', q: 'You have sold your car to someone. What should you do about the papers?', o: ['Nothing, it is now their problem', 'Make sure the change of ownership is registered with NaTIS promptly', 'Keep the licence disc for your next car'], a: 1, why: 'If the vehicle is still registered in your name, fines and other trouble linked to it can come back to you. Register the change in good time.' },
+  { scene: 'school', q: 'You want to drive a minibus taxi and carry paying passengers. What extra do you need?', o: ['Nothing extra', 'A professional driving permit, which also involves a medical certificate and a police certificate of conduct', 'Only a bigger vehicle'], a: 1, why: 'Carrying paying passengers comes with extra responsibility. The Roads Authority requires a professional driving permit with a valid medical certificate and other documents.' },
+  { scene: 'crash', q: 'You have a minor bump with another car. No one is hurt and the other driver says "let us just drive off". What is best?', o: ['Drive off before police arrive', 'Stop safely, check everyone is fine, swap details, take photos and report the crash as the law requires', 'Argue at the side of the road for an hour'], a: 1, why: 'Leaving the scene of a crash is an offence. Exchanging details and photos protects both of you, and reporting it keeps your insurance and any claims in order.' },
+  { scene: 'gravel', q: 'The legal limit on a stretch of gravel road is higher than you feel safe driving. What should you do?', o: ['Drive at the limit, it is legal', 'Drive to the conditions, often well below the limit, and slow for corrugations, dust and corners', 'Speed up to get out of the dust'], a: 1, why: 'A speed limit is a maximum, not a target. Loose gravel doubles your stopping distance and rollovers are common.' },
+  { scene: 'crossing', q: 'You are driving into a town and there is no sign showing a special speed limit. What is the default urban limit?', o: ['60 km/h', '100 km/h', '120 km/h'], a: 0, why: 'The default limit in urban areas is 60 km/h unless signs say otherwise. On open tarred roads the limit is generally higher, but the same rule applies: it is a maximum, not a target.' }
 ];
 const ROUND = 10;
 let deck = [], i = 0, score = 0, answered = false, cur = null, raf = 0, t0 = 0;
@@ -278,7 +394,10 @@ const SCENES = {
   tail(t) { sky('#7fc4ff', '#dff0ff'); ground('#b9a77c'); road('#454a55', t); g.fillStyle = '#f5f5f5'; g.fillRect(180, 40, 280, 8); g.fillStyle = '#fff'; g.beginPath(); g.moveTo(240, 258); g.lineTo(400, 258); g.lineTo(382, 224); g.lineTo(258, 224); g.closePath(); g.fillStyle = 'rgba(30,40,60,0.9)'; g.fill(); g.fillStyle = '#ffe36a'; g.fillRect(262, 232, 24, 10); g.fillRect(354, 232, 24, 10); g.fillStyle = 'rgba(255,227,106,0.25)'; g.beginPath(); g.arc(274, 237, 26, 0, 7); g.arc(366, 237, 26, 0, 7); g.fill(); dash(); },
   tyre(t) { sky('#7fc4ff', '#dff0ff'); ground('#b9a77c'); road('#454a55', t * 0.4); sign('tyre'); dash(); },
   braai(t) { sky('#0b1230', '#2b2448'); stars(20); ground('#161219'); road('#1b1a22', t * 0.5, 'rgba(255,255,255,0.5)'); cone(); sign('braai'); dash(); },
-  seat(t) { sky('#7fc4ff', '#dff0ff'); ground('#8db36c'); road('#454a55', t * 0.6); sign('seat'); dash(); }
+  seat(t) { sky('#7fc4ff', '#dff0ff'); ground('#8db36c'); road('#454a55', t * 0.6); sign('seat'); dash(); },
+  crash(t) { sky('#7fc4ff', '#dff0ff'); ground('#8db36c'); road('#454a55', t * 0.2); carAhead(330, 152, 1.05, false); const on = Math.floor(t * 2) % 2; g.fillStyle = on ? '#ffa500' : '#7a4a00'; g.beginPath(); g.arc(298, 134, 5, 0, 7); g.arc(362, 134, 5, 0, 7); g.fill(); g.fillStyle = '#d92b2b'; g.beginPath(); g.moveTo(216, 226); g.lineTo(246, 226); g.lineTo(231, 196); g.closePath(); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.moveTo(224, 222); g.lineTo(238, 222); g.lineTo(231, 206); g.closePath(); g.fill(); dash(); },
+  card(t) { sky('#7fc4ff', '#dff0ff'); ground('#8db36c'); road('#454a55', t * 0.3); g.fillStyle = '#f4f6fa'; g.fillRect(430, 30, 160, 100); g.fillStyle = '#2f6fdd'; g.fillRect(430, 30, 160, 20); g.fillStyle = '#9aa7ba'; g.fillRect(442, 60, 40, 52); g.fillStyle = '#c7cfdb'; g.fillRect(494, 62, 80, 8); g.fillRect(494, 80, 60, 8); g.fillRect(494, 98, 70, 8); g.fillStyle = '#fff'; g.font = '700 11px sans-serif'; g.fillText('DRIVING LICENCE', 440, 44); dash(); },
+  fuel(t) { sky('#7fc4ff', '#dff0ff'); ground('#b9a77c'); road('#454a55', t * 0.3); g.fillStyle = '#c33a3a'; g.fillRect(86, 70, 66, 118); g.fillStyle = '#e8eef8'; g.fillRect(96, 82, 46, 26); g.fillStyle = '#242a35'; g.fillRect(70, 186, 98, 10); g.strokeStyle = '#242a35'; g.lineWidth = 5; g.beginPath(); g.moveTo(152, 120); g.quadraticCurveTo(190, 120, 186, 176); g.stroke(); dash(); }
 };
 function paint(ts) { const t = (ts - t0) / 1000; g.clearRect(0, 0, W, H); (SCENES[cur.scene] || SCENES.belt)(A.reduced() ? 0 : t); if (!A.reduced()) raf = requestAnimationFrame(paint); }
 function drawScene() { cancelAnimationFrame(raf); t0 = performance.now(); paint(t0); }
@@ -337,6 +456,47 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) cance
   sp.addEventListener('input', calc);
   document.querySelectorAll('[data-surf]').forEach((b) => b.addEventListener('click', () => { surf = b.dataset.surf; document.querySelectorAll('[data-surf]').forEach((x) => x.setAttribute('aria-pressed', x === b)); calc(); }));
   calc();
+})();
+
+/* ---------- crash and paperwork drill ---------- */
+(function () {
+  const $ = A.$, DR = [
+    { title: 'A small bump', text: 'You tap the back of another car at a junction. No one is hurt, but both cars have marks.', steps: ['Stop safely, switch on your hazard lights and check everyone is okay', 'Move the vehicles out of the way if it is safe and legal to do so', 'Swap names, contact details and vehicle details, and take photos', 'Do not argue or admit blame at the roadside', 'Report the crash as the law requires and tell your insurer'], why: 'Staying calm, staying at the scene and recording facts protects everyone and keeps any insurance claim straightforward.', tip: 'Leaving the scene of a crash is an offence, even a small one.' },
+    { title: 'A serious crash', text: 'You arrive at a crash. A car is off the road and a passenger is hurt.', steps: ['Park safely, switch on hazards and check the scene is safe', 'Call emergency services and give the exact location', 'Help the injured without moving them unless they are in danger', 'Give first aid you are trained for, such as pressing on a bleed', 'Stay until help arrives. Later, the injured person or family can claim from the MVA Fund'], why: 'Making the scene safe and getting help quickly come first. The MVA Fund then supports treatment and recovery once they are in the system.', tip: 'Never pay a stranger to lodge an MVA Fund claim for you.' },
+    { title: 'An expired vehicle licence', text: 'You notice the licence disc on your windscreen expired last month.', steps: ['Check the expiry date and gather your papers, including your ID and registration', 'Open the NaTIS Online portal by typing the address yourself, or go to a NaTIS office', 'Complete the renewal and pay the fees', 'Keep your proof of payment', 'Display the new licence disc on the vehicle'], why: 'Vehicle licences must be renewed every year. Using the official portal or an office keeps you safe from scam websites.', tip: 'A message that threatens you with a fine and gives a payment link is a scam signal.' }
+  ];
+  const SLUG = 'road-ready-drill', st = (n) => '★'.repeat(n) + '☆'.repeat(3 - n);
+  let deck = [], ci = 0, tot = 0, left = 3, nx = 0, cur = null;
+  const hideAll = () => ['intro', 'explorer', 'system', 'drillbox', 'play', 'end', 'dplay', 'dend'].forEach((id) => { $(id).hidden = true; });
+  function show() {
+    cur = deck[ci]; nx = 0; left = 3; $('dTitle').textContent = cur.title; $('dText').textContent = cur.text;
+    $('dSlots').innerHTML = ''; cur.steps.forEach(() => { const li = document.createElement('li'); li.className = 'empty'; li.textContent = '...'; $('dSlots').appendChild(li); });
+    $('dPool').innerHTML = ''; A.shuffle(cur.steps.map((t, i) => i)).forEach((si) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'tile'; b.dataset.i = si; b.textContent = cur.steps[si]; b.addEventListener('click', () => tap(b, si)); $('dPool').appendChild(b); });
+    $('dWhy').hidden = true; $('dNextRow').hidden = true; $('dHintRow').hidden = false; $('dPoolLabel').hidden = false;
+    $('dN').textContent = ci + 1; $('dT').textContent = deck.length; $('dS').textContent = tot; $('dC').textContent = left; $('dBar').style.width = (ci / deck.length * 100) + '%';
+  }
+  function tap(b, si) {
+    if (si === nx) { A.sfx.tap(); const li = $('dSlots').children[nx]; li.className = ''; li.textContent = cur.steps[si]; b.remove(); nx++; document.querySelectorAll('#dPool .tile.hint').forEach((x) => x.classList.remove('hint')); if (nx >= cur.steps.length) fin(); }
+    else { A.sfx.bad(); left = Math.max(0, left - 1); $('dC').textContent = left; b.classList.remove('no'); void b.offsetWidth; b.classList.add('no'); }
+  }
+  function fin() {
+    tot += left; A.sfx.good(); $('dHintRow').hidden = true; $('dPoolLabel').hidden = true;
+    const w = $('dWhy'); w.className = 'why pop good'; w.innerHTML = '<span class="tag">Done <span class="stars">' + st(left) + '</span></span><p>' + A.esc(cur.why) + '</p><p><b>Remember:</b> ' + A.esc(cur.tip) + '</p>'; w.hidden = false;
+    $('dNextRow').hidden = false; $('dNext').textContent = ci + 1 >= deck.length ? 'See my result' : 'Next scenario'; $('dS').textContent = tot; $('dBar').style.width = ((ci + 1) / deck.length * 100) + '%';
+  }
+  function end() {
+    document.body.classList.remove('playing'); $('dplay').hidden = true; $('dend').hidden = false;
+    const max = deck.length * 3, isBest = A.saveBest(SLUG, tot), n = A.plays(SLUG);
+    $('dScore').textContent = tot + '/' + max; $('dRank').textContent = tot >= 8 ? 'Calm at the scene' : tot >= 6 ? 'Ready to help' : 'Learning the steps';
+    $('dEBest').textContent = (isBest && n > 1 ? 'New best. ' : '') + 'Your best is ' + A.best(SLUG) + '/9.';
+    if (window.Toybox) Toybox.setResult('Road Ready: Crash drill', tot + '/' + max); A.sfx.done(); window.scrollTo(0, 0);
+  }
+  function backHome() { hideAll(); ['intro', 'explorer', 'system', 'drillbox'].forEach((id) => { $(id).hidden = false; }); document.body.classList.remove('playing'); const b = A.best(SLUG); if (b) { $('drillBest').textContent = 'Your best drill: ' + b + '/9'; $('drillBest').hidden = false; } window.scrollTo(0, 0); }
+  $('bDrill').addEventListener('click', () => { deck = A.shuffle(DR); ci = 0; tot = 0; hideAll(); document.body.classList.add('playing'); $('dplay').hidden = false; show(); A.audio(); });
+  $('dHint').addEventListener('click', () => { if (left <= 0) return; left--; $('dC').textContent = left; A.sfx.tap(); const t = document.querySelector('#dPool .tile[data-i="' + nx + '"]'); if (t) t.classList.add('hint'); });
+  $('dNext').addEventListener('click', () => { ci++; if (ci >= deck.length) return end(); show(); window.scrollTo({ top: 0, behavior: A.reduced() ? 'auto' : 'smooth' }); });
+  $('dAgain').addEventListener('click', () => $('bDrill').click()); $('dBack').addEventListener('click', backHome);
+  const b0 = A.best(SLUG); if (b0) { $('drillBest').textContent = 'Your best drill: ' + b0 + '/9'; $('drillBest').hidden = false; }
 })();
 
 </script>

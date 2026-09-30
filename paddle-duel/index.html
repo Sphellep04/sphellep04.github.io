@@ -240,7 +240,7 @@ R.debug = (o) => { try { if (location.hash === '#debug') window.__g = o; } catch
 (() => {
 'use strict';
 const {g, clamp, rnd, TAU} = R;
-let L = 600, Wd = 400, portrait = false, pad = { c: 200, len: 90 }, ai = { c: 200, off: 0 }, ball = { a: 0, c: 0, va: 0, vc: 0, r: 8, trail: [] }, score = 0, lives = 3, rally = 0, serveT = 0, serveDir = 1, speed = 400, parts = [], flashP = 0, flashA = 0, keyDir = 0, best = 0, msg = '';
+let msgBad = false, L = 600, Wd = 400, portrait = false, pad = { c: 200, len: 90 }, ai = { c: 200, off: 0 }, ball = { a: 0, c: 0, va: 0, vc: 0, r: 8, trail: [] }, score = 0, lives = 3, rally = 0, serveT = 0, serveDir = 1, speed = 400, parts = [], flashP = 0, flashA = 0, keyDir = 0, best = 0, msg = '';
 const TH = 12, MARG = 18;
 function dims() { portrait = R.H > R.W; L = portrait ? R.H : R.W; Wd = portrait ? R.W : R.H; pad.len = clamp(Wd * 0.24, 64, 120); ball.r = clamp(Math.min(R.W, R.H) * 0.02, 6, 10); }
 function resetBall(dir) { ball.a = L / 2; ball.c = Wd / 2; speed = Math.max(300, L * 0.5); const ang = (rnd() - 0.5) * 0.7; ball.va = dir * speed * Math.cos(ang); ball.vc = speed * Math.sin(ang); ball.trail = []; serveT = 0.9; rally = 0; }
@@ -254,8 +254,8 @@ function hit(p, side) {
   if (side === 0) flashP = 0.15; else { flashA = 0.15; ai.off = (rnd() - 0.5) * pad.len * Math.max(0.15, 0.7 - score * 0.02); }
 }
 function point(byPlayer) {
-  if (byPlayer) { score++; R.setScore(score); R.beep(660, 0.2, 'square', 0.14, 500); burst(L - 6, ball.c, '#35e0ff', 18); if (score % 5 === 0 && lives < 5) { lives++; msg = '+1 HEART'; } else msg = ''; resetBall(-1 * -1); ball.va = Math.abs(ball.va); }
-  else { lives--; R.beep(200, 0.35, 'sawtooth', 0.16, -100); R.noise(0.2, 0.2, 800); R.buzz(70); burst(6, ball.c, '#ff6b9a', 18); msg = ''; if (lives <= 0) { R.gameOver(score, 'THE COMPUTER WINS'); return; } resetBall(1); ball.va = -Math.abs(ball.va); }
+  if (byPlayer) { score++; R.setScore(score); R.beep(660, 0.2, 'square', 0.14, 500); burst(L - 6, ball.c, '#35e0ff', 18); if (score % 5 === 0 && lives < 5) { lives++; msg = '+1 POINT  +1 HEART'; } else msg = '+1 POINT'; msgBad = false; resetBall(-1 * -1); ball.va = Math.abs(ball.va); }
+  else { lives--; R.beep(200, 0.35, 'sawtooth', 0.16, -100); R.noise(0.2, 0.2, 800); R.buzz(70); burst(6, ball.c, '#ff6b9a', 18); msg = 'YOU MISSED  -1 HEART'; msgBad = true; if (lives <= 0) { R.gameOver(score, 'THE COMPUTER WINS'); return; } resetBall(1); ball.va = -Math.abs(ball.va); }
   serveT = 1.0;
 }
 function update(dt) {
@@ -298,7 +298,7 @@ function draw() {
   g.textAlign = 'center'; g.font = '11px "Press Start 2P", monospace';
   const hx = R.W / 2, hy = portrait ? R.H - 18 - 0 : R.H - 14; g.fillStyle = '#ff6b9a'; g.fillText('♥'.repeat(lives) + '♡'.repeat(Math.max(0, 5 - lives)), hx, portrait ? R.H - 4 : R.H - 6);
   if (rally >= 3) { g.fillStyle = 'rgba(230,246,255,0.5)'; g.font = '12px "Press Start 2P", monospace'; g.fillText('RALLY ' + rally, R.W / 2, portrait ? R.H / 2 - 24 : 30); }
-  if (msg && serveT > 0) { g.fillStyle = '#7dff7a'; g.font = '14px "Press Start 2P", monospace'; g.fillText(msg, R.W / 2, R.H / 2 - 40); }
+  if (msg && serveT > 0) { g.fillStyle = msgBad ? '#ff6b9a' : '#7dff7a'; g.font = '14px "Press Start 2P", monospace'; g.fillText(msg, R.W / 2, R.H / 2 - 40); }
 }
 R.loop = (dt) => {
   dt = Math.min(dt, 0.05); flashP = Math.max(0, flashP - dt); flashA = Math.max(0, flashA - dt);

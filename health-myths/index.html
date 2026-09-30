@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="A health awareness game. Swipe myth or fact on HIV, TB, malaria, hygiene and everyday health.">
-<meta name="theme-color" content="#0c1c1e">
+<meta name="theme-color" content="#f4faf9">
 <title>Health Myths</title>
 <meta property="og:type" content="website">
 <meta property="og:title" content="Health Myths">
@@ -21,13 +21,14 @@
 <link rel="apple-touch-icon" href="img/favicon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600&family=DM+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700;800&display=swap">
 <style>
 :root {
   --bg: #0a1622; --bg2: #10243a; --ink: #edf3fa; --mute: #9db2c8; --line: rgba(170, 200, 235, 0.22);
-  --card: rgba(255, 255, 255, 0.06); --acc: #ffcf4a; --acc-ink: #1a1400; --good: #4ad9a0; --bad: #ff6b7a;
+  --card: var(--wash); --acc: #ffcf4a; --acc-ink: #1a1400; --good: #4ad9a0; --bad: #ff6b7a;
   --display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
   --body: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --wash: rgba(255, 255, 255, 0.05); --track: rgba(255, 255, 255, 0.11); --radius: 12px; --shadow: 0 12px 30px rgba(0,0,0,0.35);
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -43,7 +44,7 @@ h2 { margin: 0; font: 600 1.5rem/1.15 var(--display); letter-spacing: -0.01em; t
 .stats { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 0; padding: 0; list-style: none; }
 .stats li { font: 500 13px/1 var(--body); padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--mute); font-variant-numeric: tabular-nums; }
 .stats b { color: var(--ink); font-weight: 600; }
-.bar { height: 6px; margin-top: 14px; border-radius: 999px; background: rgba(255, 255, 255, 0.10); overflow: hidden; }
+.bar { height: 6px; margin-top: 14px; border-radius: 999px; background: var(--track); overflow: hidden; }
 .bar > i { display: block; height: 100%; width: 0; background: var(--acc); border-radius: inherit; transition: width 0.35s ease; }
 .panel { margin-top: 20px; padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 22px; border: 0; border-radius: 12px; font: 600 16px/1 var(--body); color: var(--acc-ink); background: var(--acc); cursor: pointer; }
@@ -59,7 +60,7 @@ h2 { margin: 0; font: 600 1.5rem/1.15 var(--display); letter-spacing: -0.01em; t
 .opt.right { border-color: var(--good); background: rgba(74, 217, 160, 0.14); }
 .opt.wrong { border-color: var(--bad); background: rgba(255, 107, 122, 0.14); }
 .opt:disabled { cursor: default; }
-.why { margin-top: 16px; padding: 14px 16px; border-left: 4px solid var(--acc); border-radius: 4px 10px 10px 4px; background: rgba(255, 255, 255, 0.05); }
+.why { margin-top: 16px; padding: 14px 16px; border-left: 4px solid var(--acc); border-radius: 4px 10px 10px 4px; background: var(--wash); }
 .why.good { border-left-color: var(--good); } .why.bad { border-left-color: var(--bad); }
 .why p { margin: 0; } .why p + p { margin-top: 8px; }
 .why .tag { display: block; margin-bottom: 6px; font: 600 12px/1 var(--body); letter-spacing: 0.14em; text-transform: uppercase; }
@@ -68,7 +69,7 @@ h2 { margin: 0; font: 600 1.5rem/1.15 var(--display); letter-spacing: -0.01em; t
 .result .big { margin: 6px 0 0; font: 600 clamp(3rem, 14vw, 5rem)/1 var(--display); color: var(--acc); font-variant-numeric: tabular-nums; }
 .result .rank { margin: 8px 0 0; font: 600 1.3rem/1.2 var(--display); }
 .remember { margin: 18px 0 0; padding: 0; list-style: none; text-align: left; display: grid; gap: 10px; }
-.remember li { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255, 255, 255, 0.04); }
+.remember li { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--wash); }
 .remember b { color: var(--acc); }
 .note { margin: 18px 0 0; font-size: 13px; color: var(--mute); }
 .credit { margin: 32px 0 0; text-align: center; font-size: 13px; color: var(--mute); }
@@ -86,7 +87,7 @@ html.tb-reduced .pop { animation: none; } html.tb-reduced .bar > i { transition:
 }
 
 .msgwrap { margin-top: 18px; perspective: 800px; touch-action: pan-y; }
-.msg { position: relative; padding: 16px 16px 18px; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05)); box-shadow: 0 12px 30px rgba(0,0,0,0.35); cursor: grab; user-select: none; -webkit-user-select: none; touch-action: pan-y; will-change: transform; transition: transform 0.25s ease, border-color 0.2s ease; }
+.msg { position: relative; padding: 16px 16px 18px; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(180deg, var(--track), var(--wash)); box-shadow: 0 12px 30px rgba(0,0,0,0.35); cursor: grab; user-select: none; -webkit-user-select: none; touch-action: pan-y; will-change: transform; transition: transform 0.25s ease, border-color 0.2s ease; }
 .msg.drag { transition: none; cursor: grabbing; }
 .msg.left { border-color: var(--bad); } .msg.right { border-color: var(--good); }
 .msg .meta { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mute); }
@@ -106,7 +107,7 @@ body.playing .top { padding-top: 56px; }
 .lens { display: flex; gap: 8px; margin-top: 10px; }
 .lens button { flex: 1 1 0; min-height: 48px; padding: 8px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink); font: 600 15px/1.2 var(--body); cursor: pointer; }
 .lens button:hover { border-color: var(--acc); }
-.lens button[aria-checked="true"] { border-color: var(--acc); background: rgba(255, 255, 255, 0.12); }
+.lens button[aria-checked="true"] { border-color: var(--acc); background: var(--track); }
 .lens button:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
 .gloss { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 12px; }
 .gloss summary { cursor: pointer; font-weight: 600; color: var(--acc); }
@@ -116,8 +117,33 @@ body.playing .top { padding-top: 56px; }
 
 :root { --bg: #0c1c1e; --bg2: #123a3a; --acc: #7ff0d4; --acc-ink: #03231f; --glow1: rgba(127, 240, 212, 0.12); --glow2: rgba(255, 138, 91, 0.07); }
 
+/* Health Myths: clinic leaflet */
+:root { --bg: #f4faf9; --bg2: #e2f1ef; --ink: #10302f; --mute: #4f6d6b; --line: rgba(16, 48, 47, 0.14); --card: #ffffff; --acc: #0d8b86; --acc-ink: #ffffff; --good: #0d8b86; --bad: #e0553f; --wash: rgba(16, 48, 47, 0.04); --track: rgba(16, 48, 47, 0.10); --display: "Public Sans", "Segoe UI", system-ui, sans-serif; --body: "Public Sans", "Segoe UI", system-ui, sans-serif; color-scheme: light; }
+html { background: #f4faf9 !important; }
+body { background: var(--bg); }
+.wrap { position: relative; }
+.top { margin: 0 -16px; padding: 64px 16px 20px; background: var(--acc); color: #fff; border-radius: 0 0 26px 26px; }
+.top .kicker, .top .lede { color: rgba(255, 255, 255, 0.85); }
+h1 { font-weight: 800; letter-spacing: -0.02em; color: #fff; }
+h2 { font-weight: 800; }
+.panel { border: 0; border-radius: 16px; box-shadow: 0 4px 18px rgba(16, 60, 58, 0.10); border-left: 6px solid var(--acc); }
+.btn { border-radius: 10px; font-weight: 700; }
+.btn.ghost { background: #fff; }
+.stats li { background: #fff; }
+.msg { background: #fff; border: 0; border-left: 6px solid var(--acc); border-radius: 12px; box-shadow: 0 6px 20px rgba(16, 60, 58, 0.12); }
+.msg .from { font-size: 1.15rem; font-weight: 800; } .msg .text { font-size: 18px; }
+.msg.answered.isL { border-left-color: var(--bad); } .msg.answered.isR { border-left-color: var(--good); }
+.msg .verdict { border-radius: 999px; color: #fff !important; }
+.dec.bad, .dec.good { color: #fff; }
+.why { background: #fff; box-shadow: 0 4px 16px rgba(16, 60, 58, 0.10); }
+.remember li, .opt, .lens button, .chips button { background: #fff; }
+.lens button[aria-checked="true"] { background: #dff3f1; }
+.foot, .note { color: var(--mute); }
+.result .big { color: var(--acc); }
+.credit a { color: var(--acc); }
+
 </style>
-<style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #0c1c1e; }</style>
+<style>html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; background: #f4faf9; }</style>
 <!-- toybox-shared -->
 <link rel="manifest" href="manifest.webmanifest">
 <script src="../toybox.js"></script>
@@ -131,7 +157,6 @@ body.playing .top { padding-top: 56px; }
   </header>
 
   <section id="intro" class="panel">
-    <h2>How it works</h2>
     <p class="note" id="how" style="margin-top:8px;font-size:15px;color:var(--mute)"></p>
     <h2 style="margin-top:20px;font-size:1.15rem">Round length</h2>
     <div class="lens" id="lens" role="radiogroup" aria-label="Round length"></div>
@@ -198,8 +223,8 @@ const A = (() => {
 
 const CFG = {
   slug: 'health-myths', kicker: 'Awareness · Health', title: 'Health Myths',
-  lede: 'Is it a myth or a fact? A quick swipe game on HIV, TB, malaria, hygiene and looking after yourself.',
-  how: 'Swipe left for <b style="color:var(--bad)">Myth</b>, right for <b style="color:var(--good)">Fact</b>. After each card you will see the short, clear reason.',
+  lede: 'Myth or fact? HIV, TB, malaria, hygiene and more.',
+  how: 'Swipe left for <b style="color:var(--bad)">Myth</b>, right for <b style="color:var(--good)">Fact</b>.',
   leftLabel: 'Myth', rightLabel: 'Fact', leftWord: 'Myth', rightWord: 'Fact', keyL: 'm', keyR: 'f', rounds: [6, 12], leftShare: 0.5,
   ranks: [[0.92, 'Health champion'], [0.75, 'Well informed'], [0.5, 'On your way'], [0, 'Time to learn more']],
   remember: [['Get tested.', 'Regular testing for HIV and other conditions helps you get treatment early. Visit your nearest clinic.'], ['Finish treatment.', 'Take medicines exactly as prescribed, including TB and HIV treatment, even when you feel better.'], ['Protect yourself.', 'Wash hands, use mosquito nets where needed, protect your skin from the sun and keep up to date with vaccines.'], ['Ask a health worker.', 'A nurse or doctor can answer questions in private. Rumours travel fast, good advice comes from trained people.']],
@@ -233,18 +258,25 @@ const DECK = [
 ];
 
 /* Generic swipe deck. Needs CFG and DECK from the toy's own file. */
-let deck = [], i = 0, score = 0, streak = 0, answered = false, cur = null, ROUND = CFG.rounds[CFG.rounds.length - 1];
+let deck = [], i = 0, score = 0, streak = 0, answered = false, cur = null, ROUND = CFG.count || CFG.rounds[CFG.rounds.length - 1];
 const msg = A.$('msg'), $ = A.$;
-const MAXLEN = CFG.rounds[CFG.rounds.length - 1];
+const MAXLEN = CFG.count || CFG.rounds[CFG.rounds.length - 1];
 $('kick').textContent = CFG.kicker; $('ttl').textContent = CFG.title; $('lede').textContent = CFG.lede; $('how').innerHTML = CFG.how;
 $('bLeft').innerHTML = '&larr; ' + A.esc(CFG.leftLabel); $('bRight').innerHTML = A.esc(CFG.rightLabel) + ' &rarr;';
 $('bLeft').setAttribute('aria-keyshortcuts', 'ArrowLeft'); $('bRight').setAttribute('aria-keyshortcuts', 'ArrowRight');
 $('remember').innerHTML = CFG.remember.map((r) => '<li><b>' + A.esc(r[0]) + '</b> ' + A.esc(r[1]) + '</li>').join('');
 if (CFG.foot) { $('foot').innerHTML = CFG.foot; $('foot').hidden = false; }
-if (CFG.gloss && CFG.gloss.length) { $('glossList').innerHTML = CFG.gloss.map((g) => '<dt>' + A.esc(g[0]) + '</dt><dd>' + A.esc(g[1]) + '</dd>').join(''); $('gloss').hidden = false; }
+if (CFG.gloss && CFG.gloss.length && $('glossList')) { $('glossList').innerHTML = CFG.gloss.map((g) => '<dt>' + A.esc(g[0]) + '</dt><dd>' + A.esc(g[1]) + '</dd>').join(''); $('gloss').hidden = false; }
 let chosen = +A.store.get('aware.' + CFG.slug + '.len', MAXLEN); if (CFG.rounds.indexOf(chosen) < 0) chosen = MAXLEN;
 function drawLens() { $('lens').innerHTML = CFG.rounds.map((n) => '<button type="button" role="radio" data-n="' + n + '" aria-checked="' + (n === chosen) + '">' + n + ' cards' + (n === MAXLEN ? ' (counts for best)' : '') + '</button>').join(''); $('lens').querySelectorAll('button').forEach((b) => b.addEventListener('click', () => { chosen = +b.dataset.n; A.store.set('aware.' + CFG.slug + '.len', String(chosen)); drawLens(); })); }
 drawLens();
+let topic = 'all';
+if (CFG.topics && $('topics')) {
+  const cnt = (k) => DECK.filter((c) => k === 'all' || c.t === k).length;
+  topic = A.store.get('aware.' + CFG.slug + '.topic', 'all'); if (!CFG.topics.some((t) => t[0] === topic)) topic = 'all';
+  const drawTopics = () => { $('topics').innerHTML = CFG.topics.map((t) => '<button type="button" role="radio" data-k="' + t[0] + '" aria-checked="' + (t[0] === topic) + '">' + A.esc(t[1]) + ' <small>' + cnt(t[0]) + '</small></button>').join(''); $('topics').querySelectorAll('button').forEach((b) => b.addEventListener('click', () => { topic = b.dataset.k; A.store.set('aware.' + CFG.slug + '.topic', topic); drawTopics(); })); };
+  drawTopics(); $('topicWrap').hidden = false;
+}
 
 function hi(text, flags) { let out = A.esc(text); for (const f of flags || []) { const e = A.esc(f); out = out.split(e).join('<mark>' + e + '</mark>'); } return out; }
 function show() {
@@ -272,17 +304,18 @@ function answer(sayLeft) {
 function next() { if (!answered) return; i++; if (i >= ROUND) return finish(); show(); window.scrollTo({ top: 0, behavior: A.reduced() ? 'auto' : 'smooth' }); }
 function finish() {
   document.body.classList.remove('playing'); $('play').hidden = true; $('end').hidden = false;
-  const full = ROUND === MAXLEN, isBest = full && A.saveBest(CFG.slug, score), n = A.plays(CFG.slug);
+  const full = ROUND === MAXLEN && topic === 'all', isBest = full && A.saveBest(CFG.slug, score), n = A.plays(CFG.slug);
   $('eScore').textContent = score + '/' + ROUND;
   const pct = score / ROUND; let rank = CFG.ranks[CFG.ranks.length - 1][1]; for (const r of CFG.ranks) if (pct >= r[0]) { rank = r[1]; break; }
   $('eRank').textContent = rank;
-  $('eBest').textContent = full ? ((isBest && n > 1 ? 'New best. ' : '') + 'Your best is ' + A.best(CFG.slug) + '/' + MAXLEN + '.') : 'Short rounds do not count towards your best. Try the full round.';
+  $('eBest').textContent = full ? ((isBest && n > 1 ? 'New best. ' : '') + 'Your best is ' + A.best(CFG.slug) + '/' + MAXLEN + '.') : 'Short and single-topic rounds do not count towards your best. Try the full mixed round.';
   if (window.Toybox) Toybox.setResult(CFG.title, score + '/' + ROUND);
   A.sfx.done(); window.scrollTo(0, 0);
 }
 function start() {
-  ROUND = chosen; const L = A.shuffle(DECK.filter((c) => c.a === 'L')), R = A.shuffle(DECK.filter((c) => c.a === 'R'));
-  const nl = Math.min(L.length, Math.round(ROUND * (CFG.leftShare || 0.5))), nr = Math.min(R.length, ROUND - nl);
+  ROUND = chosen; const pool = DECK.filter((c) => topic === 'all' || c.t === topic), L = A.shuffle(pool.filter((c) => c.a === 'L')), R = A.shuffle(pool.filter((c) => c.a === 'R'));
+  let nl = Math.min(L.length, Math.round(ROUND * (CFG.leftShare || 0.5))), nr = Math.min(R.length, ROUND - nl);
+  if (nl + nr < ROUND) nl = Math.min(L.length, ROUND - nr);
   deck = A.shuffle(L.slice(0, nl).concat(R.slice(0, nr))); ROUND = deck.length; i = 0; score = 0; streak = 0;
   document.body.classList.add('playing'); $('intro').hidden = true; $('end').hidden = true; $('play').hidden = false; show(); A.audio();
 }
