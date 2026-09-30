@@ -21,15 +21,6 @@ Each toy is a self-contained folder with its own `index.html` and `img/` folder,
 | `hangman/` | [Hangman](https://tinytoybox.me/hangman/) | Retro Corner: Guess the hidden word before the stick figure is finished. Animals, food, tech and Namibia. |
 | `paddle-duel/` | [Paddle Duel](https://tinytoybox.me/paddle-duel/) | Retro Corner: Classic paddle and ball against the computer. Win a heart back every five points. |
 
-## Adding a toy
-
-1. Create a folder with the toy's name, containing `index.html` and `img/` (`preview.png` at 1200 by 630, plus `favicon-64.png` and `favicon-180.png`).
-2. Copy the preview to `img/<name>-preview.png` and add a card to the home page `index.html`.
-
-Plain HTML, CSS and JavaScript. No build step.
-
-`Kalimba/` is only a redirect so the old capital K link still works.
-
 ## Shared pieces
 
 Every toy loads one shared file, `toybox.js`, and the whole site is covered by `sw.js`.
