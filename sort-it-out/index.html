@@ -200,10 +200,10 @@ const A = (() => {
     o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + d + 0.05);
   }
   const sfx = {
-    good() { tone(660, 0.12, 'triangle', 0.10); tone(880, 0.18, 'triangle', 0.10, 0, 0.09); },
-    bad() { tone(220, 0.22, 'sawtooth', 0.07, -90); },
-    tap() { tone(520, 0.05, 'triangle', 0.06); },
-    done() { [523, 659, 784, 1046].forEach((f, i) => tone(f, 0.22, 'triangle', 0.09, 0, i * 0.11)); }
+    good() { tone(190, 0.10, 'triangle', 0.14, -70); tone(640, 0.12, 'triangle', 0.07, 0, 0.07); },
+    bad() { tone(150, 0.20, 'square', 0.05, -30); tone(120, 0.24, 'square', 0.05, -20, 0.12); },
+    tap() { tone(300, 0.04, 'triangle', 0.06); },
+    done() { [262, 330, 392, 523, 659].forEach((f, i) => tone(f, 0.16, 'triangle', 0.08, 0, i * 0.08)); }
   };
   function bestKey(slug) { return 'aware.' + slug + '.best'; }
   function best(slug) { const v = +store.get(bestKey(slug), 0); return isFinite(v) ? v : 0; }

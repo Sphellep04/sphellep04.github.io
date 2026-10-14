@@ -173,10 +173,10 @@ const A = (() => {
     o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + d + 0.05);
   }
   const sfx = {
-    good() { tone(660, 0.12, 'triangle', 0.10); tone(880, 0.18, 'triangle', 0.10, 0, 0.09); },
-    bad() { tone(220, 0.22, 'sawtooth', 0.07, -90); },
-    tap() { tone(520, 0.05, 'triangle', 0.06); },
-    done() { [523, 659, 784, 1046].forEach((f, i) => tone(f, 0.22, 'triangle', 0.09, 0, i * 0.11)); }
+    good() { tone(1250, 0.14, 'sine', 0.10, -650); tone(820, 0.20, 'sine', 0.07, -300, 0.10); },
+    bad() { tone(330, 0.22, 'sine', 0.10, 220); tone(260, 0.30, 'sine', 0.08, 160, 0.16); },
+    tap() { tone(900, 0.05, 'sine', 0.05, -300); },
+    done() { [392, 494, 587, 784].forEach((f, i) => tone(f, 0.28, 'sine', 0.08, -80, i * 0.12)); }
   };
   function bestKey(slug) { return 'aware.' + slug + '.best'; }
   function best(slug) { const v = +store.get(bestKey(slug), 0); return isFinite(v) ? v : 0; }
@@ -209,7 +209,15 @@ const FACTS = [
   'Keep a jug of drinking water in the fridge instead of running the tap until it turns cold.',
   'Water deep and less often. Deep watering encourages plant roots to grow down, where the soil stays moist for longer.',
   'Choose local, drought-tolerant plants for the garden. They are used to dry conditions and need far less watering.',
-  'Rainwater tanks and barrels catch the free water that falls on your roof, ready for the garden later.'
+  'Rainwater tanks and barrels catch the free water that falls on your roof, ready for the garden later.',
+  'Windhoek has been turning treated wastewater back into drinking water since the late 1960s. It was one of the first cities in the world to do it, because water is so scarce here.',
+  'Keep a bowl in the sink when you wash vegetables, then water your plants with it. Rinse water is clean enough for the garden.',
+  'Defrost food overnight in the fridge instead of holding it under a running tap.',
+  'Sweep paths and driveways with a broom. Hosing them down can use more water in a few minutes than a person drinks in many days.',
+  'Cover a swimming pool or water trough when it is not in use. It cuts the water lost to evaporation, especially in summer.',
+  'Check your water bill. A sudden jump with no change in how you use water usually means a hidden leak.',
+  'Fill the kettle or pot with only the water you need. It saves water and the energy used to heat it.',
+  'Teach everyone at home to report a leak straight away. A tap that has been dripping for weeks can waste a lot of water.'
 ];
 const MODES = { relaxed: { n: 'Relaxed', drain: 0.6, spawn: 1.35, slug: 'water-wise-relaxed' }, normal: { n: 'Normal', drain: 1, spawn: 1, slug: 'water-wise' }, tough: { n: 'Tough', drain: 1.35, spawn: 0.8, slug: 'water-wise-tough' } };
 let mode = 'normal';

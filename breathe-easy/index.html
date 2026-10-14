@@ -226,10 +226,10 @@ const A = (() => {
     o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + d + 0.05);
   }
   const sfx = {
-    good() { tone(660, 0.12, 'triangle', 0.10); tone(880, 0.18, 'triangle', 0.10, 0, 0.09); },
-    bad() { tone(220, 0.22, 'sawtooth', 0.07, -90); },
-    tap() { tone(520, 0.05, 'triangle', 0.06); },
-    done() { [523, 659, 784, 1046].forEach((f, i) => tone(f, 0.22, 'triangle', 0.09, 0, i * 0.11)); }
+    good() { tone(528, 0.5, 'sine', 0.06); },
+    bad() { tone(220, 0.4, 'sine', 0.05); },
+    tap() { tone(396, 0.35, 'sine', 0.05); },
+    done() { tone(528, 1.6, 'sine', 0.08); tone(792, 1.4, 'sine', 0.04); tone(1056, 1.1, 'sine', 0.02); }
   };
   function bestKey(slug) { return 'aware.' + slug + '.best'; }
   function best(slug) { const v = +store.get(bestKey(slug), 0); return isFinite(v) ? v : 0; }
@@ -257,7 +257,13 @@ const TIPS = [
   { t: 'Limit the doom scroll', b: 'Endless news and social feeds can keep your mind on alert. Set a time to check them, then put your phone down and do something with your hands or your body.' },
   { t: 'Move it out', b: 'A brisk walk, a kick-about with friends, dancing in your room or a few stretches can burn off the tension that stress builds in the body.' },
   { t: 'Be kind to yourself', b: 'Talk to yourself the way you would talk to a good friend having a hard time. Harsh self-talk makes stress heavier, not lighter.' },
-  { t: 'Help is a strength', b: 'If stress or low mood lasts for weeks, or feels too heavy, speak to a doctor, counsellor or someone you trust. Asking for support is a sensible step, not a weakness.' }
+  { t: 'Help is a strength', b: 'If stress or low mood lasts for weeks, or feels too heavy, speak to a doctor, counsellor or someone you trust. Asking for support is a sensible step, not a weakness.' },
+  { t: 'Breathe out for longer', b: 'A breath out that is longer than the breath in tells your body it is safe to slow down. Try breathing in for four and out for six, a few times.' },
+  { t: 'Give worry a window', b: 'Pick a short time each day to think about your worries, maybe ten minutes. When a worry pops up at other times, tell yourself it can wait for its window.' },
+  { t: 'Switch off before bed', b: 'Screens and news late at night keep the mind busy. Putting your phone away half an hour before sleep makes it easier to wind down.' },
+  { t: 'Study in short blocks', b: 'For exams, work in blocks of about 25 minutes with a short break in between. It feels lighter and you remember more than from one long, tiring session.' },
+  { t: 'Count what went well', b: 'At the end of the day, write down three things that went fine, however small. It trains your mind to notice more than just the worries.' },
+  { t: 'Know your limits', b: 'It is fine to say no when you are already stretched. Protecting your time and energy helps you cope with the things that matter most.' }
 ];
 const $ = A.$; const cv = $('cv'), g = cv.getContext('2d'), S = 360;
 let mode = 'calm', mins = 2, before = 0, after = 0, run = false, paused = false, el = 0, last = 0, raf = 0, phaseIdx = -1, cycle = 0;

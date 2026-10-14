@@ -153,6 +153,9 @@ R.beep = (f, dur, type, vol, slide, delay) => {
   o.type = type || 'square'; o.frequency.setValueAtTime(f, t); if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(20, slide), t + dur);
   const v = vol === undefined ? 0.15 : vol; gn.gain.setValueAtTime(v, t); gn.gain.exponentialRampToValueAtTime(0.0001, t + dur); o.connect(gn); gn.connect(master); o.start(t); o.stop(t + dur + 0.02);
 };
+/* voice for this game: clunky: deep and slightly longer */
+R.voice = { map: {}, mul: 0.75, dur: 1.15, vol: 1.0 };
+{ const base = R.beep; R.beep = (f, d, type, v, slide, delay) => base(f * R.voice.mul, d * R.voice.dur, R.voice.map[type || 'square'] || type, v === undefined ? undefined : v * R.voice.vol, slide ? slide * R.voice.mul : slide, delay); }
 R.noise = (dur, vol, cut) => {
   if (!R.sound || !ac) return; const t = ac.currentTime, s = ac.createBufferSource(), f = ac.createBiquadFilter(), gn = ac.createGain();
   s.buffer = nbuf; f.type = 'lowpass'; f.frequency.value = cut || 1800; gn.gain.setValueAtTime(vol === undefined ? 0.25 : vol, t); gn.gain.exponentialRampToValueAtTime(0.0001, t + dur); s.connect(f); f.connect(gn); gn.connect(master); s.start(t); s.stop(t + dur);

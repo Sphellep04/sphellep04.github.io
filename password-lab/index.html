@@ -244,10 +244,10 @@ const A = (() => {
     o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + d + 0.05);
   }
   const sfx = {
-    good() { tone(660, 0.12, 'triangle', 0.10); tone(880, 0.18, 'triangle', 0.10, 0, 0.09); },
-    bad() { tone(220, 0.22, 'sawtooth', 0.07, -90); },
-    tap() { tone(520, 0.05, 'triangle', 0.06); },
-    done() { [523, 659, 784, 1046].forEach((f, i) => tone(f, 0.22, 'triangle', 0.09, 0, i * 0.11)); }
+    good() { tone(1800, 0.02, 'square', 0.03); tone(1500, 0.02, 'square', 0.03, 0, 0.05); tone(1046, 0.22, 'triangle', 0.09, 0, 0.11); },
+    bad() { tone(200, 0.12, 'square', 0.05); tone(200, 0.16, 'square', 0.05, 0, 0.17); },
+    tap() { tone(2000, 0.015, 'square', 0.025); },
+    done() { [392, 523, 659, 784, 1046].forEach((f, i) => tone(f, 0.14, 'sine', 0.08, 0, i * 0.07)); }
   };
   function bestKey(slug) { return 'aware.' + slug + '.best'; }
   function best(slug) { const v = +store.get(bestKey(slug), 0); return isFinite(v) ? v : 0; }
@@ -352,7 +352,13 @@ const QZ = [
   { q: 'A colleague shares a work password in a group chat "so everyone can use it". What is wrong with this?', o: ['Nothing, it saves time', 'Everyone with access to the chat, now and later, can see it and you cannot tell who used it', 'It makes the password stronger'], a: 1, why: 'Shared passwords cannot be traced to one person and stay in chat history. Use individual accounts or a team password manager.' },
   { q: 'Your phone offers to save a password in the browser. Is that okay?', o: ['Never, it is always unsafe', 'It is better than reusing passwords, especially with a screen lock and account sync protected by 2FA', 'Only on public computers'], a: 1, why: 'A built-in password manager is much better than reusing the same password. Never save passwords on shared or public computers.' },
   { q: 'Which is the best length to aim for on a passphrase?', o: ['6 characters', 'About 12 characters or more, ideally 4 or more random words', 'Exactly 8 characters'], a: 1, why: 'Every extra word multiplies the number of guesses needed. Four or more random words is easy to remember and hard to crack.' },
-  { q: 'Someone looks over your shoulder as you type a PIN at a shop. What is a smart habit?', o: ['Type faster', 'Cover the keypad with your hand', 'Say the PIN quietly so you do not forget it'], a: 1, why: '"Shoulder surfing" is a real way PINs are stolen. Covering the keypad and checking for cameras takes a second.' }
+  { q: 'Someone looks over your shoulder as you type a PIN at a shop. What is a smart habit?', o: ['Type faster', 'Cover the keypad with your hand', 'Say the PIN quietly so you do not forget it'], a: 1, why: '"Shoulder surfing" is a real way PINs are stolen. Covering the keypad and checking for cameras takes a second.' },
+  { q: 'You get a text saying your bank account is locked and to click a link to unlock it. What is the safest move?', o: ['Click quickly before it locks for good', 'Ignore the link and contact your bank using the number on your card or the official app', 'Reply with your account number to prove who you are'], a: 1, why: 'Scammers create panic so you act without thinking. Always contact the bank yourself through details you already trust.' },
+  { q: 'Which kind of second step for 2-step verification is generally safest?', o: ['A code sent by text message', 'An authenticator app or a security key', 'A question about your pet\'s name'], a: 1, why: 'Text codes can be intercepted by SIM swap fraud. An app or key is stronger, though any 2-step is much better than none.' },
+  { q: 'You must use public Wi-Fi at a cafe. What should you avoid?', o: ['Reading the news', 'Logging in to your bank or entering passwords on a network you do not trust', 'Listening to music'], a: 1, why: 'Use mobile data for anything sensitive when you are on a network you do not control.' },
+  { q: 'How often should you change a strong, unique password?', o: ['Every week', 'When there is a reason, such as a breach or a suspicion that someone knows it', 'Never, even after a breach'], a: 1, why: 'Changing strong passwords on a timer often leads to weaker, predictable ones. Change it when there is a reason.' },
+  { q: 'You are told a password you use was found in a data leak. What should you do?', o: ['Nothing, it is probably old', 'Change it everywhere you used it and turn on 2-step verification', 'Add a number to the end and keep using it'], a: 1, why: 'Criminals try leaked passwords on other sites, so every account that shares it is at risk.' },
+  { q: 'What is a passphrase?', o: ['A short password with lots of symbols', 'A long password made from several unrelated words', 'A password you say out loud to unlock your phone'], a: 1, why: 'Length is what makes a password hard to guess, and words are easier to remember than random characters.' }
 ];
 let qi = 0, qs = 0, qAns = false, qd = [];
 function qShow() { const c = qd[qi]; qAns = false; $('qText').textContent = c.q; $('qN').textContent = qi + 1; $('qS').textContent = qs; const box = $('qOpts'); box.innerHTML = ''; A.shuffle(c.o.map((t, k) => k)).forEach((k, n) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'opt pop'; b.innerHTML = '<span style="color:var(--acc);font-weight:700;display:inline-block;min-width:1.6em">' + 'ABC'[n] + '</span> ' + A.esc(c.o[k]); b.dataset.k = k; b.addEventListener('click', () => qPick(k, b)); box.appendChild(b); }); $('qWhy').hidden = true; $('qNextRow').hidden = true; }
@@ -377,7 +383,11 @@ const PAIRS = [
   ['iloveyou', 'Zebra-9-Kettle-Moon', 'b', 'iloveyou is in every common password list. A mix of unrelated words, numbers and a hyphen is much harder to guess.'],
   ['MyBirthday1234', 'window-purple-sandal-kettle', 'b', 'A birthday and a number run are guessable. Four random words are not linked to anything about you.'],
   ['Admin@2024', 'saddle-bishop-plum-frozen-tent', 'b', 'Admin and a year are among the first guesses. A long random phrase is far stronger.'],
-  ['N7$vB3&kQ1#zR5', 'password1234567', 'a', 'Fourteen random characters is very strong, while password1234567 is longer but is a common word and a number run.']
+  ['N7$vB3&kQ1#zR5', 'password1234567', 'a', 'Fourteen random characters is very strong, while password1234567 is longer but is a common word and a number run.'],
+  ['Password123!', 'violet-hammer-ocean-lantern', 'b', 'Password123! is on every list of common passwords, even with a symbol. Four random words are longer and far harder to guess.'],
+  ['Windhoek2024', 'copper-zebra-ladle-moss', 'b', 'A place and a year is an easy pattern to guess. Four unrelated words have nothing personal in them.'],
+  ['iloveyou', 'plum-tractor-sketch-wave', 'b', 'iloveyou is one of the most common passwords in the world and falls in seconds. A random phrase does not.'],
+  ['K8#mQ2$vX7!pL4', 'football1', 'a', 'Fourteen random characters is very strong. football1 is a common word with a number on the end.']
 ];
 const DN = 8; let dd = [], di = 0, ds = 0, dAns = false;
 function dShow() {

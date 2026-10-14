@@ -208,10 +208,10 @@ const A = (() => {
     o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + d + 0.05);
   }
   const sfx = {
-    good() { tone(660, 0.12, 'triangle', 0.10); tone(880, 0.18, 'triangle', 0.10, 0, 0.09); },
-    bad() { tone(220, 0.22, 'sawtooth', 0.07, -90); },
-    tap() { tone(520, 0.05, 'triangle', 0.06); },
-    done() { [523, 659, 784, 1046].forEach((f, i) => tone(f, 0.22, 'triangle', 0.09, 0, i * 0.11)); }
+    good() { tone(400, 0.16, 'sine', 0.08, 800); tone(1200, 0.10, 'sine', 0.05, 0, 0.14); },
+    bad() { tone(300, 0.05, 'square', 0.05); tone(300, 0.05, 'square', 0.05, 0, 0.09); tone(200, 0.12, 'square', 0.05, 0, 0.18); },
+    tap() { tone(700, 0.04, 'sine', 0.05); },
+    done() { tone(880, 0.22, 'sine', 0.08); tone(1318, 0.5, 'sine', 0.07, 0, 0.18); }
   };
   function bestKey(slug) { return 'aware.' + slug + '.best'; }
   function best(slug) { const v = +store.get(bestKey(slug), 0); return isFinite(v) ? v : 0; }
