@@ -23,7 +23,6 @@ Each toy is a self-contained folder with its own `index.html` and `img/` folder,
 | `phish-or-legit/` | [Phish or Legit](https://tinytoybox.me/phish-or-legit/) | Awareness: Cyber security space: scams, red flags, quiz and breach drill |
 | `road-ready/` | [Road Ready](https://tinytoybox.me/road-ready/) | Awareness: Ten road safety situations |
 | `first-aid-first/` | [First Aid First](https://tinytoybox.me/first-aid-first/) | Awareness: Put first aid steps in order |
-| `water-wise/` | [Water Wise](https://tinytoybox.me/water-wise/) | Awareness: Fix leaks before the tank runs dry |
 | `breathe-easy/` | [Breathe Easy](https://tinytoybox.me/breathe-easy/) | Awareness: A gentle breathing pacer with a stress tip |
 | `fact-or-fake/` | [Fact or Fake](https://tinytoybox.me/fact-or-fake/) | Awareness: Spot fake news before you share it |
 | `health-myths/` | [Health Myths](https://tinytoybox.me/health-myths/) | Awareness: Myth or fact on everyday health |
